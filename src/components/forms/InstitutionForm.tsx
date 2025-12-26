@@ -1,18 +1,19 @@
 import React, { useState } from 'react';
 import { 
-  Building, CheckCircle, QrCode, Phone, MapPin, 
+  Building, CheckCircle, Phone, MapPin, 
   Users, Info, Calendar, Hash, Ruler, Layers 
 } from 'lucide-react';
 import { translations } from '../../translations';
 import type { Language } from '../../translations';
 import { FEES } from '../../constants';
+// 1. IMPORT YOUR QR IMAGE HERE
 
 interface InstitutionFormProps {
   lang: Language;
 }
 
 const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
-  const [step, setStep] = useState(1); // 1: Form, 2: Payment
+  const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [transactionId, setTransactionId] = useState('');
@@ -48,23 +49,43 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
       setIsSubmitting(false);
       setStep(2);
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 1200);
+    }, 800);
   };
 
-  const handleFinalSubmit = (e: React.FormEvent) => {
+  const handleFinalSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!transactionId) return;
+    
     setIsSubmitting(true);
-    setTimeout(() => {
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/institutions/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          transactionId: transactionId.toUpperCase()
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setIsSuccess(true);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        alert(data.message || "Registration failed.");
+      }
+    } catch (error) {
+      alert("Could not connect to the server.");
+    } finally {
       setIsSubmitting(false);
-      setIsSuccess(true);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 2500);
+    }
   };
 
   if (isSuccess) {
     return (
-      <div className="bg-white p-12 rounded-2xl shadow-2xl text-center max-w-2xl mx-auto my-12 animate-in zoom-in-95 duration-500 border border-green-100">
+      <div className="bg-white p-12 rounded-2xl shadow-2xl text-center max-w-2xl mx-auto my-12 border border-green-100">
         <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-8">
           <CheckCircle className="w-16 h-16 text-green-600" />
         </div>
@@ -73,16 +94,16 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
         </h2>
         <p className="text-gray-600 mb-8 leading-relaxed text-lg">
           {lang === 'hi' 
-            ? 'आपका संबद्धता आवेदन और भुगतान प्राप्त हो गया है। हमारी जिला टीम भौतिक सत्यापन के लिए 7 कार्य दिवसों के भीतर आपसे संपर्क करेगी।' 
-            : "Your affiliation application and payment have been received. Our district team will contact you within 7 working days for the on-site physical verification visit."}
+            ? 'आपका संबद्धता आवेदन और भुगतान प्राप्त हो गया है।' 
+            : "Your affiliation application and payment have been received."}
         </p>
         <div className="bg-slate-50 p-6 rounded-xl text-left border border-slate-200 mb-8">
           <p className="text-sm text-slate-500 font-bold uppercase mb-2">Transaction ID</p>
-          <p className="font-mono text-xl text-blue-900">{transactionId}</p>
+          <p className="font-mono text-xl text-blue-900">{transactionId.toUpperCase()}</p>
         </div>
         <button 
-          onClick={() => { setIsSuccess(false); setStep(1); }}
-          className="bg-blue-900 text-white px-12 py-4 rounded-xl font-bold hover:bg-orange-600 transition-all shadow-lg hover:-translate-y-1"
+          onClick={() => { setIsSuccess(false); setStep(1); setTransactionId(''); }}
+          className="bg-blue-900 text-white px-12 py-4 rounded-xl font-bold hover:bg-orange-600 transition-all shadow-lg"
         >
           {lang === 'hi' ? 'मुख्य पृष्ठ पर लौटें' : 'Return to Home'}
         </button>
@@ -92,6 +113,7 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
 
   return (
     <div className="max-w-5xl mx-auto">
+      {/* Header Section */}
       <div className="bg-blue-900 text-white rounded-t-3xl p-10 relative overflow-hidden">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
@@ -106,14 +128,12 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
             <p className="text-3xl font-oswald font-bold">₹{FEES.INSTITUTION}</p>
           </div>
         </div>
-        <Building className="absolute -bottom-10 -right-10 w-64 h-64 text-white/5" />
       </div>
 
       <div className="bg-white shadow-2xl rounded-b-3xl overflow-hidden border-x border-b border-gray-100">
         {step === 1 ? (
           <form onSubmit={handleProceedToPayment} className="p-8 lg:p-12 space-y-12">
-            
-            {/* Section 1: Profile & Registration */}
+            {/* Form Sections (Profile, Leadership, Infrastructure, Contact) */}
             <section>
               <div className="flex items-center space-x-3 mb-8 border-b border-gray-100 pb-4">
                 <Info className="text-orange-600" size={20} />
@@ -144,7 +164,6 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
               </div>
             </section>
 
-            {/* Section 2: Leadership */}
             <section>
               <div className="flex items-center space-x-3 mb-8 border-b border-gray-100 pb-4">
                 <Users className="text-blue-600" size={20} />
@@ -162,7 +181,6 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
               </div>
             </section>
 
-            {/* Section 3: Infrastructure */}
             <section>
               <div className="flex items-center space-x-3 mb-8 border-b border-gray-100 pb-4">
                 <Layers className="text-green-600" size={20} />
@@ -188,7 +206,6 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
               </div>
             </section>
 
-            {/* Section 4: Contact */}
             <section>
               <div className="flex items-center space-x-3 mb-8 border-b border-gray-100 pb-4">
                 <Phone className="text-purple-600" size={20} />
@@ -220,21 +237,25 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
                 disabled={isSubmitting}
                 className="w-full bg-orange-600 hover:bg-blue-900 text-white font-oswald text-2xl uppercase py-6 rounded-2xl shadow-xl transition-all"
               >
-                {isSubmitting ? '...' : t.instSubmit}
+                {isSubmitting ? 'Validating...' : t.instSubmit}
               </button>
             </div>
           </form>
         ) : (
           <form onSubmit={handleFinalSubmit} className="p-12 lg:p-20 space-y-12 bg-slate-50">
             <div className="text-center max-w-2xl mx-auto">
-              <QrCode className="text-blue-900 mx-auto mb-6" size={48} />
               <h3 className="text-3xl font-oswald font-bold text-gray-900 mb-4 uppercase">{tp.method}</h3>
               <p className="text-gray-500 text-lg mb-10">{tp.upi}</p>
             </div>
             
             <div className="flex flex-col items-center">
-              <div className="bg-white p-10 rounded-3xl shadow-2xl border-2 border-blue-50 mb-8">
-                <QrCode size={240} className="text-blue-900" />
+              <div className="bg-white p-6 rounded-3xl shadow-2xl border-2 border-blue-50 mb-8">
+                {/* 2. DISPLAYING YOUR REAL QR IMAGE */}
+                <img 
+                  src={"https://res.cloudinary.com/dcqo5qt7b/image/upload/v1766767120/QR_1766767090_adh5z3.png"} 
+                  alt="UPI QR Code" 
+                  className="w-64 h-64 object-contain rounded-xl" 
+                />
               </div>
               <div className="bg-blue-900 px-8 py-3 rounded-full font-mono font-bold text-white shadow-lg tracking-wider text-lg">
                 {tp.upiId}
@@ -256,7 +277,7 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
               <button 
                 type="submit" 
                 disabled={isSubmitting || !transactionId}
-                className={`w-full bg-blue-900 hover:bg-orange-600 text-white font-oswald text-2xl uppercase py-6 rounded-2xl shadow-2xl transition-all ${isSubmitting ? 'opacity-70' : ''}`}
+                className={`w-full bg-blue-900 hover:bg-orange-600 text-white font-oswald text-2xl uppercase py-6 rounded-2xl shadow-2xl transition-all ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
               >
                 {isSubmitting ? tp.processing : tp.verify}
               </button>

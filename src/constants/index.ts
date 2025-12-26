@@ -5,8 +5,8 @@ export const CONTACT_INFO = {
 };
 
 export const FEES = {
-  PLAYER: 500,
-  INSTITUTION: 5000
+  PLAYER: 400,
+  INSTITUTION: 2000
 };
 
 export const MOCK_NEWS = [

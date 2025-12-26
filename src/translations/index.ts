@@ -40,7 +40,7 @@ export const translations = {
     },
     payment: {
       title: 'Payment Verification', fee: 'Application Fee', method: 'Scan & Pay',
-      upi: 'Pay via any UPI App', upiId: 'ddka@upi', txId: 'Enter Transaction ID',
+      upi: 'Pay via any UPI App', upiId: '9504904499@upi', txId: 'Enter Transaction ID',
       verify: 'Verify Payment', processing: 'Verifying...', note: 'Valid for current season.'
     },
     footer: { desc: 'The official governing body for Kabaddi in Dhanbad.', quickLinks: 'Quick Links', contact: 'Contact Us' }
@@ -84,7 +84,7 @@ export const translations = {
     },
     payment: {
       title: 'भुगतान सत्यापन', fee: 'आवेदन शुल्क', method: 'स्कैन और भुगतान',
-      upi: 'किसी भी UPI ऐप से भुगतान करें', upiId: 'ddka@upi', txId: 'ट्रांजैक्शन आईडी दर्ज करें',
+      upi: 'किसी भी UPI ऐप से भुगतान करें', upiId: '9504904499@upi', txId: 'ट्रांजैक्शन आईडी दर्ज करें',
       verify: 'भुगतान सत्यापित करें', processing: 'सत्यापित किया जा रहा है...', note: 'वर्तमान सत्र के लिए वैध।'
     },
     footer: { desc: 'धनबाद में कबड्डी के लिए आधिकारिक शासी निकाय।', quickLinks: 'त्वरित लिंक', contact: 'संपर्क करें' }
