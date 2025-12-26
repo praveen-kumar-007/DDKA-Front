@@ -1,0 +1,8 @@
+@import "tailwindcss"; /* This one line replaces the 3 old tailwind lines */
+
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&display=swap');
+
+/* Add this to make sure your Oswald font still works in v4 */
+@theme {
+  --font-oswald: "Oswald", sans-serif;
+}
