@@ -6,7 +6,6 @@ import {
 import { translations } from '../../translations';
 import type { Language } from '../../translations';
 import { FEES } from '../../constants';
-// 1. IMPORT YOUR QR IMAGE HERE
 
 interface InstitutionFormProps {
   lang: Language;
@@ -45,6 +44,7 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
   const handleProceedToPayment = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    // Visual feedback delay before moving to payment step
     setTimeout(() => {
       setIsSubmitting(false);
       setStep(2);
@@ -52,6 +52,7 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
     }, 800);
   };
 
+  // --- UPDATED: RESTORED REAL BACKEND CONNECTION ---
   const handleFinalSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!transactionId) return;
@@ -59,12 +60,17 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/institutions/register`, {
+      // Connect to your Node.js backend using the environment variable
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      
+      const response = await fetch(`${API_URL}/api/institutions/register`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
           ...formData,
-          transactionId: transactionId.toUpperCase()
+          transactionId: transactionId.toUpperCase().trim()
         }),
       });
 
@@ -74,10 +80,12 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
         setIsSuccess(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
-        alert(data.message || "Registration failed.");
+        // Show server errors like "Registration No already exists"
+        alert(data.message || "Registration failed. Please try again.");
       }
     } catch (error) {
-      alert("Could not connect to the server.");
+      console.error("Submission Error:", error);
+      alert("Connection Error: Could not reach the server. Please ensure the backend is running.");
     } finally {
       setIsSubmitting(false);
     }
@@ -85,7 +93,7 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
 
   if (isSuccess) {
     return (
-      <div className="bg-white p-12 rounded-2xl shadow-2xl text-center max-w-2xl mx-auto my-12 border border-green-100">
+      <div className="bg-white p-12 rounded-2xl shadow-2xl text-center max-w-2xl mx-auto my-12 animate-in zoom-in-95 border border-green-100">
         <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-8">
           <CheckCircle className="w-16 h-16 text-green-600" />
         </div>
@@ -113,7 +121,6 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
 
   return (
     <div className="max-w-5xl mx-auto">
-      {/* Header Section */}
       <div className="bg-blue-900 text-white rounded-t-3xl p-10 relative overflow-hidden">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
@@ -133,7 +140,6 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
       <div className="bg-white shadow-2xl rounded-b-3xl overflow-hidden border-x border-b border-gray-100">
         {step === 1 ? (
           <form onSubmit={handleProceedToPayment} className="p-8 lg:p-12 space-y-12">
-            {/* Form Sections (Profile, Leadership, Infrastructure, Contact) */}
             <section>
               <div className="flex items-center space-x-3 mb-8 border-b border-gray-100 pb-4">
                 <Info className="text-orange-600" size={20} />
@@ -151,19 +157,20 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
                 </div>
                 <div className="space-y-2 md:col-span-2">
                   <label className="text-sm font-bold text-gray-700">{t.labels.instName}</label>
-                  <input required name="instName" value={formData.instName} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border rounded-xl" placeholder={t.placeholders.instName} />
+                  <input required name="instName" value={formData.instName} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border rounded-xl outline-none" placeholder={t.placeholders.instName} />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-gray-700 flex items-center gap-1"><Hash size={14}/> {lang === 'hi' ? 'पंजीकरण संख्या' : 'Registration No.'}</label>
-                  <input required name="regNo" value={formData.regNo} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border rounded-xl" placeholder="e.g. REG/123/2024" />
+                  <input required name="regNo" value={formData.regNo} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border rounded-xl outline-none" placeholder="e.g. REG/123/2024" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-gray-700 flex items-center gap-1"><Calendar size={14}/> {lang === 'hi' ? 'स्थापना वर्ष' : 'Year of Estb.'}</label>
-                  <input required type="number" name="year" value={formData.year} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border rounded-xl" placeholder="2024" />
+                  <input required type="number" name="year" value={formData.year} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border rounded-xl outline-none" placeholder="2024" />
                 </div>
               </div>
             </section>
 
+            {/* Leadership Details Section */}
             <section>
               <div className="flex items-center space-x-3 mb-8 border-b border-gray-100 pb-4">
                 <Users className="text-blue-600" size={20} />
@@ -172,15 +179,16 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-gray-700">{lang === 'hi' ? 'संस्थान प्रमुख का नाम' : 'Head of Institution Name'}</label>
-                  <input required name="headName" value={formData.headName} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border rounded-xl" placeholder="Principal / Chairman Name" />
+                  <input required name="headName" value={formData.headName} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border rounded-xl outline-none" placeholder="Principal / Chairman Name" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-gray-700">{lang === 'hi' ? 'सचिव / खेल प्रभारी' : 'Secretary / Sports In-charge'}</label>
-                  <input required name="secretaryName" value={formData.secretaryName} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border rounded-xl" placeholder="Contact Person Name" />
+                  <input required name="secretaryName" value={formData.secretaryName} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border rounded-xl outline-none" placeholder="Contact Person Name" />
                 </div>
               </div>
             </section>
 
+            {/* Infrastructure Section */}
             <section>
               <div className="flex items-center space-x-3 mb-8 border-b border-gray-100 pb-4">
                 <Layers className="text-green-600" size={20} />
@@ -206,6 +214,7 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
               </div>
             </section>
 
+            {/* Contact Section */}
             <section>
               <div className="flex items-center space-x-3 mb-8 border-b border-gray-100 pb-4">
                 <Phone className="text-purple-600" size={20} />
@@ -249,8 +258,8 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
             </div>
             
             <div className="flex flex-col items-center">
-              <div className="bg-white p-6 rounded-3xl shadow-2xl border-2 border-blue-50 mb-8">
-                {/* 2. DISPLAYING YOUR REAL QR IMAGE */}
+              <div className="bg-white p-6 rounded-3xl shadow-2xl border-2 border-blue-50 mb-8 transform hover:scale-105 transition-transform">
+                {/* YOUR REAL QR IMAGE LINK */}
                 <img 
                   src={"https://res.cloudinary.com/dcqo5qt7b/image/upload/v1766767120/QR_1766767090_adh5z3.png"} 
                   alt="UPI QR Code" 
@@ -268,7 +277,7 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
                 required 
                 value={transactionId}
                 onChange={(e) => setTransactionId(e.target.value)}
-                className="w-full px-8 py-5 bg-white border-2 border-gray-100 rounded-2xl outline-none text-center font-mono text-2xl shadow-inner uppercase"
+                className="w-full px-8 py-5 bg-white border-2 border-gray-100 rounded-2xl outline-none text-center font-mono text-2xl shadow-inner uppercase focus:ring-4 focus:ring-orange-100 transition-all"
                 placeholder="TXNXXXXXXXXX"
               />
             </div>
@@ -277,7 +286,7 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
               <button 
                 type="submit" 
                 disabled={isSubmitting || !transactionId}
-                className={`w-full bg-blue-900 hover:bg-orange-600 text-white font-oswald text-2xl uppercase py-6 rounded-2xl shadow-2xl transition-all ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                className={`w-full bg-blue-900 hover:bg-orange-600 text-white font-oswald text-2xl uppercase py-6 rounded-2xl shadow-2xl transition-all ${isSubmitting ? 'opacity-70 cursor-not-allowed' : 'active:scale-95'}`}
               >
                 {isSubmitting ? tp.processing : tp.verify}
               </button>
