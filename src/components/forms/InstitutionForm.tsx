@@ -102,8 +102,8 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
         </h2>
         <p className="text-gray-600 mb-8 leading-relaxed text-lg">
           {lang === 'hi' 
-            ? 'आपका संबद्धता आवेदन और भुगतान प्राप्त हो गया है।' 
-            : "Your affiliation application and payment have been received."}
+            ? 'हम आपका संस्थान पंजीकरण आवेदन और भुगतान शीघ्र ही समीक्षा करेंगे।' 
+            : "We will review your affiliation application and payment shortly."}
         </p>
         <div className="bg-slate-50 p-6 rounded-xl text-left border border-slate-200 mb-8">
           <p className="text-sm text-slate-500 font-bold uppercase mb-2">Transaction ID</p>
