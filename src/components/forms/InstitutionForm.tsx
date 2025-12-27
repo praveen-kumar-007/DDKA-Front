@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   Building, CheckCircle, Phone, MapPin, 
-  Users, Info, Calendar, Hash, Ruler, Layers 
+  Users, Info, Calendar, Hash, Ruler, Layers, Upload, X 
 } from 'lucide-react';
 import { translations } from '../../translations';
 import type { Language } from '../../translations';
@@ -17,6 +17,10 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [transactionId, setTransactionId] = useState('');
   
+  // State for Payment Screenshot
+  const [screenshot, setScreenshot] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string>('');
+
   const t = translations[lang].forms;
   const tp = translations[lang].payment;
 
@@ -41,10 +45,22 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setScreenshot(file);
+      setPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const clearScreenshot = () => {
+    setScreenshot(null);
+    setPreview('');
+  };
+
   const handleProceedToPayment = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // Visual feedback delay before moving to payment step
     setTimeout(() => {
       setIsSubmitting(false);
       setStep(2);
@@ -52,26 +68,35 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
     }, 800);
   };
 
-  // --- UPDATED: RESTORED REAL BACKEND CONNECTION ---
   const handleFinalSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!transactionId) return;
+    if (!transactionId || !screenshot) {
+      alert("Please provide both Transaction ID and Payment Screenshot.");
+      return;
+    }
     
     setIsSubmitting(true);
 
     try {
-      // Connect to your Node.js backend using the environment variable
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
       
+      // Use FormData for multipart/form-data (required for file uploads)
+      const dataToSend = new FormData();
+      
+      // Append all text fields
+      Object.entries(formData).forEach(([key, value]) => {
+        dataToSend.append(key, value);
+      });
+      dataToSend.append('transactionId', transactionId.toUpperCase().trim());
+      
+      // Append the screenshot file
+      dataToSend.append('screenshot', screenshot);
+
       const response = await fetch(`${API_URL}/api/institutions/register`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...formData,
-          transactionId: transactionId.toUpperCase().trim()
-        }),
+        // Note: Do not set Content-Type header when sending FormData, 
+        // the browser will set it automatically with the correct boundary.
+        body: dataToSend,
       });
 
       const data = await response.json();
@@ -80,12 +105,11 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
         setIsSuccess(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
-        // Show server errors like "Registration No already exists"
         alert(data.message || "Registration failed. Please try again.");
       }
     } catch (error) {
       console.error("Submission Error:", error);
-      alert("Connection Error: Could not reach the server. Please ensure the backend is running.");
+      alert("Connection Error: Could not reach the server.");
     } finally {
       setIsSubmitting(false);
     }
@@ -110,7 +134,7 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
           <p className="font-mono text-xl text-blue-900">{transactionId.toUpperCase()}</p>
         </div>
         <button 
-          onClick={() => { setIsSuccess(false); setStep(1); setTransactionId(''); }}
+          onClick={() => { setIsSuccess(false); setStep(1); setTransactionId(''); clearScreenshot(); }}
           className="bg-blue-900 text-white px-12 py-4 rounded-xl font-bold hover:bg-orange-600 transition-all shadow-lg"
         >
           {lang === 'hi' ? 'मुख्य पृष्ठ पर लौटें' : 'Return to Home'}
@@ -140,6 +164,7 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
       <div className="bg-white shadow-2xl rounded-b-3xl overflow-hidden border-x border-b border-gray-100">
         {step === 1 ? (
           <form onSubmit={handleProceedToPayment} className="p-8 lg:p-12 space-y-12">
+            {/* Section 1: Institutional Profile */}
             <section>
               <div className="flex items-center space-x-3 mb-8 border-b border-gray-100 pb-4">
                 <Info className="text-orange-600" size={20} />
@@ -157,7 +182,7 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
                 </div>
                 <div className="space-y-2 md:col-span-2">
                   <label className="text-sm font-bold text-gray-700">{t.labels.instName}</label>
-                  <input required name="instName" value={formData.instName} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border rounded-xl outline-none" placeholder={t.placeholders.instName} />
+                  <input required name="instName" value={formData.instName} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border rounded-xl outline-none" placeholder="e.g. DAV Public School, Dhanbad" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-gray-700 flex items-center gap-1"><Hash size={14}/> {lang === 'hi' ? 'पंजीकरण संख्या' : 'Registration No.'}</label>
@@ -170,7 +195,7 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
               </div>
             </section>
 
-            {/* Leadership Details Section */}
+            {/* Section 2: Leadership Details */}
             <section>
               <div className="flex items-center space-x-3 mb-8 border-b border-gray-100 pb-4">
                 <Users className="text-blue-600" size={20} />
@@ -188,7 +213,7 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
               </div>
             </section>
 
-            {/* Infrastructure Section */}
+            {/* Section 3: Sports Infrastructure */}
             <section>
               <div className="flex items-center space-x-3 mb-8 border-b border-gray-100 pb-4">
                 <Layers className="text-green-600" size={20} />
@@ -197,11 +222,11 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-gray-700">{lang === 'hi' ? 'कुल खिलाड़ी' : 'Total Kabaddi Players'}</label>
-                  <input required type="number" name="totalPlayers" value={formData.totalPlayers} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border rounded-xl" placeholder="0" />
+                  <input required type="number" name="totalPlayers" value={formData.totalPlayers} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border rounded-xl outline-none" placeholder="0" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-gray-700 flex items-center gap-1"><Ruler size={14}/> {lang === 'hi' ? 'खेल का मैदान (वर्ग फुट)' : 'Playground Area (sq.ft)'}</label>
-                  <input required name="area" value={formData.area} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border rounded-xl" placeholder="e.g. 2000" />
+                  <input required name="area" value={formData.area} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border rounded-xl outline-none" placeholder="e.g. 2000" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-gray-700">{lang === 'hi' ? 'सतह का प्रकार' : 'Surface Type'}</label>
@@ -214,7 +239,7 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
               </div>
             </section>
 
-            {/* Contact Section */}
+            {/* Section 4: Contact Information */}
             <section>
               <div className="flex items-center space-x-3 mb-8 border-b border-gray-100 pb-4">
                 <Phone className="text-purple-600" size={20} />
@@ -223,19 +248,19 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-gray-700">{t.labels.officePhone}</label>
-                  <input required name="officePhone" value={formData.officePhone} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border rounded-xl" placeholder="+91 XXXX XXXXXX" />
+                  <input required name="officePhone" value={formData.officePhone} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border rounded-xl outline-none" placeholder="+91 XXXX XXXXXX" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-gray-700">{lang === 'hi' ? 'वैकल्पिक फोन' : 'Alternative Phone'}</label>
-                  <input name="altPhone" value={formData.altPhone} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border rounded-xl" placeholder="+91 XXXX XXXXXX" />
+                  <input name="altPhone" value={formData.altPhone} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border rounded-xl outline-none" placeholder="+91 XXXX XXXXXX" />
                 </div>
                 <div className="md:col-span-2 space-y-2">
                   <label className="text-sm font-bold text-gray-700">{t.labels.email}</label>
-                  <input required type="email" name="email" value={formData.email} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border rounded-xl" placeholder="institution@email.com" />
+                  <input required type="email" name="email" value={formData.email} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border rounded-xl outline-none" placeholder="institution@email.com" />
                 </div>
                 <div className="md:col-span-2 space-y-2">
                   <label className="text-sm font-bold text-gray-700 flex items-center gap-1"><MapPin size={14}/> {t.labels.address}</label>
-                  <textarea required name="address" value={formData.address} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border rounded-xl h-32" placeholder={t.placeholders.address}></textarea>
+                  <textarea required name="address" value={formData.address} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border rounded-xl h-32 outline-none" placeholder={t.placeholders.address}></textarea>
                 </div>
               </div>
             </section>
@@ -259,7 +284,6 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
             
             <div className="flex flex-col items-center">
               <div className="bg-white p-6 rounded-3xl shadow-2xl border-2 border-blue-50 mb-8 transform hover:scale-105 transition-transform">
-                {/* YOUR REAL QR IMAGE LINK */}
                 <img 
                   src={"https://res.cloudinary.com/dcqo5qt7b/image/upload/v1766767120/QR_1766767090_adh5z3.png"} 
                   alt="UPI QR Code" 
@@ -271,22 +295,58 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
               </div>
             </div>
 
-            <div className="max-w-md mx-auto space-y-6 pt-10">
-              <label className="block text-sm font-black text-gray-700 uppercase tracking-widest text-center">{tp.txId}</label>
-              <input 
-                required 
-                value={transactionId}
-                onChange={(e) => setTransactionId(e.target.value)}
-                className="w-full px-8 py-5 bg-white border-2 border-gray-100 rounded-2xl outline-none text-center font-mono text-2xl shadow-inner uppercase focus:ring-4 focus:ring-orange-100 transition-all"
-                placeholder="TXNXXXXXXXXX"
-              />
+            <div className="max-w-md mx-auto space-y-8 pt-10">
+              {/* Transaction ID Input */}
+              <div>
+                <label className="block text-sm font-black text-gray-700 uppercase tracking-widest text-center mb-3">{tp.txId}</label>
+                <input 
+                  required 
+                  value={transactionId}
+                  onChange={(e) => setTransactionId(e.target.value)}
+                  className="w-full px-8 py-5 bg-white border-2 border-gray-100 rounded-2xl outline-none text-center font-mono text-2xl shadow-inner uppercase focus:ring-4 focus:ring-orange-100 transition-all"
+                  placeholder="TXNXXXXXXXXX"
+                />
+              </div>
+
+              {/* NEW: Screenshot Upload Section */}
+              <div className="space-y-4">
+                <label className="block text-sm font-black text-gray-700 uppercase tracking-widest text-center">
+                  {lang === 'hi' ? 'भुगतान स्क्रीनशॉट अपलोड करें' : 'Upload Payment Screenshot'}
+                </label>
+                
+                <div className="relative">
+                  {!preview ? (
+                    <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-blue-200 rounded-2xl bg-white hover:bg-blue-50 transition-colors cursor-pointer group">
+                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                        <Upload className="w-10 h-10 text-blue-400 group-hover:scale-110 transition-transform mb-3" />
+                        <p className="text-sm text-gray-500 font-medium">
+                          {lang === 'hi' ? 'फ़ाइल चुनें या यहाँ खींचें' : 'Choose file or drag here'}
+                        </p>
+                        <p className="text-xs text-gray-400 mt-1">PNG, JPG up to 5MB</p>
+                      </div>
+                      <input type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
+                    </label>
+                  ) : (
+                    <div className="relative w-full h-64 rounded-2xl overflow-hidden border-2 border-blue-100 shadow-lg bg-white">
+                      <img src={preview} alt="Payment Preview" className="w-full h-full object-contain p-2" />
+                      <button 
+                        type="button"
+                        onClick={clearScreenshot}
+                        className="absolute top-3 right-3 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 shadow-lg transition-all"
+                      >
+                        <X size={18} />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
 
             <div className="pt-12 max-w-lg mx-auto">
               <button 
                 type="submit" 
-                disabled={isSubmitting || !transactionId}
-                className={`w-full bg-blue-900 hover:bg-orange-600 text-white font-oswald text-2xl uppercase py-6 rounded-2xl shadow-2xl transition-all ${isSubmitting ? 'opacity-70 cursor-not-allowed' : 'active:scale-95'}`}
+                disabled={isSubmitting || !transactionId || !screenshot}
+                className={`w-full bg-blue-900 hover:bg-orange-600 text-white font-oswald text-2xl uppercase py-6 rounded-2xl shadow-2xl transition-all ${isSubmitting || !transactionId || !screenshot ? 'opacity-70 cursor-not-allowed' : 'active:scale-95'}`}
               >
                 {isSubmitting ? tp.processing : tp.verify}
               </button>
