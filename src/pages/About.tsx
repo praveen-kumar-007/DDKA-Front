@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Language } from '../translations';
 import { translations } from '../translations';
-import { ShieldCheck, Award, Users, Star } from 'lucide-react';
+import { ShieldCheck, Award, Users, Star, UserCheck, ScrollText, Medal, Megaphone } from 'lucide-react';
 
 interface AboutProps {
   lang: Language;
@@ -10,146 +10,301 @@ interface AboutProps {
 export const About: React.FC<AboutProps> = ({ lang }) => {
   const t = translations[lang];
 
-  const leadership = [
+  // The Top 4 Leaders (With Images)
+  const coreLeadership = [
     {
       name: lang === 'hi' ? 'राजीव श्रीवास्तव' : 'Rajeev Shrivastava',
       role: lang === 'hi' ? 'अध्यक्ष' : 'President',
       org: 'DDKA',
-      image: "https://res.cloudinary.com/dcqo5qt7b/image/upload/v1766755551/Gemini_Generated_Image_ct0q4vct0q4vct0q_gavscz.png", // Paste image link here
+      image: "https://res.cloudinary.com/dcqo5qt7b/image/upload/v1766755551/Gemini_Generated_Image_ct0q4vct0q4vct0q_gavscz.png",
       icon: <ShieldCheck className="w-6 h-6 text-orange-500" />
     },
     {
       name: lang === 'hi' ? 'मिंटू ठाकुर' : 'Mintoo Thakur',
       role: lang === 'hi' ? 'सचिव' : 'Secretary',
       org: 'DDKA',
-      image: "https://res.cloudinary.com/dcqo5qt7b/image/upload/v1766756133/Gemini_Generated_Image_qer0xhqer0xhqer0_oynz0o.png", // Paste image link here
+      image: "https://res.cloudinary.com/dcqo5qt7b/image/upload/v1766756133/Gemini_Generated_Image_qer0xhqer0xhqer0_oynz0o.png",
       icon: <Award className="w-6 h-6 text-orange-500" />
     },
     {
       name: lang === 'hi' ? 'पप्पू कुमार यादव' : 'Pappu Kumar Yadav',
-      role: lang === 'hi' ? 'जिला कोच' : 'District Coach',
+      role: lang === 'hi' ? 'कोषाध्यक्ष और कोच' : 'Treasurer & Coach',
       org: 'DDKA',
-      image: "https://res.cloudinary.com/dcqo5qt7b/image/upload/v1766755331/WhatsApp_Image_2025-12-26_at_9.37.43_AM_kxzdyb.jpg", // Paste image link here
+      image: "https://res.cloudinary.com/dcqo5qt7b/image/upload/v1766755331/WhatsApp_Image_2025-12-26_at_9.37.43_AM_kxzdyb.jpg",
       icon: <Star className="w-6 h-6 text-orange-500" />
+    },
+    {
+      name: lang === 'hi' ? 'प्रवीण कुमार' : 'Praveen Kumar',
+      role: lang === 'hi' ? 'मीडिया प्रभारी' : 'Media Incharge',
+      org: 'DDKA',
+      // 👇 PASTE PRAVEEN'S IMAGE LINK INSIDE THE QUOTES BELOW 👇
+      image: "https://res.cloudinary.com/dmmll82la/image/upload/v1765632491/sp-club/passports/passport-1765632490936-299511838.jpg", 
+      icon: <Megaphone className="w-6 h-6 text-orange-500" />
     }
   ];
 
+  // The Rest of the Committee (From Document)
+  const committee = {
+    chairman: {
+      title: lang === 'hi' ? 'चेयरमैन' : 'Chairman',
+      names: [lang === 'hi' ? 'प्रदीप कुमार मंडल' : 'Pradeep Kr. Mandal']
+    },
+    vicePresidents: {
+      title: lang === 'hi' ? 'उपाध्यक्ष' : 'Vice Presidents',
+      names: [
+        lang === 'hi' ? 'बी. सी. मंडल' : 'B. C. Mandal',
+        lang === 'hi' ? 'रविंद्र महतो' : 'Ravindra Mahto',
+        lang === 'hi' ? 'राजीव सोनी' : 'Rajeev Soni',
+        lang === 'hi' ? 'नीतू कुमारी' : 'Nitu Kumari'
+      ]
+    },
+    asstSecretaries: {
+      title: lang === 'hi' ? 'सहायक सचिव' : 'Asst. Secretaries',
+      names: [
+        lang === 'hi' ? 'मुकेश प्रसाद' : 'Mukesh Prasad',
+        lang === 'hi' ? 'निरंजन महतो' : 'Niranjan Mahto',
+        lang === 'hi' ? 'डी. एन. बैठा' : 'D. N. Baitha',
+        lang === 'hi' ? 'लालमणि महतो' : 'Lalmani Mahto'
+      ]
+    },
+    patrons: {
+      title: lang === 'hi' ? 'मुख्य संरक्षक' : 'Chief Patrons',
+      names: [
+        lang === 'hi' ? 'मथुरा प्रसाद महतो (MLA टुंडी)' : 'Mathura Prasad Mahto (MLA Tundi)',
+        lang === 'hi' ? 'कुणाल राज भारद्वाज (राष्ट्रीय खिलाड़ी)' : 'Kunal Raj Bhardwaj (National Player)',
+        lang === 'hi' ? 'एस. के. भारती (SSE/TRS/RIY)' : 'S.K. Bharti (SSE/TRS/RIY)',
+        lang === 'hi' ? 'राजीव रंजन महतो (अधिवक्ता)' : 'Rajeev Ranjan Mahto (Advocate)'
+      ]
+    }
+  };
+
   return (
-    <div className="py-12 md:py-20 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="max-w-6xl mx-auto px-4">
+    <div className="py-12 md:py-24 animate-in fade-in slide-in-from-bottom-4 duration-700 bg-slate-50">
+      <div className="max-w-[90rem] mx-auto px-4">
         
         {/* Hero Section */}
-        <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-6xl font-oswald font-bold text-blue-900 mb-6 uppercase">
+        <div className="text-center mb-20">
+          <h1 className="text-5xl md:text-7xl font-oswald font-bold text-blue-900 mb-6 uppercase tracking-tight">
             {t.nav.about}
           </h1>
-          <div className="w-24 h-2 bg-orange-500 mx-auto rounded-full"></div>
+          <div className="w-32 h-2 bg-gradient-to-r from-orange-400 to-orange-600 mx-auto rounded-full shadow-lg"></div>
+          <p className="mt-6 text-slate-500 font-light text-xl uppercase tracking-widest">
+             {lang === 'hi' ? 'परंपरा • अनुशासन • गौरव' : 'Tradition • Discipline • Glory'}
+          </p>
         </div>
 
-        {/* Main Image */}
-        <div className="relative mb-20">
-          <img 
-            src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1766755173/Gemini_Generated_Image_p2t0etp2t0etp2t0_xheh79.png" 
-            className="w-full h-64 md:h-[500px] object-cover rounded-3xl shadow-2xl border-4 border-white"
-            alt="About DDKA Kabaddi"
-          />
-          <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 bg-blue-900 text-white px-8 py-6 rounded-2xl shadow-xl w-[90%] md:w-auto text-center">
-            <p className="text-lg md:text-xl font-oswald uppercase tracking-widest">
-              {lang === 'hi' ? 'धनबाद जिला कबड्डी संघ' : 'Dhanbad District Kabaddi Association'}
-            </p>
+        {/* Main Banner Image */}
+        <div className="relative mb-24 max-w-7xl mx-auto group">
+          <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-orange-600 rounded-[2.5rem] blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+          <div className="relative rounded-[2rem] overflow-hidden border-4 border-white shadow-2xl">
+             <img 
+              src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1766755173/Gemini_Generated_Image_p2t0etp2t0etp2t0_xheh79.png" 
+              className="w-full h-64 md:h-[550px] object-cover transform transition duration-700 group-hover:scale-105"
+              alt="About DDKA Kabaddi"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-blue-950/90 via-transparent to-transparent flex items-end justify-center pb-12">
+               <div className="bg-white/10 backdrop-blur-md border border-white/20 text-white px-10 py-4 rounded-full shadow-2xl">
+                 <p className="text-xl md:text-2xl font-oswald uppercase tracking-widest font-bold">
+                   {lang === 'hi' ? 'धनबाद जिला कबड्डी संघ' : 'Dhanbad District Kabaddi Association'}
+                 </p>
+               </div>
+            </div>
           </div>
         </div>
 
         {/* Vision & Mission Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-24 mt-16 md:mt-0">
-          <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-xl hover:shadow-2xl transition-shadow">
-            <div className="w-12 h-12 bg-orange-100 rounded-2xl flex items-center justify-center mb-6">
-              <ShieldCheck className="text-orange-600" />
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 mb-28">
+          <div className="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-xl hover:shadow-2xl transition-all relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-8 opacity-5 transform translate-x-10 -translate-y-10 group-hover:scale-110 transition-transform">
+               <ShieldCheck size={200} />
             </div>
-            <h2 className="text-3xl font-oswald font-bold text-blue-900 mb-4 uppercase">
-              {lang === 'hi' ? 'हमारा विजन' : 'Our Vision'}
-            </h2>
-            <p className="text-slate-600 leading-relaxed text-lg">
-              {lang === 'hi' 
-                ? 'धनबाद जिला कबड्डी संघ (DDKA) की स्थापना एक ही विजन के साथ की गई थी: कबड्डी को झारखंड के प्रमुख खेल के रूप में अपने सही स्थान पर वापस लाना और भारत की कोयला राजधानी से अंतरराष्ट्रीय स्तर की प्रतिभाओं को खोजना।'
-                : 'DDKA was established with a singular vision: to restore Kabaddi to its rightful place as the premier sport of Jharkhand and scout international-level talent from the Coal Capital of India.'}
-            </p>
+            <div className="relative z-10">
+                <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mb-8">
+                <ShieldCheck className="text-orange-600 w-8 h-8" />
+                </div>
+                <h2 className="text-4xl font-oswald font-bold text-blue-900 mb-6 uppercase">
+                {lang === 'hi' ? 'हमारा विजन' : 'Our Vision'}
+                </h2>
+                <p className="text-slate-600 leading-relaxed text-lg">
+                {lang === 'hi' 
+                    ? 'धनबाद जिला कबड्डी संघ (DDKA) की स्थापना एक ही विजन के साथ की गई थी: कबड्डी को झारखंड के प्रमुख खेल के रूप में अपने सही स्थान पर वापस लाना और भारत की कोयला राजधानी से अंतरराष्ट्रीय स्तर की प्रतिभाओं को खोजना।'
+                    : 'DDKA was established with a singular vision: to restore Kabaddi to its rightful place as the premier sport of Jharkhand and scout international-level talent from the Coal Capital of India.'}
+                </p>
+            </div>
           </div>
 
-          <div className="bg-blue-900 p-8 rounded-3xl shadow-xl text-white">
-            <div className="w-12 h-12 bg-blue-800 rounded-2xl flex items-center justify-center mb-6">
-              <Users className="text-orange-400" />
+          <div className="bg-blue-900 p-10 rounded-[2.5rem] shadow-xl text-white relative overflow-hidden group">
+             <div className="absolute -bottom-10 -left-10 p-8 opacity-10 transform group-hover:rotate-12 transition-transform">
+               <Users size={200} />
             </div>
-            <h2 className="text-3xl font-oswald font-bold mb-4 uppercase text-orange-400">
-              {lang === 'hi' ? 'हमारा मिशन' : 'Our Mission'}
-            </h2>
-            <p className="text-blue-100 leading-relaxed text-lg">
-              {lang === 'hi'
-                ? 'हमारा मिशन युवाओं को अनुशासन, टीम वर्क और शारीरिक फिटनेस के माध्यम से सशक्त बनाना है, जो कबड्डी के पारंपरिक खेल द्वारा प्रदान की जाती है। हम जमीनी स्तर पर प्रशिक्षण और बुनियादी ढांचा प्रदान करने के लिए प्रतिबद्ध हैं।'
-                : 'Our mission is to empower the youth through discipline, teamwork, and physical fitness provided by the traditional sport of Kabaddi. We are committed to providing world-class training and infrastructure at the grassroots level.'}
-            </p>
+            <div className="relative z-10">
+                <div className="w-16 h-16 bg-white/10 backdrop-blur rounded-2xl flex items-center justify-center mb-8 border border-white/10">
+                <Users className="text-orange-400 w-8 h-8" />
+                </div>
+                <h2 className="text-4xl font-oswald font-bold mb-6 uppercase text-orange-400">
+                {lang === 'hi' ? 'हमारा मिशन' : 'Our Mission'}
+                </h2>
+                <p className="text-blue-100 leading-relaxed text-lg">
+                {lang === 'hi'
+                    ? 'हमारा मिशन युवाओं को अनुशासन, टीम वर्क और शारीरिक फिटनेस के माध्यम से सशक्त बनाना है। हम जमीनी स्तर पर विश्व स्तरीय प्रशिक्षण और बुनियादी ढांचा प्रदान करने के लिए प्रतिबद्ध हैं।'
+                    : 'Our mission is to empower the youth through discipline, teamwork, and physical fitness. We are committed to providing world-class training and infrastructure at the grassroots level.'}
+                </p>
+            </div>
           </div>
         </div>
 
-        {/* Leadership Section */}
-        <div className="space-y-12">
-          <div className="text-center">
-            <h2 className="text-4xl font-oswald font-bold text-blue-900 uppercase">
-              {lang === 'hi' ? 'प्रमुख नेतृत्व' : 'Key Leadership'}
+        {/* ------------------------------------------------------------------ */}
+        {/* CORE LEADERSHIP (CARDS) */}
+        {/* ------------------------------------------------------------------ */}
+        <div className="mb-28">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-oswald font-bold text-blue-900 uppercase tracking-tight">
+              {lang === 'hi' ? 'कार्यकारी नेतृत्व' : 'Executive Leadership'}
             </h2>
-            <p className="text-slate-500 mt-2">{lang === 'hi' ? 'DDKA को नई ऊंचाइयों पर ले जाने वाली टीम' : 'The team driving DDKA to new heights'}</p>
+            <div className="w-24 h-1.5 bg-orange-500 mx-auto mt-4 rounded-full"></div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {leadership.map((member, index) => (
-              <div key={index} className="group relative bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-slate-100">
-                {/* Image Placeholder */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {coreLeadership.map((member, index) => (
+              <div key={index} className="group relative bg-white rounded-[2.5rem] overflow-hidden shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 border border-slate-100">
+                {/* Image Area */}
                 <div className="aspect-[4/5] bg-slate-200 overflow-hidden relative">
+                   <div className="absolute inset-0 bg-gradient-to-t from-blue-900/80 via-transparent to-transparent z-10 opacity-60 group-hover:opacity-80 transition-opacity"></div>
                   {member.image ? (
-                    <img src={member.image} alt={member.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                    <img src={member.image} alt={member.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-slate-100">
-                      <Users className="w-20 h-20 text-slate-300" />
+                    <div className="w-full h-full flex items-center justify-center bg-slate-200">
+                       <Users className="w-20 h-20 text-slate-400" />
+                       <p className="absolute bottom-4 text-xs text-slate-500">Image Required</p>
                     </div>
                   )}
-                  {/* Floating Icon */}
-                  <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-3 rounded-2xl shadow-lg">
+                  {/* Floating Icon Badge */}
+                  <div className="absolute top-6 right-6 z-20 bg-white/30 backdrop-blur-md border border-white/40 p-3 rounded-2xl shadow-lg text-white">
                     {member.icon}
                   </div>
                 </div>
 
-                {/* Content */}
-                <div className="p-6 text-center bg-white relative">
-                  <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-20 h-1 bg-orange-500 rounded-full"></div>
-                  <h3 className="text-2xl font-oswald font-bold text-blue-900 uppercase tracking-tight">
+                {/* Text Content */}
+                <div className="p-6 text-center bg-white relative z-20 -mt-10 mx-4 mb-4 rounded-3xl shadow-lg border border-slate-50">
+                  <h3 className="text-xl font-oswald font-bold text-blue-900 uppercase tracking-tight mb-1">
                     {member.name}
                   </h3>
-                  <div className="mt-2 flex items-center justify-center space-x-2">
-                    <span className="bg-blue-50 text-blue-700 px-4 py-1 rounded-full text-sm font-bold uppercase tracking-wider">
-                      {member.role}
-                    </span>
-                  </div>
-                  <p className="text-orange-600 font-bold mt-2 tracking-widest">{member.org}</p>
+                  <div className="w-12 h-1 bg-orange-500 mx-auto rounded-full mb-3"></div>
+                  <p className="text-orange-600 font-bold uppercase text-xs tracking-widest mb-1">
+                    {member.role}
+                  </p>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
+        {/* ------------------------------------------------------------------ */}
+        {/* EXTENDED COMMITTEE LIST (NO IMAGES) */}
+        {/* ------------------------------------------------------------------ */}
+        <div className="max-w-7xl mx-auto bg-white rounded-[3rem] p-8 md:p-16 shadow-2xl border border-slate-100 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-600 via-orange-500 to-blue-600"></div>
+          
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-oswald font-bold text-blue-900 uppercase">
+              {lang === 'hi' ? 'संघ के पदाधिकारी' : 'Association Office Bearers'}
+            </h2>
+            <p className="text-slate-500 mt-3 font-light">
+               Dhanbad District Kabaddi Association Team
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20">
+            
+            {/* Left Column: Chairman & Patrons */}
+            <div className="space-y-12">
+               {/* Chairman Block */}
+               <div className="bg-slate-50 p-8 rounded-3xl border-l-8 border-blue-900 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="flex items-center gap-4 mb-4">
+                     <UserCheck className="text-blue-900 w-8 h-8" />
+                     <h3 className="text-2xl font-oswald font-bold text-blue-900 uppercase">
+                        {committee.chairman.title}
+                     </h3>
+                  </div>
+                  <ul className="space-y-2">
+                     {committee.chairman.names.map((name, i) => (
+                        <li key={i} className="text-xl text-slate-700 font-medium pl-2">{name}</li>
+                     ))}
+                  </ul>
+               </div>
+
+               {/* Patrons Block */}
+               <div className="bg-slate-50 p-8 rounded-3xl border-l-8 border-orange-500 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="flex items-center gap-4 mb-4">
+                     <Medal className="text-orange-600 w-8 h-8" />
+                     <h3 className="text-2xl font-oswald font-bold text-blue-900 uppercase">
+                        {committee.patrons.title}
+                     </h3>
+                  </div>
+                  <ul className="space-y-3">
+                     {committee.patrons.names.map((name, i) => (
+                        <li key={i} className="text-base text-slate-600 border-b border-slate-200 pb-2 last:border-0">
+                           {name}
+                        </li>
+                     ))}
+                  </ul>
+               </div>
+            </div>
+
+            {/* Right Column: VPs and Asst Secretaries */}
+            <div className="space-y-12">
+               {/* Vice Presidents */}
+               <div>
+                  <div className="flex items-center gap-3 mb-6">
+                     <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-800">
+                        <Users size={20} />
+                     </div>
+                     <h3 className="text-xl font-bold text-slate-400 uppercase tracking-widest">
+                        {committee.vicePresidents.title}
+                     </h3>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                     {committee.vicePresidents.names.map((name, i) => (
+                        <div key={i} className="bg-white border border-slate-200 p-4 rounded-xl shadow-sm flex items-center gap-3">
+                           <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                           <span className="font-semibold text-slate-700">{name}</span>
+                        </div>
+                     ))}
+                  </div>
+               </div>
+
+               {/* Asst Secretaries */}
+               <div>
+                  <div className="flex items-center gap-3 mb-6">
+                     <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-800">
+                        <ScrollText size={20} />
+                     </div>
+                     <h3 className="text-xl font-bold text-slate-400 uppercase tracking-widest">
+                        {committee.asstSecretaries.title}
+                     </h3>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                     {committee.asstSecretaries.names.map((name, i) => (
+                        <div key={i} className="bg-white border border-slate-200 p-4 rounded-xl shadow-sm flex items-center gap-3">
+                           <div className="w-2 h-2 rounded-full bg-orange-500"></div>
+                           <span className="font-semibold text-slate-700">{name}</span>
+                        </div>
+                     ))}
+                  </div>
+               </div>
+            </div>
+
+          </div>
+        </div>
+
         {/* Bottom Contact CTA */}
-        <div className="mt-24 bg-slate-50 rounded-[40px] p-8 md:p-12 text-center border border-slate-200">
-          <h3 className="text-2xl md:text-3xl font-oswald font-bold text-blue-900 uppercase mb-4">
-            {lang === 'hi' ? 'हमसे जुड़ें' : 'Connect With Us'}
-          </h3>
-          <p className="text-slate-600 max-w-2xl mx-auto mb-8 text-lg">
-            {lang === 'hi' 
-              ? 'क्या आपके पास कोई प्रश्न है या आप DDKA के साथ साझेदारी करना चाहते हैं? हमारी टीम आपकी सहायता के लिए यहाँ है।'
-              : 'Have questions or want to partner with DDKA? Our team is here to help you grow the game of Kabaddi.'}
-          </p>
-          <button className="bg-orange-600 hover:bg-blue-900 text-white px-10 py-4 rounded-2xl font-bold transition-all shadow-lg hover:-translate-y-1">
-            {lang === 'hi' ? 'संपर्क करें' : 'Contact DDKA'}
+        <div className="mt-24 text-center">
+          <p className="text-slate-400 text-sm mb-4 uppercase tracking-widest">Want to join us?</p>
+          <button className="bg-blue-900 hover:bg-orange-600 text-white px-12 py-5 rounded-full font-bold text-lg transition-all shadow-xl hover:-translate-y-1 hover:shadow-orange-500/20">
+            {lang === 'hi' ? 'संपर्क करें' : 'Contact Association'}
           </button>
         </div>
+        
       </div>
     </div>
   );
