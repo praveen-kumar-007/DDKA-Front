@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Hero from '../components/ui/Hero';
-import { Trophy, Users, Award, Zap, ExternalLink, Megaphone, Calendar, ArrowRight } from 'lucide-react';
+import { Trophy, Users, Award, Zap, ExternalLink, Megaphone, Calendar, ArrowRight, Activity } from 'lucide-react';
 import { MOCK_NEWS } from '../constants';
 import type { NewsArticle } from '../types';
 import type { Language } from '../translations';
@@ -31,7 +31,7 @@ export const Home: React.FC<HomeProps> = ({ lang, onNavigate }) => {
       <Hero onRegisterClick={() => onNavigate('register')} lang={lang} />
       
       {/* ----------------------------------------------------------------------- */}
-      {/* NEW: FEATURED CHAMPIONSHIP ANNOUNCEMENT SECTION */}
+      {/* FEATURED CHAMPIONSHIP ANNOUNCEMENT SECTION */}
       {/* ----------------------------------------------------------------------- */}
       <section className="relative py-16 bg-gradient-to-br from-red-900 to-blue-950 text-white overflow-hidden border-y-8 border-orange-500">
         <div className="absolute top-0 right-0 p-4 opacity-10">
@@ -45,9 +45,6 @@ export const Home: React.FC<HomeProps> = ({ lang, onNavigate }) => {
             <div className="w-full lg:w-1/3">
               <div className="relative group">
                 <div className="absolute -inset-1 bg-gradient-to-r from-orange-600 to-pink-600 rounded-2xl blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-tilt"></div>
-                {/* IMPORTANT: Replace the src below with your actual uploaded image path.
-                   Example: src="/assets/championship-poster.png"
-                */}
                 <img 
                   src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1766845990/Gemini_Generated_Image_eyfw6eyfw6eyfw6e_pldumt.png" 
                   alt="Dhanbad Kabaddi Championship 2026" 
@@ -70,7 +67,7 @@ export const Home: React.FC<HomeProps> = ({ lang, onNavigate }) => {
               </h2>
               
               <p className="text-xl text-blue-200 mb-8 font-light border-l-4 border-orange-500 pl-4">
-                 {lang === 'hi' 
+                  {lang === 'hi' 
                   ? 'सब-जूनियर (अंडर-16) बालक एवं बालिका वर्ग' 
                   : 'Sub-Junior (Under-16) Boys & Girls Category'}
               </p>
@@ -161,6 +158,59 @@ export const Home: React.FC<HomeProps> = ({ lang, onNavigate }) => {
           </div>
         </div>
       </section>
+
+      {/* ----------------------------------------------------------------------- */}
+      {/* NEW: ASSOCIATION MEETING UPDATE SECTION */}
+      {/* ----------------------------------------------------------------------- */}
+      <section className="py-16 bg-slate-50 border-y border-slate-200">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="flex items-center gap-3 mb-8">
+            <Activity className="text-orange-600" />
+            <h3 className="text-2xl font-bold text-blue-900 uppercase tracking-wide">
+              {lang === 'hi' ? 'संघ की गतिविधियां' : 'Association Updates'}
+            </h3>
+          </div>
+
+          <div className="bg-white rounded-2xl p-4 shadow-lg flex flex-col md:flex-row gap-8 items-center">
+            {/* IMAGE AREA - PASTE YOUR LINK BELOW */}
+            <div className="w-full md:w-1/2">
+               <div className="rounded-xl overflow-hidden shadow-md border-2 border-orange-100">
+                  {/* 👇👇👇 PASTE YOUR IMAGE LINK INSIDE THE QUOTES BELOW 👇👇👇 */}
+                  <img 
+                    src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1766941283/WhatsApp_Image_2025-12-28_at_10.06.10_PM_vlhjvh.jpg" 
+                    alt="DDKA Committee Meeting" 
+                    className="w-full h-auto object-cover hover:scale-105 transition-transform duration-500"
+                  />
+               </div>
+            </div>
+            
+            {/* CONTENT AREA */}
+            <div className="w-full md:w-1/2 md:pr-4">
+              <span className="text-xs font-bold text-orange-600 bg-orange-100 px-2 py-1 rounded mb-3 inline-block">
+                 {lang === 'hi' ? 'ताज़ा खबर' : 'LATEST UPDATE'}
+              </span>
+              <h2 className="text-3xl font-oswald font-bold text-blue-900 mb-4">
+                {lang === 'hi' 
+                  ? 'धनबाद जिला कबड्डी संघ की बैठक' 
+                  : 'Meeting of Dhanbad District Kabaddi Association'}
+              </h2>
+              <p className="text-slate-600 leading-relaxed mb-4">
+                {lang === 'hi'
+                  ? 'धनबाद जिला कबड्डी संघ की एक महत्वपूर्ण बैठक आयोजित की गई जिसमें जिले में कबड्डी के विकास और आगामी कार्ययोजना पर चर्चा की गई। इस बैठक में संघ के वरिष्ठ पदाधिकारी और सदस्य उपस्थित रहे।'
+                  : 'A significant meeting of the Dhanbad District Kabaddi Association (DDKA) was held to discuss the development of Kabaddi and the upcoming roadmap for the district. Senior officials and members of the association were present to strategize future events.'}
+              </p>
+              <div className="flex items-center gap-2 text-sm text-blue-800 font-semibold bg-blue-50 p-3 rounded-lg border border-blue-100">
+                 <Users size={16} />
+                 {lang === 'hi' 
+                   ? 'कार्यकारिणी समिति और सदस्य उपस्थित'
+                   : 'Executive Committee & Members Present'}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      {/* ----------------------------------------------------------------------- */}
+
 
       {/* Latest News Preview Section */}
       <section className="py-20 bg-blue-900 text-white overflow-hidden relative">
