@@ -324,7 +324,7 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
                         </p>
                         <p className="text-xs text-gray-400 mt-1">PNG, JPG up to 5MB</p>
                       </div>
-                      <input type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
+                      <input required type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
                     </label>
                   ) : (
                     <div className="relative w-full h-64 rounded-2xl overflow-hidden border-2 border-blue-100 shadow-lg bg-white">
