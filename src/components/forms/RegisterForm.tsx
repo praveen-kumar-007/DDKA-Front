@@ -214,7 +214,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ lang }) => {
                   <label className="text-sm font-black text-slate-500 uppercase tracking-widest flex items-center gap-2"><Droplets size={16} className="text-red-500" /> Blood</label>
                   <select required name="bloodGroup" value={formData.bloodGroup} onChange={handleChange} className="w-full px-6 py-5 border-2 border-slate-100 rounded-2xl focus:ring-4 focus:ring-blue-50 focus:border-blue-500 transition-all outline-none bg-white text-lg">
                     <option value="">Select</option>
-                    {['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'].map(bg => <option key={bg} value={bg}>{bg}</option>)}
+                    {['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-',"Don't Know"].map(bg => <option key={bg} value={bg}>{bg}</option>)}
                   </select>
                 </div>
               </div>
