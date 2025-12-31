@@ -19,7 +19,7 @@ const Hero: React.FC<HeroProps> = ({ onRegisterClick, lang }) => {
       {/* Background with Overlay */}
       <div 
         className="absolute inset-0 bg-cover bg-center transition-transform duration-[10s] hover:scale-105 opacity-40"
-        style={{ backgroundImage: `url('https://res.cloudinary.com/dcqo5qt7b/image/upload/v1767020554/WhatsApp_Image_2025-12-28_at_9.36.56_PM_kjwen4.jpg')` }}
+        style={{ backgroundImage: `url('https://res.cloudinary.com/dcqo5qt7b/image/upload/v1767020556/WhatsApp_Image_2025-12-28_at_9.36.59_PM_sijegu.jpg')` }}
       >
         <div className="absolute inset-0 bg-gradient-to-r from-blue-950 via-blue-900/60 to-transparent"></div>
       </div>
