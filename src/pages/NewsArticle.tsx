@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Calendar, Tag, ArrowLeft } from 'lucide-react';
 
+// News Article Detail Page
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const NewsArticle = () => {
