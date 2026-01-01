@@ -1,6 +1,6 @@
 
+import React from 'react';
 import type { IDCardData } from '../types';
-import { COLORS } from '../constants';
 
 interface Props {
   data: IDCardData;
@@ -25,7 +25,7 @@ export const IDCardFront: React.FC<Props> = ({ data }) => {
         height: '380px', 
         borderRadius: '16px',
         fontFamily: "'Poppins', sans-serif",
-        border: `2px solid ${COLORS.primary}`
+        border: '3px solid #ff6b35'
       }}
     >
       {/* Watermark Logos Background */}
@@ -34,38 +34,42 @@ export const IDCardFront: React.FC<Props> = ({ data }) => {
         <div className="absolute bottom-4 right-4 text-2xl font-black text-blue-900">JH-KBD</div>
       </div>
 
-      {/* Header Section - Professional */}
+      {/* Header Section - Orange Gradient */}
       <div 
-        className="relative px-3 py-2.5 shrink-0"
-        style={{ background: COLORS.primary }}
+        className="relative px-3 py-3 shrink-0"
+        style={{ background: 'linear-gradient(135deg, #ff6b35 0%, #f7931e 100%)' }}
       >
         <div className="flex items-center justify-center gap-1.5">
-          <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-sm border border-orange-500">
+          <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-sm border-2 border-white">
             <span className="text-[10px] font-black text-orange-600">🇮🇳</span>
           </div>
           <div className="flex-1 text-center">
             <h1 className="text-white text-[8px] font-black leading-tight tracking-tight uppercase">
               DDKA - OFFICIAL ID
             </h1>
-            <p className="text-orange-300 text-[5.5px] font-bold uppercase tracking-widest mt-0.5">
-              Dhanbad District Kabaddi Association
+            <p className="text-white text-[5px] font-bold uppercase tracking-widest mt-0.5">
+              Dhanbad District Kabaddi
             </p>
           </div>
-          <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-sm border border-orange-500">
+          <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-sm border-2 border-white">
             <span className="text-[10px] font-black">🏏</span>
           </div>
         </div>
       </div>
 
-      {/* Accent Line */}
-      <div className="h-0.5 w-full shrink-0" style={{ 
-        background: `linear-gradient(90deg, ${COLORS.secondary}, ${COLORS.accent}, ${COLORS.secondary})`,
+      {/* Accent Line - Vibrant */}
+      <div className="h-1 w-full shrink-0" style={{ 
+        background: 'linear-gradient(90deg, #ff6b35, #f7931e, #ff6b35)',
       }} />
 
-      {/* Photo Section - Professional Square */}
-      <div className="flex justify-center py-2.5 relative shrink-0">
-        <div className="relative p-1 bg-gradient-to-br from-blue-600 to-blue-800 shadow-lg rounded border-2 border-orange-500" 
-             style={{ width: '68px', height: '82px' }}>
+      {/* Photo Section - Orange/White Frame */}
+      <div className="flex justify-center py-3 relative shrink-0">
+        <div className="relative p-1.5 shadow-lg rounded-lg" 
+             style={{ 
+               width: '70px', 
+               height: '85px',
+               background: 'linear-gradient(135deg, #ff6b35 0%, #f7931e 100%)'
+             }}>
           <div className="w-full h-full bg-white overflow-hidden rounded">
             <img 
               src={data.photoUrl} 
@@ -77,14 +81,14 @@ export const IDCardFront: React.FC<Props> = ({ data }) => {
       </div>
 
       {/* ID Number Badge */}
-      <div className="flex justify-center">
-        <div className="bg-gradient-to-r from-slate-900 to-slate-800 text-white text-[7px] font-black px-2.5 py-0.5 rounded-full border border-orange-500 shadow-md">
+      <div className="flex justify-center mb-1">
+        <div className="bg-white text-orange-600 text-[7px] font-black px-3 py-1 rounded-full border-2 border-orange-600 shadow-md">
           ID: {data.idNo}
         </div>
       </div>
 
       {/* Player Name */}
-      <div className="px-3 py-1.5 text-center border-b border-slate-200">
+      <div className="px-3 py-1.5 text-center border-b-2 border-orange-200">
         <h2 className="text-[10px] font-black text-slate-900 uppercase tracking-tight leading-tight">
           {data.name}
         </h2>
@@ -93,50 +97,48 @@ export const IDCardFront: React.FC<Props> = ({ data }) => {
         </p>
       </div>
 
-      {/* Details Grid - Professional */}
+      {/* Details Grid - Simple & Clear */}
       <div className="flex-grow px-2.5 py-1.5 space-y-1 overflow-hidden">
         {/* Row 1: DOB and Blood Group */}
         <div className="grid grid-cols-2 gap-1">
-          <div className="bg-blue-50 px-1.5 py-0.75 rounded border-l-2 border-blue-600">
-            <span className="text-[4.5px] text-slate-500 font-bold uppercase block tracking-wide">DOB</span>
+          <div className="bg-white px-1.5 py-0.75 rounded border border-slate-300">
+            <span className="text-[4px] text-slate-500 font-bold uppercase block tracking-wide">DOB</span>
             <span className="text-[7px] font-bold text-slate-900 leading-tight">{formatDOB(data.dob)}</span>
           </div>
-          <div className="bg-red-50 px-1.5 py-0.75 rounded border-l-2 border-red-600">
-            <span className="text-[4.5px] text-slate-500 font-bold uppercase block tracking-wide">Blood</span>
-            <span className="text-[7.5px] font-black text-red-600 leading-tight">{data.bloodGroup}</span>
+          <div className="bg-white px-1.5 py-0.75 rounded border border-slate-300">
+            <span className="text-[4px] text-slate-500 font-bold uppercase block tracking-wide">Blood</span>
+            <span className="text-[7.5px] font-black text-slate-900 leading-tight">{data.bloodGroup}</span>
           </div>
         </div>
 
         {/* Row 2: Phone */}
-        <div className="bg-slate-900 text-white px-1.5 py-0.75 rounded">
-          <span className="text-[4.5px] text-slate-300 font-bold uppercase block tracking-wide">Phone</span>
-          <span className="text-[7px] font-bold tracking-wider leading-tight">{data.phone}</span>
+        <div className="bg-white border border-slate-300 px-1.5 py-0.75 rounded">
+          <span className="text-[4px] text-slate-500 font-bold uppercase block tracking-wide">Phone</span>
+          <span className="text-[6.5px] font-bold text-slate-900 tracking-wider leading-tight">{data.phone}</span>
         </div>
 
         {/* Row 3: Father's Name */}
-        <div className="bg-slate-50 px-1.5 py-0.75 rounded border border-slate-200">
-          <span className="text-[4.5px] text-slate-500 font-bold uppercase block tracking-wide">Father</span>
-          <p className="text-[6.5px] font-semibold text-slate-800 leading-tight truncate">
+        <div className="bg-white px-1.5 py-0.75 rounded border border-slate-300">
+          <span className="text-[4px] text-slate-500 font-bold uppercase block tracking-wide">Father</span>
+          <p className="text-[6px] font-semibold text-slate-800 leading-tight truncate">
             {data.fathersName}
           </p>
         </div>
 
         {/* Row 4: Address */}
-        <div className="bg-slate-50 px-1.5 py-0.75 rounded border border-slate-200 flex-grow">
-          <span className="text-[4.5px] text-slate-500 font-bold uppercase block tracking-wide">Address</span>
+        <div className="bg-white px-1.5 py-0.75 rounded border border-slate-300 flex-grow">
+          <span className="text-[4px] text-slate-500 font-bold uppercase block tracking-wide">Address</span>
           <p className="text-[6px] font-medium text-slate-700 leading-tight line-clamp-2">
             {data.address}
           </p>
         </div>
       </div>
 
-      {/* Footer - Professional */}
-      <div className="bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 px-2 py-1.5 mt-auto shrink-0 flex items-center justify-between">
-        <span className="text-white/40 text-[5px] font-black tracking-[0.15em] uppercase">OFFICIAL MEMBER CARD</span>
-        <div className="flex gap-0.5">
-          <div className="w-2 h-0.5 bg-orange-500 rounded-full"></div>
-          <div className="w-1 h-0.5 bg-orange-400 rounded-full"></div>
-        </div>
+      {/* Footer - Orange Gradient */}
+      <div className="px-2 py-1.5 mt-auto shrink-0 flex items-center justify-between" 
+           style={{ background: 'linear-gradient(90deg, #ff6b35, #f7931e)' }}>
+        <span className="text-white text-[5px] font-black tracking-[0.15em] uppercase">OFFICIAL MEMBER CARD</span>
+        <span className="text-white text-[5px] font-bold">Est. 2017</span>
       </div>
     </div>
   );
