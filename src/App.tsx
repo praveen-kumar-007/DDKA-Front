@@ -19,6 +19,7 @@ import AdminSignup from './pages/AdminSignup';
 import AdminRegistrationDetails from './pages/AdminRegistrationDetails';
 import AdminGalleryUpload from './pages/AdminGalleryUpload';
 import AdminContact from './pages/AdminContact';
+import AdminPlayerIDGenerator from './pages/AdminPlayerIDGenerator';
 import Contact from './pages/Contact';
 
 // Form Components
@@ -83,6 +84,10 @@ const App: React.FC = () => {
             <Route path="/admin/contact" element={
               isAuthenticated ? <AdminContact /> : <AdminLogin onLoginSuccess={() => setIsAuthenticated(true)} />
             } />
+          {/* Admin Player ID Generator (protected) */}
+          <Route path="/admin/player-ids" element={
+            isAuthenticated ? <AdminPlayerIDGenerator /> : <AdminLogin onLoginSuccess={() => setIsAuthenticated(true)} />
+          } />
           {/* Admin News Upload Route (protected) */}
           <Route path="/admin-news-upload" element={
             isAuthenticated ? <AdminNewsUpload /> : <AdminLogin onLoginSuccess={() => setIsAuthenticated(true)} />

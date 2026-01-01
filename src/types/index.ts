@@ -21,3 +21,15 @@ export interface GalleryItem {
   title: string;
   category: string;
 }
+
+export interface IDCardData {
+  idNo: string;
+  name: string;
+  fathersName: string;
+  dob: string;
+  bloodGroup: string;
+  phone: string;
+  address: string;
+  photoUrl: string;
+  transactionId: string;
+}

@@ -20,3 +20,17 @@ export const GALLERY_MOCK_DATA = [
   { id: 2, url: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=2093", title: "Practice Session", category: "Training" },
   { id: 3, url: "https://images.unsplash.com/photo-1544441893-675973e31d85?q=80&w=2070", title: "Winning Moment", category: "Awards" }
 ];
+
+export const ASSOCIATION_INFO = {
+  name: "DDKA - Dhanbad District Kabaddi Association"
+};
+
+export const COLORS = {
+  primary: "#1e40af",
+  secondary: "#f59e0b",
+  accent: "#dc2626"
+};
+
+export const LOGOS = {
+  AKFI: "https://via.placeholder.com/80?text=DDKA"
+};
