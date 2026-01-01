@@ -10,17 +10,21 @@ export const IDCardFront: React.FC<Props> = ({ data }) => {
   const formatDOB = (dobString: string) => {
     try {
       const date = new Date(dobString);
-      return date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      return date.toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+      });
     } catch {
       return dobString;
     }
   };
 
   return (
-    <div 
-      style={{ 
-        width: '210px', 
-        height: '330px', 
+    <div
+      style={{
+        width: '210px',
+        height: '330px',
         borderRadius: '16px',
         overflow: 'hidden',
         boxShadow: '0 8px 25px rgba(0, 20, 40, 0.12)',
@@ -28,167 +32,168 @@ export const IDCardFront: React.FC<Props> = ({ data }) => {
         flexDirection: 'column',
         backgroundColor: '#ffffff',
         position: 'relative',
-        fontFamily: "'Poppins', sans-serif"
+        fontFamily: "'Poppins', sans-serif",
       }}
     >
-      {/* Watermark Logos */}
-      <div style={{
-        position: 'absolute',
-        inset: 0,
-        pointerEvents: 'none',
-        opacity: 0.08,
-        zIndex: 0
-      }}>
-        <div style={{position: 'absolute', top: '16px', left: '16px', fontSize: '24px', fontWeight: 900, color: '#ff6b35'}}>AKFI</div>
-        <div style={{position: 'absolute', bottom: '16px', right: '16px', fontSize: '24px', fontWeight: 900, color: '#ff6b35'}}>JH-KBD</div>
-      </div>
-
-      {/* Header */}
-      <div 
+      {/* Top Header - Deep Blue */}
+      <div
         style={{
-          background: 'linear-gradient(135deg, #ff6b35 0%, #f7931e 100%)',
-          padding: '12px 12px',
+          background: 'linear-gradient(135deg, #00579B, #003366)',
+          padding: '9px 11px',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center',
           position: 'relative',
           zIndex: 1,
-          gap: '8px'
         }}
       >
-        <div style={{
-          width: '28px',
-          height: '28px',
-          backgroundColor: 'white',
-          borderRadius: '50%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-        }}>
-          <span style={{fontSize: '12px'}}>🇮🇳</span>
-        </div>
-        <div style={{textAlign: 'center', flex: 1}}>
-          <h1 style={{
-            fontSize: '12px',
-            fontWeight: 700,
-            color: 'white',
+        <h1
+          style={{
+            fontSize: '13px',
+            fontWeight: 600,
+            color: '#FFFFFF',
             margin: 0,
-            lineHeight: 1.2
-          }}>DDKA ID</h1>
-        </div>
-        <div style={{
-          width: '28px',
-          height: '28px',
-          backgroundColor: 'white',
-          borderRadius: '50%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-        }}>
-          <span style={{fontSize: '12px'}}>🏏</span>
-        </div>
+            lineHeight: 1.2,
+          }}
+        >
+          Dhanbad District Kabaddi Association
+        </h1>
       </div>
 
-      {/* Photo Section - Circular with negative margin */}
-      <div style={{
-        marginTop: '-32px',
-        textAlign: 'center',
-        position: 'relative',
-        zIndex: 2,
-        paddingBottom: '8px'
-      }}>
-        <div style={{
-          width: '70px',
-          height: '70px',
-          margin: '0 auto',
-          borderRadius: '50%',
-          border: '4px solid white',
-          overflow: 'hidden',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-          backgroundColor: '#e0e0e0',
-          backgroundImage: `url(${data.photoUrl})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center'
-        }}>
-          <img 
-            src={data.photoUrl} 
-            alt={data.name}
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              display: 'block'
-            }}
-          />
-        </div>
+      {/* Photo - Circular, Overlapping Header */}
+      <div
+        style={{
+          marginTop: '-16px',
+          textAlign: 'center',
+          position: 'relative',
+          zIndex: 2,
+        }}
+      >
+        <img
+          src={data.photoUrl}
+          alt={data.name}
+          style={{
+            width: '86px',
+            height: '98px',
+            objectFit: 'cover',
+            border: '3px solid #ffffff',
+            borderRadius: '50%',
+            boxShadow: '0 3px 9px rgba(0, 0, 0, 0.12)',
+            backgroundColor: '#e0e0e0',
+          }}
+        />
       </div>
 
       {/* Details Section */}
-      <div style={{
-        padding: '8px 10px 10px 10px',
-        textAlign: 'center',
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column'
-      }}>
-        <h2 style={{
-          fontSize: '12px',
-          fontWeight: 700,
-          color: '#1a1a1a',
-          margin: '0 0 2px 0',
-          textTransform: 'uppercase'
-        }}>
+      <div
+        style={{
+          padding: '7px 11px 9px 11px',
+          textAlign: 'center',
+          flexGrow: 1,
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        <h2
+          style={{
+            fontSize: '14px',
+            fontWeight: 700,
+            color: '#003366',
+            marginBottom: '1px',
+            marginTop: '5px',
+          }}
+        >
           {data.name}
         </h2>
-        <p style={{
-          fontSize: '8px',
-          fontWeight: 600,
-          color: '#ff6b35',
-          margin: '0 0 8px 0',
-          textTransform: 'uppercase',
-          letterSpacing: '0.4px'
-        }}>
-          Kabaddi Player
+        <p
+          style={{
+            fontSize: '8.5px',
+            fontWeight: 500,
+            color: '#FF6F00',
+            marginBottom: '9px',
+            textTransform: 'uppercase',
+            letterSpacing: '0.3px',
+          }}
+        >
+          DDKA Member
         </p>
 
         {/* Detail Grid */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'auto 1fr',
-          gap: '3px 6px',
-          textAlign: 'left',
-          fontSize: '8px',
-          marginTop: 'auto',
-          lineHeight: 1.3
-        }}>
-          <span style={{fontWeight: 600, color: '#333', fontSize: '7.5px'}}>ID:</span>
-          <span style={{fontWeight: 600, color: '#ff6b35', fontSize: '8px'}}>{data.idNo}</span>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'auto 1fr',
+            gap: '3.5px 5px',
+            textAlign: 'left',
+            fontSize: '8.5px',
+            marginTop: 'auto',
+            lineHeight: 1.25,
+          }}
+        >
+          <span style={{ fontWeight: 600, color: '#333', fontSize: '8px' }}>ID:</span>
+          <span style={{ fontWeight: 600, color: '#003366', fontSize: '8.5px' }}>{data.idNo}</span>
 
-          <span style={{fontWeight: 600, color: '#333', fontSize: '7.5px'}}>DOB:</span>
-          <span style={{fontWeight: 500, color: '#1a1a1a', fontSize: '8px'}}>{formatDOB(data.dob)}</span>
+          <span style={{ fontWeight: 600, color: '#333', fontSize: '8px' }}>DOB:</span>
+          <span style={{ fontWeight: 500, color: '#111', fontSize: '8.5px' }}>{formatDOB(data.dob)}</span>
 
-          <span style={{fontWeight: 600, color: '#333', fontSize: '7.5px'}}>Blood:</span>
-          <span style={{fontWeight: 700, color: '#d32f2f', fontSize: '8.5px'}}>{data.bloodGroup}</span>
+          <span style={{ fontWeight: 600, color: '#333', fontSize: '8px' }}>Blood:</span>
+          <span style={{ fontWeight: 700, color: '#C62828', fontSize: '8.5px' }}>{data.bloodGroup}</span>
 
-          <span style={{fontWeight: 600, color: '#333', fontSize: '7.5px'}}>Phone:</span>
-          <span style={{fontWeight: 500, color: '#1a1a1a', fontSize: '8px'}}>{data.phone}</span>
+          <span style={{ fontWeight: 600, color: '#333', fontSize: '8px' }}>Phone:</span>
+          <span style={{ fontWeight: 500, color: '#111', fontSize: '8.5px' }}>{data.phone}</span>
 
-          <span style={{gridColumn: '1 / -1', fontWeight: 600, color: '#333', fontSize: '7.5px', marginTop: '2px'}}>Address:</span>
-          <span style={{gridColumn: '1 / -1', fontWeight: 500, color: '#1a1a1a', fontSize: '7.5px', lineHeight: 1.2}}>{data.address}</span>
+          <span
+            style={{
+              gridColumn: '1 / -1',
+              fontWeight: 600,
+              color: '#333',
+              fontSize: '8px',
+              marginTop: '2.5px',
+            }}
+          >
+            Address:
+          </span>
+          <span
+            style={{
+              gridColumn: '1 / -1',
+              fontWeight: 500,
+              color: '#111',
+              fontSize: '8px',
+              lineHeight: 1.2,
+            }}
+          >
+            {data.address}
+          </span>
 
-          <span style={{gridColumn: '1 / -1', fontWeight: 600, color: '#333', fontSize: '7.5px', marginTop: '2px'}}>Father:</span>
-          <span style={{gridColumn: '1 / -1', fontWeight: 500, color: '#1a1a1a', fontSize: '7.5px'}}>{data.fathersName}</span>
+          <span
+            style={{
+              gridColumn: '1 / -1',
+              fontWeight: 600,
+              color: '#333',
+              fontSize: '8px',
+              marginTop: '2.5px',
+            }}
+          >
+            Father:
+          </span>
+          <span
+            style={{
+              gridColumn: '1 / -1',
+              fontWeight: 500,
+              color: '#111',
+              fontSize: '8px',
+            }}
+          >
+            {data.fathersName}
+          </span>
         </div>
       </div>
 
-      {/* Bottom Bar */}
-      <div 
+      {/* Bottom Bar - Orange Accent */}
+      <div
         style={{
           height: '5px',
-          background: 'linear-gradient(135deg, #ff6b35, #f7931e)',
-          marginTop: 'auto'
+          background: 'linear-gradient(135deg, #FF8F00, #FF6F00)',
+          marginTop: 'auto',
         }}
       />
     </div>

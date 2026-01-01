@@ -7,10 +7,12 @@ interface Props {
 
 export const IDCardBack: React.FC<Props> = ({ data }) => {
   const qrData = `DDKA:${data.idNo}:${data.name}`;
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=70x70&data=${encodeURIComponent(qrData)}&color=ff6b35`;
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=65x65&data=${encodeURIComponent(
+    qrData,
+  )}`;
 
   return (
-    <div 
+    <div
       style={{
         width: '210px',
         height: '330px',
@@ -21,163 +23,163 @@ export const IDCardBack: React.FC<Props> = ({ data }) => {
         flexDirection: 'column',
         backgroundColor: '#ffffff',
         position: 'relative',
-        fontFamily: "'Poppins', sans-serif"
+        fontFamily: "'Poppins', sans-serif",
       }}
     >
-      {/* Watermark Logos */}
-      <div style={{
-        position: 'absolute',
-        inset: 0,
-        pointerEvents: 'none',
-        opacity: 0.08,
-        zIndex: 0
-      }}>
-        <div style={{position: 'absolute', top: '16px', left: '16px', fontSize: '24px', fontWeight: 900, color: '#ff6b35'}}>AKFI</div>
-        <div style={{position: 'absolute', bottom: '16px', right: '16px', fontSize: '24px', fontWeight: 900, color: '#ff6b35'}}>JH-KBD</div>
-      </div>
-
-      {/* Header */}
-      <div 
+      {/* Top Header - Deep Blue */}
+      <div
         style={{
-          background: 'linear-gradient(135deg, #ff6b35 0%, #f7931e 100%)',
-          color: 'white',
+          background: 'linear-gradient(135deg, #00579B, #003366)',
+          color: '#ffffff',
           textAlign: 'center',
-          padding: '9px 10px',
-          position: 'relative',
-          zIndex: 1
+          padding: '7px 9px',
         }}
       >
-        <h3 style={{
-          fontSize: '11px',
-          fontWeight: 600,
-          margin: '0 0 2px 0'
-        }}>
+        <h3
+          style={{
+            fontSize: '11.5px',
+            fontWeight: 600,
+            marginBottom: '1px',
+            marginTop: 0,
+          }}
+        >
           Dhanbad District Kabaddi
         </h3>
-        <p style={{
-          fontSize: '8px',
-          fontWeight: 400,
-          opacity: 0.95,
-          margin: 0
-        }}>
+        <p
+          style={{
+            fontSize: '8px',
+            fontWeight: 400,
+            opacity: 0.9,
+            margin: 0,
+          }}
+        >
           Member ID Card
         </p>
       </div>
 
       {/* Main Content */}
-      <div style={{
-        padding: '10px 11px',
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        fontSize: '8px',
-        color: '#333',
-        lineHeight: 1.3,
-        zIndex: 1
-      }}>
-        {/* About Section */}
-        <h4 style={{
-          fontSize: '9px',
-          fontWeight: 600,
-          color: '#ff6b35',
-          marginBottom: '3px',
-          textAlign: 'center'
-        }}>
+      <div
+        style={{
+          padding: '9px 11px',
+          flexGrow: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          fontSize: '8.5px',
+          color: '#333',
+          lineHeight: 1.25,
+        }}
+      >
+        <h4
+          style={{
+            fontSize: '9.5px',
+            fontWeight: 600,
+            color: '#003366',
+            marginBottom: '3.5px',
+            textAlign: 'center',
+          }}
+        >
           About DDKA
         </h4>
-        <p style={{
-          textAlign: 'center',
-          marginBottom: '7px',
-          fontSize: '7.5px',
-          lineHeight: 1.25,
-          color: '#555'
-        }}>
+        <p
+          style={{
+            textAlign: 'center',
+            marginBottom: '7px',
+            fontSize: '8px',
+            lineHeight: 1.2,
+            color: '#444',
+          }}
+        >
           Promoting excellence in Kabaddi. Dedicated to developing talent, fitness, and sportsmanship.
         </p>
 
         {/* QR Section */}
-        <div style={{
-          textAlign: 'center',
-          margin: '5px 0'
-        }}>
-          <img 
-            src={qrUrl} 
-            alt="QR Code" 
+        <div
+          style={{
+            textAlign: 'center',
+            margin: '5px 0',
+          }}
+        >
+          <img
+            src={qrUrl}
+            alt="QR Code"
             style={{
-              width: '70px',
-              height: '70px',
-              border: '2px solid #ff6b35',
-              borderRadius: '4px',
-              margin: '0 auto 4px auto',
+              width: '65px',
+              height: '65px',
+              border: '1.5px solid #004A99',
+              borderRadius: '2.5px',
+              margin: '0 auto 3.5px auto',
               display: 'block',
-              backgroundColor: '#fff'
+              backgroundColor: '#fff',
             }}
           />
-          <p style={{
-            fontSize: '7.5px',
-            fontWeight: 500,
-            color: '#ff6b35',
-            margin: 0
-          }}>
+          <p
+            style={{
+              fontSize: '8px',
+              fontWeight: 500,
+              color: '#003366',
+              margin: 0,
+            }}
+          >
             Scan for Details
           </p>
         </div>
 
-        {/* Club Info Grid */}
-        <div style={{
-          fontSize: '7.5px',
-          textAlign: 'center',
-          margin: '5px 0 3px 0',
-          paddingTop: '4px',
-          borderTop: '1px dashed #ff6b35',
-          color: '#444',
-          lineHeight: 1.2
-        }}>
-          <p style={{margin: '2px 0'}}>
-            <strong style={{color: '#ff6b35'}}>Phone:</strong> +91-6542-8765-43
+        {/* Issuing Info */}
+        <div
+          style={{
+            fontSize: '8px',
+            textAlign: 'center',
+            margin: '5px 0 2.5px 0',
+            paddingTop: '5px',
+            borderTop: '1px dashed #004A99',
+            color: '#444',
+          }}
+        >
+          <p style={{ margin: 0 }}>
+            <strong style={{ color: '#003366' }}>Phone:</strong> +91-6542-8765-43
           </p>
-          <p style={{margin: '2px 0'}}>
-            <strong style={{color: '#ff6b35'}}>Email:</strong> ddka@kabaddi.in
-          </p>
-        </div>
-
-        {/* Address Info */}
-        <div style={{
-          fontSize: '7px',
-          textAlign: 'center',
-          margin: '3px 0 5px 0',
-          color: '#555',
-          lineHeight: 1.25,
-          wordWrap: 'break-word'
-        }}>
-          <p style={{margin: 0}}>
-            <strong style={{color: '#ff6b35'}}>Address:</strong> Dhanbad, Jharkhand, India
+          <p style={{ margin: 0 }}>
+            <strong style={{ color: '#003366' }}>Email:</strong> ddka@kabaddi.in
           </p>
         </div>
 
-        {/* Contact Footer */}
-        <div style={{
-          fontSize: '7px',
-          textAlign: 'center',
-          color: '#666',
-          marginTop: 'auto',
-          paddingTop: '4px',
-          borderTop: '1px solid #ff6b35',
-          lineHeight: 1.2
-        }}>
-          <p style={{margin: '2px 0 0 0'}}>
-            If found, please return to DDKA office
+        <div
+          style={{
+            fontSize: '8px',
+            textAlign: 'center',
+            margin: '2.5px 0 5px 0',
+            color: '#444',
+            wordWrap: 'break-word',
+            lineHeight: 1.2,
+          }}
+        >
+          <p style={{ margin: 0 }}>
+            <strong style={{ color: '#003366' }}>Address:</strong> Dhanbad, Jharkhand, India
           </p>
-          <p style={{margin: '1px 0'}}>Est. 2017</p>
+        </div>
+
+        {/* Contact Info */}
+        <div
+          style={{
+            fontSize: '7.5px',
+            textAlign: 'center',
+            color: '#555',
+            marginTop: 'auto',
+            paddingTop: '5px',
+            borderTop: '1px solid #FF8F00',
+            lineHeight: 1.2,
+            wordWrap: 'break-word',
+          }}
+        >
+          <p style={{ margin: 0 }}>If found, please return to DDKA office.</p>
         </div>
       </div>
 
-      {/* Bottom Bar */}
-      <div 
+      {/* Bottom Bar - Orange Accent */}
+      <div
         style={{
-          height: '5px',
-          background: 'linear-gradient(135deg, #ff6b35, #f7931e)',
-          marginTop: 'auto'
+          height: '4.5px',
+          background: 'linear-gradient(135deg, #FF8F00, #FF6F00)',
         }}
       />
     </div>
