@@ -169,28 +169,30 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ lang }) => {
   }
 
   return (
-    <div className="bg-white shadow-2xl rounded-[2.5rem] overflow-hidden max-w-5xl mx-auto border border-gray-100">
-      <div className="bg-blue-900 p-12 text-white relative overflow-hidden">
-        <div className="relative z-10">
-          <h2 className="text-5xl font-oswald font-bold uppercase tracking-wider">{t.playerTitle}</h2>
-          <p className="text-blue-200 mt-3 font-light text-xl">{step === 1 ? t.playerSubtitle : "Step 2: Manual Payment Receipt Submission"}</p>
+    <div className="bg-white shadow-2xl rounded-2xl sm:rounded-[2.5rem] overflow-hidden max-w-full sm:max-w-5xl mx-auto border border-gray-100">
+      <div className="bg-blue-900 p-4 xs:p-6 sm:p-8 md:p-12 text-white relative overflow-hidden">
+        <div className="flex items-start justify-between relative z-10 w-full">
+          <div>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-oswald font-bold uppercase tracking-wider">{t.playerTitle}</h2>
+            <p className="text-blue-200 mt-3 font-light text-lg sm:text-xl">{step === 1 ? t.playerSubtitle : "Step 2: Manual Payment Receipt Submission"}</p>
+          </div>
+          <div className="ml-2 mt-1 bg-orange-600 px-2 py-1 xs:px-4 xs:py-2 sm:px-8 sm:py-4 rounded-2xl xs:rounded-3xl font-black shadow-2xl text-base xs:text-lg sm:text-2xl animate-pulse z-20 whitespace-nowrap flex-shrink-0">
+            ₹{FEES.PLAYER}
+          </div>
         </div>
-        <div className="absolute top-12 right-12 bg-orange-600 px-8 py-4 rounded-3xl font-black shadow-2xl text-2xl animate-pulse">
-          ₹{FEES.PLAYER}
-        </div>
-        <div className="absolute -bottom-10 -right-10 w-48 h-48 bg-white/5 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-6 -right-6 sm:-bottom-10 sm:-right-10 w-32 h-32 sm:w-48 sm:h-48 bg-white/5 rounded-full blur-3xl"></div>
       </div>
 
       {step === 1 ? (
-        <form onSubmit={handleProceedToPayment} className="p-12 space-y-12">
+        <form onSubmit={handleProceedToPayment} className="p-2 xs:p-4 sm:p-8 md:p-12 space-y-6 xs:space-y-8 sm:space-y-10 md:space-y-12">
           
           {/* Section 1: Personal Information */}
           <section className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex items-center space-x-4 mb-10 border-b border-slate-100 pb-4">
-              <div className="p-3 bg-orange-50 rounded-2xl"><User className="text-orange-600" size={28} /></div>
-              <h3 className="text-3xl font-bold text-slate-800 font-oswald uppercase tracking-tight">{lang === 'hi' ? 'व्यक्तिगत जानकारी' : 'Personal Information'}</h3>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 mb-6 sm:mb-10 border-b border-slate-100 pb-4">
+              <div className="p-2 sm:p-3 bg-orange-50 rounded-2xl"><User className="text-orange-600" size={24} /></div>
+              <h3 className="text-2xl sm:text-3xl font-bold text-slate-800 font-oswald uppercase tracking-tight">{lang === 'hi' ? 'व्यक्तिगत जानकारी' : 'Personal Information'}</h3>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-10">
               <div className="space-y-3">
                 <label className="text-sm font-black text-slate-500 uppercase tracking-widest">{t.labels.fullName}</label>
                 <input required name="fullName" value={formData.fullName} onChange={handleChange} className="w-full px-6 py-5 border-2 border-slate-100 rounded-2xl focus:ring-4 focus:ring-blue-50 focus:border-blue-500 transition-all outline-none text-lg" placeholder="Full Name" />
@@ -203,7 +205,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ lang }) => {
                 <label className="text-sm font-black text-slate-500 uppercase tracking-widest flex items-center gap-2"><Calendar size={16} /> Date of Birth</label>
                 <input required type="date" name="dob" value={formData.dob} onChange={handleChange} className="w-full px-6 py-5 border-2 border-slate-100 rounded-2xl focus:ring-4 focus:ring-blue-50 focus:border-blue-500 transition-all outline-none text-lg" />
               </div>
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-2 gap-4 sm:gap-6">
                 <div className="space-y-3">
                   <label className="text-sm font-black text-slate-500 uppercase tracking-widest">Gender</label>
                   <select name="gender" value={formData.gender} onChange={handleChange} className="w-full px-6 py-5 border-2 border-slate-100 rounded-2xl focus:ring-4 focus:ring-blue-50 focus:border-blue-500 transition-all outline-none bg-white text-lg">
@@ -223,11 +225,11 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ lang }) => {
 
           {/* Section 2: Contact & Identity */}
           <section className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="flex items-center space-x-4 mb-10 border-b border-slate-100 pb-4">
-              <div className="p-3 bg-blue-50 rounded-2xl"><Phone className="text-blue-600" size={28} /></div>
-              <h3 className="text-3xl font-bold text-slate-800 font-oswald uppercase tracking-tight">{lang === 'hi' ? 'संपर्क और पहचान' : 'Contact & Identity'}</h3>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 mb-6 sm:mb-10 border-b border-slate-100 pb-4">
+              <div className="p-2 sm:p-3 bg-blue-50 rounded-2xl"><Phone className="text-blue-600" size={24} /></div>
+              <h3 className="text-2xl sm:text-3xl font-bold text-slate-800 font-oswald uppercase tracking-tight">{lang === 'hi' ? 'संपर्क और पहचान' : 'Contact & Identity'}</h3>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-10">
               <div className="space-y-3">
                 <label className="text-sm font-black text-slate-500 uppercase tracking-widest flex items-center gap-2"><Mail size={16} /> Email Address</label>
                 <input required type="email" name="email" value={formData.email} onChange={handleChange} className="w-full px-6 py-5 border-2 border-slate-100 rounded-2xl outline-none focus:border-blue-500 text-lg" placeholder="example@mail.com" />
@@ -253,11 +255,11 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ lang }) => {
 
           {/* Section 3: Sports Experience */}
           <section className="animate-in fade-in slide-in-from-bottom-4 duration-1000">
-            <div className="flex items-center space-x-4 mb-10 border-b border-slate-100 pb-4">
-              <div className="p-3 bg-green-50 rounded-2xl"><Trophy className="text-green-600" size={28} /></div>
-              <h3 className="text-3xl font-bold text-slate-800 font-oswald uppercase tracking-tight">{lang === 'hi' ? 'खेल का अनुभव' : 'Sports Experience'}</h3>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 mb-6 sm:mb-10 border-b border-slate-100 pb-4">
+              <div className="p-2 sm:p-3 bg-green-50 rounded-2xl"><Trophy className="text-green-600" size={24} /></div>
+              <h3 className="text-2xl sm:text-3xl font-bold text-slate-800 font-oswald uppercase tracking-tight">{lang === 'hi' ? 'खेल का अनुभव' : 'Sports Experience'}</h3>
             </div>
-            <div className="space-y-10">
+            <div className="space-y-6 sm:space-y-10">
               <div className="space-y-3">
                 <label className="text-sm font-black text-slate-500 uppercase tracking-widest">Previous Experience (if any)</label>
                 <textarea name="sportsExperience" value={formData.sportsExperience} onChange={handleChange} className="w-full px-6 py-5 border-2 border-slate-100 rounded-2xl outline-none h-32 text-lg" placeholder="Mention clubs, tournaments, or achievements..."></textarea>
@@ -271,14 +273,14 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ lang }) => {
 
           {/* Section 4: Mandatory Document Uploads */}
           <section>
-            <div className="flex items-center space-x-4 mb-10 border-b border-slate-100 pb-4">
-              <div className="p-3 bg-purple-50 rounded-2xl"><Upload className="text-purple-600" size={28} /></div>
-              <h3 className="text-3xl font-bold text-slate-800 font-oswald uppercase tracking-tight">{t.labels.uploads}</h3>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 mb-6 sm:mb-10 border-b border-slate-100 pb-4">
+              <div className="p-2 sm:p-3 bg-purple-50 rounded-2xl"><Upload className="text-purple-600" size={24} /></div>
+              <h3 className="text-2xl sm:text-3xl font-bold text-slate-800 font-oswald uppercase tracking-tight">{t.labels.uploads}</h3>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 md:gap-8">
               {['photo', 'front', 'back'].map((key) => (
                 <div key={key} className="relative group">
-                  <label className={`border-4 border-dashed ${fileNames[key] ? 'border-green-500 bg-green-50/50' : 'border-slate-200 bg-slate-50'} rounded-[2.5rem] p-8 h-64 flex flex-col items-center justify-center hover:border-blue-400 transition-all cursor-pointer overflow-hidden shadow-sm`}>
+                  <label className={`border-4 border-dashed ${fileNames[key] ? 'border-green-500 bg-green-50/50' : 'border-slate-200 bg-slate-50'} rounded-2xl sm:rounded-[2.5rem] p-4 xs:p-6 sm:p-8 h-48 xs:h-56 sm:h-64 flex flex-col items-center justify-center hover:border-blue-400 transition-all cursor-pointer overflow-hidden shadow-sm`}>
                     <input required type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, key)} />
                     {previews[key] && (
                       <img src={previews[key]} alt="Preview" className="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:opacity-10 transition-opacity" />
@@ -291,7 +293,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ lang }) => {
                         {key === 'photo' ? t.labels.photo : key === 'front' ? t.labels.aadharFront : t.labels.aadharBack}
                       </p>
                       {fileNames[key] && (
-                        <p className="text-xs text-blue-600 font-bold mt-2 truncate max-w-[160px] bg-white px-3 py-1 rounded-full">{fileNames[key]}</p>
+                        <p className="text-xs text-blue-600 font-bold mt-2 truncate max-w-[120px] xs:max-w-[160px] bg-white px-2 xs:px-3 py-1 rounded-full">{fileNames[key]}</p>
                       )}
                     </div>
                   </label>
@@ -305,11 +307,11 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ lang }) => {
             </div>
           </section>
 
-          <div className="pt-10">
+          <div className="pt-4 xs:pt-6 sm:pt-10">
             <button 
               type="submit" 
               disabled={isSubmitting}
-              className={`w-full bg-orange-600 hover:bg-blue-900 text-white font-oswald text-3xl uppercase py-8 rounded-[2rem] shadow-2xl transition-all flex items-center justify-center gap-4 group active:scale-95 ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+              className={`w-full bg-orange-600 hover:bg-blue-900 text-white font-oswald text-xl xs:text-2xl sm:text-3xl uppercase py-4 xs:py-6 sm:py-8 rounded-xl xs:rounded-[2rem] shadow-2xl transition-all flex items-center justify-center gap-4 group active:scale-95 ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
             >
               {isSubmitting ? 'Validating Data...' : t.submit}
             </button>
@@ -317,66 +319,66 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ lang }) => {
         </form>
       ) : (
         /* STEP 2: PAYMENT & RECEIPT VERIFICATION */
-        <form onSubmit={handleFinalSubmit} className="p-16 space-y-16 animate-in slide-in-from-right-20 duration-1000 bg-slate-50">
+        <form onSubmit={handleFinalSubmit} className="p-2 xs:p-4 sm:p-10 md:p-16 space-y-6 xs:space-y-8 sm:space-y-12 md:space-y-16 animate-in slide-in-from-right-20 duration-1000 bg-slate-50">
           <div className="text-center space-y-4">
             <h3 className="text-4xl font-oswald font-bold text-slate-900 uppercase tracking-wide">{tp.fee}: ₹{FEES.PLAYER}</h3>
             <p className="text-slate-500 text-xl font-medium italic">{tp.upi}</p>
           </div>
           
-          <div className="flex flex-col lg:flex-row items-center justify-center gap-16">
-            <div className="flex flex-col items-center">
-              <div className="bg-white p-10 rounded-[4rem] border-8 border-white shadow-2xl mb-8 transform hover:scale-105 transition-transform duration-500">
+          <div className="flex flex-col gap-6 xs:gap-8 lg:flex-row items-center justify-center lg:gap-16 overflow-x-auto">
+            <div className="flex flex-col items-center w-full lg:w-auto min-w-[220px] xs:min-w-[260px] sm:min-w-[320px]">
+              <div className="bg-white p-4 xs:p-6 sm:p-10 rounded-xl xs:rounded-[2rem] sm:rounded-[4rem] border-4 sm:border-8 border-white shadow-2xl mb-4 xs:mb-6 sm:mb-8 transform hover:scale-105 transition-transform duration-500">
                 <img 
                   src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1766767120/QR_1766767090_adh5z3.png" 
                   alt="DDKA Official QR Code" 
-                  className="w-64 h-64 object-contain rounded-3xl" 
+                  className="w-32 h-32 xs:w-40 xs:h-40 sm:w-64 sm:h-64 object-contain rounded-lg xs:rounded-2xl sm:rounded-3xl" 
                 />
               </div>
-              <div className="bg-blue-900 px-12 py-5 rounded-full font-black text-white shadow-2xl tracking-tighter text-2xl border-4 border-white/20">
+              <div className="bg-blue-900 px-4 py-2 xs:px-6 xs:py-3 sm:px-12 sm:py-5 rounded-full font-black text-white shadow-2xl tracking-tighter text-base xs:text-lg sm:text-2xl border-2 sm:border-4 border-white/20">
                 {tp.upiId}
               </div>
             </div>
 
             {/* PAYMENT SCREENSHOT UPLOAD */}
-            <div className="w-full max-w-md">
-              <label className="block text-sm font-black text-slate-700 text-center uppercase tracking-[0.4em] mb-6">Upload Payment Screenshot</label>
+            <div className="w-full max-w-[90vw] xs:max-w-xs sm:max-w-md">
+              <label className="block text-xs sm:text-sm font-black text-slate-700 text-center uppercase tracking-[0.3em] sm:tracking-[0.4em] mb-4 sm:mb-6">Upload Payment Screenshot</label>
               <div className="relative">
-                <label className={`border-8 border-dashed ${fileNames.receipt ? 'border-green-500 bg-green-50' : 'border-slate-300 bg-white'} rounded-[3.5rem] p-12 h-80 flex flex-col items-center justify-center cursor-pointer transition-all overflow-hidden shadow-2xl`}>
+                <label className={`border-4 sm:border-8 border-dashed ${fileNames.receipt ? 'border-green-500 bg-green-50' : 'border-slate-300 bg-white'} rounded-xl xs:rounded-2xl sm:rounded-[3.5rem] p-4 xs:p-6 sm:p-12 h-32 xs:h-48 sm:h-80 flex flex-col items-center justify-center cursor-pointer transition-all overflow-hidden shadow-2xl`}>
                   <input required type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'receipt')} />
                   {previews.receipt ? (
-                    <img src={previews.receipt} alt="Receipt Preview" className="absolute inset-0 w-full h-full object-contain p-8" />
+                    <img src={previews.receipt} alt="Receipt Preview" className="absolute inset-0 w-full h-full object-contain p-2 xs:p-4 sm:p-8" />
                   ) : (
                     <div className="text-center">
-                      <div className="p-6 bg-slate-50 rounded-full mb-4 inline-block"><Upload size={48} className="text-slate-300" /></div>
-                      <p className="text-slate-400 font-black text-lg uppercase">Select Screenshot</p>
+                      <div className="p-2 xs:p-4 sm:p-6 bg-slate-50 rounded-full mb-1 xs:mb-2 sm:mb-4 inline-block"><Upload size={28} className="text-slate-300" /></div>
+                      <p className="text-slate-400 font-black text-xs xs:text-sm sm:text-lg uppercase">Select Screenshot</p>
                     </div>
                   )}
                 </label>
                 {fileNames.receipt && (
-                  <button onClick={(e) => removeFile(e, 'receipt')} className="absolute -top-6 -right-6 bg-red-500 text-white p-4 rounded-full shadow-2xl hover:rotate-90 transition-all z-20">
-                    <X size={24} />
+                  <button onClick={(e) => removeFile(e, 'receipt')} className="absolute -top-4 -right-4 sm:-top-6 sm:-right-6 bg-red-500 text-white p-2 sm:p-4 rounded-full shadow-2xl hover:rotate-90 transition-all z-20">
+                    <X size={20} />
                   </button>
                 )}
               </div>
             </div>
           </div>
 
-          <div className="max-w-2xl mx-auto space-y-6">
-            <label className="block text-lg font-black text-slate-700 text-center uppercase tracking-[0.5em]">{tp.txId}</label>
+          <div className="max-w-[90vw] xs:max-w-xs sm:max-w-2xl mx-auto space-y-3 xs:space-y-4 sm:space-y-6">
+            <label className="block text-base sm:text-lg font-black text-slate-700 text-center uppercase tracking-[0.3em] sm:tracking-[0.5em]">{tp.txId}</label>
             <input 
               required 
               value={transactionId}
               onChange={(e) => setTransactionId(e.target.value)}
-              className="w-full px-10 py-8 border-8 border-white rounded-[3rem] focus:ring-12 focus:ring-orange-100 outline-none text-center font-mono text-4xl shadow-inner uppercase bg-white tracking-widest"
+              className="w-full px-4 xs:px-6 sm:px-10 py-3 xs:py-5 sm:py-8 border-4 sm:border-8 border-white rounded-lg xs:rounded-2xl sm:rounded-[3rem] focus:ring-8 sm:focus:ring-12 focus:ring-orange-100 outline-none text-center font-mono text-lg xs:text-2xl sm:text-4xl shadow-inner uppercase bg-white tracking-widest"
               placeholder="TXN123456789"
             />
           </div>
 
-          <div className="pt-6">
+          <div className="pt-3 xs:pt-4 sm:pt-6">
             <button 
               type="submit" 
               disabled={isSubmitting || !transactionId || !selectedFiles.receipt}
-              className={`w-full bg-blue-900 hover:bg-orange-600 text-white font-oswald text-4xl uppercase py-10 rounded-[3rem] shadow-2xl transition-all active:scale-95 ${isSubmitting || !selectedFiles.receipt ? 'opacity-40 cursor-not-allowed' : ''}`}
+              className={`w-full bg-blue-900 hover:bg-orange-600 text-white font-oswald text-xl xs:text-2xl sm:text-4xl uppercase py-4 xs:py-6 sm:py-10 rounded-lg xs:rounded-2xl sm:rounded-[3rem] shadow-2xl transition-all active:scale-95 ${isSubmitting || !selectedFiles.receipt ? 'opacity-40 cursor-not-allowed' : ''}`}
             >
               {isSubmitting ? "Processing Submission..." : "Complete Registration"}
             </button>

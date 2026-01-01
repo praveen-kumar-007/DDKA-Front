@@ -19,9 +19,14 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onPageChange, lang, onLang
     { name: t.nav.about, id: 'about' },
     { name: t.nav.gallery, id: 'gallery' },
     { name: t.nav.news, id: 'news' },
-    { name: t.nav.register, id: 'register' },
-    { name: t.nav.institution, id: 'institution' },
+    { name: t.nav.register, id: 'register', dropdown: [
+      { name: t.forms.playerTitle, id: 'register' },
+      { name: t.forms.instTitle, id: 'institution' },
+    ] },
   ];
+
+  // State for mobile dropdown
+  const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false);
 
   return (
     <nav className="bg-white shadow-lg sticky top-0 z-50">
@@ -47,16 +52,72 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onPageChange, lang, onLang
           <div className="hidden lg:flex items-center space-x-4 xl:space-x-6">
             <div className="flex items-center space-x-4 xl:space-x-6 mr-4 border-r border-gray-100 pr-4">
               {navItems.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => onPageChange(item.id)}
-                  className={`text-xs xl:text-sm font-semibold transition-colors duration-200 uppercase tracking-wider ${
-                    currentPage === item.id ? 'text-orange-600 border-b-2 border-orange-600' : 'text-gray-600 hover:text-blue-800'
-                  }`}
-                >
-                  {item.name}
-                </button>
+                item.dropdown ? (
+                  <div key={item.id} className="relative group hidden lg:block">
+                    <button
+                      className={`text-xs xl:text-sm font-semibold transition-colors duration-200 uppercase tracking-wider flex items-center gap-1 ${
+                        (currentPage === 'register' || currentPage === 'institution') ? 'text-orange-600 border-b-2 border-orange-600' : 'text-gray-600 hover:text-blue-800'
+                      }`}
+                      tabIndex={0}
+                    >
+                      {item.name}
+                      <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                    </button>
+                    <div className="absolute left-0 mt-2 w-48 bg-white border border-gray-100 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 pointer-events-none group-hover:pointer-events-auto group-focus-within:pointer-events-auto transition-opacity z-30">
+                      {item.dropdown.map((sub) => (
+                        <button
+                          key={sub.id}
+                          onClick={() => onPageChange(sub.id)}
+                          className={`block w-full text-left px-4 py-2 text-xs xl:text-sm font-semibold rounded-lg ${
+                            currentPage === sub.id ? 'bg-orange-50 text-orange-600' : 'text-gray-700 hover:bg-gray-50'
+                          }`}
+                        >
+                          {sub.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    key={item.id}
+                    onClick={() => onPageChange(item.id)}
+                    className={`text-xs xl:text-sm font-semibold transition-colors duration-200 uppercase tracking-wider ${
+                      currentPage === item.id ? 'text-orange-600 border-b-2 border-orange-600' : 'text-gray-600 hover:text-blue-800'
+                    }`}
+                  >
+                    {item.name}
+                  </button>
+                )
               ))}
+              {/* Mobile Registration Dropdown Button */}
+              {navItems.find((item) => item.dropdown) && (
+                <div className="relative lg:hidden">
+                  <button
+                    className={`text-xs font-semibold transition-colors duration-200 uppercase tracking-wider flex items-center gap-1 ${
+                      (currentPage === 'register' || currentPage === 'institution') ? 'text-orange-600 border-b-2 border-orange-600' : 'text-gray-600 hover:text-blue-800'
+                    }`}
+                    onClick={() => setMobileDropdownOpen((open) => !open)}
+                  >
+                    {t.nav.register}
+                    <svg className={`w-3 h-3 ml-1 transform transition-transform ${mobileDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                  </button>
+                  {mobileDropdownOpen && (
+                    <div className="absolute left-0 mt-2 w-48 bg-white border border-gray-100 rounded-lg shadow-lg z-30">
+                      {navItems.find((item) => item.dropdown).dropdown.map((sub) => (
+                        <button
+                          key={sub.id}
+                          onClick={() => { onPageChange(sub.id); setIsOpen(false); setMobileDropdownOpen(false); }}
+                          className={`block w-full text-left px-4 py-2 text-xs font-semibold rounded-lg ${
+                            currentPage === sub.id ? 'bg-orange-50 text-orange-600' : 'text-gray-700 hover:bg-gray-50'
+                          }`}
+                        >
+                          {sub.name}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
             
             <div className="flex items-center space-x-3">
@@ -86,12 +147,12 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onPageChange, lang, onLang
 
       {/* Mobile menu dropdown */}
       {isOpen && (
-        <div className="lg:hidden bg-white border-t border-gray-100 shadow-xl absolute w-full animate-in fade-in slide-in-from-top-2">
+        <div className="lg:hidden bg-white border-t border-gray-100 shadow-xl absolute w-full animate-in fade-in slide-in-from-top-2 z-40">
           <div className="px-4 pt-2 pb-6 space-y-1">
-            {navItems.map((item) => (
+            {navItems.filter((item) => !item.dropdown).map((item) => (
               <button
                 key={item.id}
-                onClick={() => { onPageChange(item.id); setIsOpen(false); }}
+                onClick={() => { onPageChange(item.id); setIsOpen(false); setMobileDropdownOpen(false); }}
                 className={`block w-full text-left px-4 py-4 text-base font-semibold rounded-lg ${
                   currentPage === item.id ? 'bg-orange-50 text-orange-600' : 'text-gray-700 hover:bg-gray-50'
                 }`}
@@ -99,6 +160,33 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onPageChange, lang, onLang
                 {item.name}
               </button>
             ))}
+            {/* Mobile Registration Dropdown */}
+            <div className="group">
+              <button
+                className={`block w-full text-left px-4 py-4 text-base font-semibold rounded-lg flex items-center justify-between ${
+                  (currentPage === 'register' || currentPage === 'institution') ? 'bg-orange-50 text-orange-600' : 'text-gray-700 hover:bg-gray-50'
+                }`}
+                onClick={() => setMobileDropdownOpen((open) => !open)}
+              >
+                {t.nav.register}
+                <svg className={`w-4 h-4 ml-2 transform transition-transform ${mobileDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+              </button>
+              {mobileDropdownOpen && (
+                <div className="pl-4 mt-1">
+                  {navItems.find((item) => item.dropdown).dropdown.map((sub) => (
+                    <button
+                      key={sub.id}
+                      onClick={() => { onPageChange(sub.id); setIsOpen(false); setMobileDropdownOpen(false); }}
+                      className={`block w-full text-left px-4 py-2 text-sm font-semibold rounded-lg ${
+                        currentPage === sub.id ? 'bg-orange-50 text-orange-600' : 'text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      {sub.name}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
