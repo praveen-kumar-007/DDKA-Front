@@ -31,22 +31,50 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onPageChange, lang, onLang
 
   return (
     <nav className="bg-white shadow-lg sticky top-0 z-50">
-      {/* Top Affiliation Bar */}
-      <div className="bg-slate-900 text-white py-1.5 border-b border-blue-800/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center text-[8px] sm:text-[10px] font-bold uppercase tracking-wider text-center md:text-left gap-1 md:gap-4">
-            <div className="flex items-center gap-2">
-              <span className="text-orange-500">•</span>
-              <span>{t.affiliation.line1}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-orange-500">•</span>
-              <span>{t.affiliation.line2}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-orange-500">•</span>
-              <span>{t.affiliation.line3}</span>
-            </div>
+      {/* Top Affiliation Bar - Scrolling Ticker */}
+      <div className="bg-slate-950 text-white py-2.5 border-b border-orange-500/20 overflow-hidden relative">
+        <div className="flex whitespace-nowrap animate-marquee">
+          <div className="flex items-center gap-12 px-4 text-[10px] sm:text-[12px] font-bold uppercase tracking-[0.3em]">
+            <span className="flex items-center gap-3 text-orange-500">
+              <span className="w-2 h-2 bg-orange-500 rounded-full animate-pulse shadow-[0_0_12px_rgba(249,115,22,0.9)]"></span>
+              <span className="text-white">{t.affiliation.line1}</span>
+            </span>
+            <span className="flex items-center gap-3 text-orange-500">
+              <span className="w-2 h-2 bg-orange-500 rounded-full animate-pulse shadow-[0_0_12px_rgba(249,115,22,0.9)]"></span>
+              <span className="text-white">{t.affiliation.line2}</span>
+            </span>
+            <span className="flex items-center gap-3 text-orange-500">
+              <span className="w-2 h-2 bg-orange-500 rounded-full animate-pulse shadow-[0_0_12px_rgba(249,115,22,0.9)]"></span>
+              <span className="text-white">{t.affiliation.line3}</span>
+            </span>
+            {/* Duplicate for seamless loop */}
+            <span className="flex items-center gap-3 text-orange-500">
+              <span className="w-2 h-2 bg-orange-500 rounded-full animate-pulse shadow-[0_0_12px_rgba(249,115,22,0.9)]"></span>
+              <span className="text-white">{t.affiliation.line1}</span>
+            </span>
+            <span className="flex items-center gap-3 text-orange-500">
+              <span className="w-2 h-2 bg-orange-500 rounded-full animate-pulse shadow-[0_0_12px_rgba(249,115,22,0.9)]"></span>
+              <span className="text-white">{t.affiliation.line2}</span>
+            </span>
+            <span className="flex items-center gap-3 text-orange-500">
+              <span className="w-2 h-2 bg-orange-500 rounded-full animate-pulse shadow-[0_0_12px_rgba(249,115,22,0.9)]"></span>
+              <span className="text-white">{t.affiliation.line3}</span>
+            </span>
+          </div>
+          {/* Second set for continuous flow */}
+          <div className="flex items-center gap-12 px-4 text-[10px] sm:text-[12px] font-bold uppercase tracking-[0.3em]">
+            <span className="flex items-center gap-3 text-orange-500">
+              <span className="w-2 h-2 bg-orange-500 rounded-full animate-pulse shadow-[0_0_12px_rgba(249,115,22,0.9)]"></span>
+              <span className="text-white">{t.affiliation.line1}</span>
+            </span>
+            <span className="flex items-center gap-3 text-orange-500">
+              <span className="w-2 h-2 bg-orange-500 rounded-full animate-pulse shadow-[0_0_12px_rgba(249,115,22,0.9)]"></span>
+              <span className="text-white">{t.affiliation.line2}</span>
+            </span>
+            <span className="flex items-center gap-3 text-orange-500">
+              <span className="w-2 h-2 bg-orange-500 rounded-full animate-pulse shadow-[0_0_12px_rgba(249,115,22,0.9)]"></span>
+              <span className="text-white">{t.affiliation.line3}</span>
+            </span>
           </div>
         </div>
       </div>

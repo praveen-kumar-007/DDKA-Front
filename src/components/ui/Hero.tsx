@@ -14,6 +14,7 @@ interface HeroProps {
 
 const Hero: React.FC<HeroProps> = ({ onRegisterClick, onScheduleClick, lang }) => {
   const t = translations[lang].hero;
+  const aff = translations[lang].affiliation;
   
   return (
     <div className="relative min-h-[95vh] flex flex-col overflow-hidden bg-blue-950">
@@ -32,12 +33,9 @@ const Hero: React.FC<HeroProps> = ({ onRegisterClick, onScheduleClick, lang }) =
               <Trophy size={14} />
               <span>{t.badge}</span>
             </div>
-            <div className="inline-flex items-center space-x-2 bg-blue-800/80 backdrop-blur-sm text-white px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider border border-blue-400/30">
+            <div className="inline-flex items-center space-x-2 bg-blue-800/80 backdrop-blur-sm text-white px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider border border-blue-400/30">
               <ShieldCheck size={14} className="text-orange-400" />
-              <span>{lang === 'hi' 
-  ? 'झारखंड राज्य कबड्डी संघ से संबद्ध (AKFI मान्यता प्राप्त)' 
-  : 'Affiliated to Jharkhand State Kabaddi Association (Recognized by AKFI)'
-}</span>
+              <span>{aff.line1}</span>
             </div>
           </div>
 

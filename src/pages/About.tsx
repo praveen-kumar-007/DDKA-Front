@@ -127,6 +127,56 @@ export const About: React.FC<AboutProps> = ({ lang }) => {
 
         {/* Vision & Mission Grid */}
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-10 mb-20 md:mb-28">
+          {/* Affiliation Details - Advanced Styling */}
+          <div className="lg:col-span-2 relative group mb-10">
+            <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 via-orange-500 to-blue-900 rounded-[2.5rem] blur-xl opacity-20 group-hover:opacity-40 transition duration-1000"></div>
+            <div className="relative bg-white/80 backdrop-blur-xl p-8 md:p-12 rounded-[2.5rem] border border-white shadow-2xl overflow-hidden">
+              {/* Decorative Background Elements */}
+              <div className="absolute top-0 right-0 -mt-20 -mr-20 w-64 h-64 bg-orange-100 rounded-full blur-3xl opacity-50"></div>
+              <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-64 h-64 bg-blue-100 rounded-full blur-3xl opacity-50"></div>
+
+              <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-12">
+                <div className="flex items-center gap-8">
+                  <div className="relative">
+                    <div className="absolute -inset-2 bg-gradient-to-tr from-orange-500 to-blue-600 rounded-2xl blur opacity-40 animate-pulse"></div>
+                    <div className="relative w-20 h-20 bg-white rounded-2xl flex items-center justify-center shadow-xl border border-slate-100">
+                      <ShieldCheck className="text-blue-600 w-10 h-10" />
+                    </div>
+                  </div>
+                  <div>
+                    <h2 className="text-3xl md:text-4xl font-oswald font-bold bg-gradient-to-r from-blue-900 to-blue-700 bg-clip-text text-transparent uppercase tracking-tight">
+                      {lang === 'hi' ? 'आधिकारिक संबद्धता' : 'Official Affiliation'}
+                    </h2>
+                    <div className="flex items-center gap-3 mt-2">
+                      <span className="h-px w-8 bg-orange-500"></span>
+                      <p className="text-orange-600 text-xs md:text-sm uppercase tracking-[0.2em] font-black">
+                        {lang === 'hi' ? 'मान्यता प्राप्त एवं पंजीकृत' : 'Recognized & Registered'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full lg:w-auto">
+                  {[
+                    { text: translations[lang].affiliation.line1, icon: "🏆" },
+                    { text: translations[lang].affiliation.line2, icon: "📜" },
+                    { text: translations[lang].affiliation.line3, icon: "🤝" }
+                  ].map((item, i) => (
+                    <div key={i} className="relative group/card">
+                      <div className="absolute -inset-0.5 bg-gradient-to-b from-slate-200 to-slate-50 rounded-2xl opacity-0 group-hover/card:opacity-100 transition duration-500"></div>
+                      <div className="relative bg-slate-50/50 hover:bg-white p-6 rounded-2xl border border-slate-100 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 text-center">
+                        <span className="text-2xl mb-3 block">{item.icon}</span>
+                        <p className="text-[11px] md:text-xs font-bold text-slate-800 uppercase tracking-wider leading-relaxed">
+                          {item.text}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Vision */}
           <div className="bg-white p-6 md:p-10 rounded-[2rem] md:rounded-[2.5rem] border border-slate-100 shadow-xl relative overflow-hidden group">
             <div className="relative z-10">
