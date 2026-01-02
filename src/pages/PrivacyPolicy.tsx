@@ -360,7 +360,7 @@ const PrivacyPolicy: React.FC<{ lang: Language }> = ({ lang }) => {
                       <h3 className="text-xl font-semibold text-white mb-4">Dhanbad District Kabaddi Association (DDKA)</h3>
                       <div className="space-y-2 text-sm">
                         <p><strong>Email:</strong> dhanbaddistrictkabaddi@gmail.com</p>
-                        <p><strong>Address:</strong> Retaerd Rly colony Gomoh , Dhanbad, Jharkhand 828401</p>
+                        <p><strong>Address:</strong> Retired Rly Colony, Gomoh, Dhanbad, Jharkhand 828401</p>
                       </div>
                     </div>
                   </div>
@@ -376,7 +376,7 @@ const PrivacyPolicy: React.FC<{ lang: Language }> = ({ lang }) => {
                     <h3 className="text-xl font-semibold text-white mb-4">Dhanbad District Kabaddi Association (DDKA)</h3>
                     <div className="space-y-2 text-sm">
                       <p><strong>Email:</strong> dhanbaddistrictkabaddi@gmail.com</p>
-                      <p><strong>Address:</strong> Retaerd Rly colony Gomoh , Dhanbad, Jharkhand 828401</p>
+                      <p><strong>Address:</strong> Retired Rly Colony, Gomoh, Dhanbad, Jharkhand 828401</p>
                     </div>
                   </div>
                 </div>

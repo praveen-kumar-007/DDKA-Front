@@ -1,5 +1,5 @@
 export const CONTACT_INFO = {
-  address: "Retaerd Rly colony Gomoh , Dhanbad, Jharkhand 828401",
+  address: "Retired Rly Colony, Gomoh, Dhanbad, Jharkhand 828401",
   phone: "+91 9123163206",
   email: "dhanbaddistrictkabaddi@gmail.com"
 };

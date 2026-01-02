@@ -22,7 +22,7 @@ const FAQS = [
 			hi: 'DDKA कहाँ स्थित है?',
 		},
 		answer: {
-			en: 'Retaerd Rly colony Gomoh, Dhanbad, Jharkhand 828401',
+			en: 'Retired Rly Colony, Gomoh, Dhanbad, Jharkhand 828401',
 			hi: 'रिटायर्ड रेलवे कॉलोनी, गोमो, धनबाद, झारखंड 828401',
 		},
 	},

@@ -426,7 +426,7 @@ const TermsConditions: React.FC<{ lang: Language }> = ({ lang }) => {
                     <ul className="space-y-2 mt-3 text-sm">
                       <li><strong>Dhanbad District Kabaddi Association (DDKA)</strong></li>
                       <li>Email: dhanbaddistrictkabaddi@gmail.com</li>
-                      <li>Location: Retaerd Rly colony Gomoh , Dhanbad, Jharkhand 828401</li>
+                      <li>Location: Retired Rly Colony, Gomoh, Dhanbad, Jharkhand 828401</li>
                     </ul>
                   </div>
                 </>

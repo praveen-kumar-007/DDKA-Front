@@ -180,8 +180,8 @@ export const IDCardBack: React.FC<Props> = ({ data }) => {
           }}
         >
           <p style={{ margin: 0 }}>
-            <strong style={{ color: '#003366' }}>Address:</strong> Retaerd Rly colony Gomoh , Dhanbad, Jharkhand 828401
-          </p>
+              <strong style={{ color: '#003366' }}>Address:</strong> Retired Rly Colony, Gomoh, Dhanbad, Jharkhand 828401
+            </p>
         </div>
 
         {/* Secretary Signature */}
