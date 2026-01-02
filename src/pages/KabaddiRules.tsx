@@ -1,4 +1,5 @@
 import React from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Trophy, Users, Clock, Target, Shield, AlertCircle, CheckCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { Language } from '../translations';
@@ -11,7 +12,23 @@ const KabaddiRules: React.FC<KabaddiRulesProps> = ({ lang }) => {
   const isHi = lang === 'hi';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-20 px-4">
+    <>
+      <Helmet>
+        <title>
+          {isHi
+            ? 'कबड्डी नियम | धनबाद जिला कबड्डी संघ (DDKA)'
+            : 'Kabaddi Rules | Dhanbad District Kabaddi Association (DDKA), Jharkhand'}
+        </title>
+        <meta
+          name="description"
+          content={
+            isHi
+              ? 'DDKA द्वारा अपनाए गए कबड्डी के विस्तृत नियम, कोर्ट के माप, टीम संरचना, रेड और डिफेंस के नियम, फाउल और स्कोरिंग सिस्टम – AKFI मानकों के अनुरूप।'
+              : 'Detailed Kabaddi rules followed by Dhanbad District Kabaddi Association (DDKA) – court dimensions, team composition, raid and defense rules, fouls and scoring system as per AKFI standards.'
+          }
+        />
+      </Helmet>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-20 px-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
@@ -1368,6 +1385,7 @@ const KabaddiRules: React.FC<KabaddiRulesProps> = ({ lang }) => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Mail, MapPin, Phone, Info, ChevronDown, ChevronUp } from 'lucide-react';
 import { CONTACT_INFO } from '../constants';
 
@@ -80,7 +81,23 @@ const Contact: React.FC<{ lang?: 'en' | 'hi' }> = ({ lang = 'en' }) => {
 	};
 
 	return (
-		<div className="min-h-screen bg-gradient-to-b from-slate-50 to-white py-0 px-0">
+		<>
+			<Helmet>
+				<title>
+					{lang === 'hi'
+						? 'संपर्क करें | धनबाद जिला कबड्डी संघ (DDKA)'
+						: 'Contact DDKA | Dhanbad District Kabaddi Association, Jharkhand'}
+				</title>
+				<meta
+					name="description"
+					content={
+						lang === 'hi'
+							? 'धनबाद जिला कबड्डी संघ (DDKA) से संपर्क करें – पता, फोन, ईमेल और ऑनलाइन संपर्क फ़ॉर्म के माध्यम से धनबाद, झारखंड में कबड्डी से जुड़ी सभी जानकारी प्राप्त करें।'
+							: 'Contact Dhanbad District Kabaddi Association (DDKA) – address, phone, email and contact form for Kabaddi-related queries in Dhanbad, Jharkhand.'
+					}
+				/>
+			</Helmet>
+			<div className="min-h-screen bg-gradient-to-b from-slate-50 to-white py-0 px-0">
 			<div className="w-full bg-gradient-to-b from-orange-50 to-white py-16 px-2 text-center">
 				<h1 className="text-5xl font-extrabold mb-2 text-blue-900 drop-shadow">
 					Contact <span className="text-orange-500">DDKA</span>
@@ -313,6 +330,7 @@ const Contact: React.FC<{ lang?: 'en' | 'hi' }> = ({ lang = 'en' }) => {
 				</div>
 			</div>
 		</div>
+		</>
 	);
 };
 

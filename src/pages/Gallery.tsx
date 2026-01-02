@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Helmet } from 'react-helmet-async';
 import type { Language } from '../translations';
 import { translations } from '../translations';
 
@@ -78,7 +79,23 @@ export const Gallery: React.FC<GalleryProps> = ({ lang }) => {
   };
 
   return (
-    <div className="py-16 md:py-24 bg-slate-50">
+    <>
+      <Helmet>
+        <title>
+          {lang === 'hi'
+            ? 'DDKA फोटो गैलरी | धनबाद कबड्डी तस्वीरें'
+            : 'DDKA Kabaddi Gallery | Dhanbad District Kabaddi Photos'}
+        </title>
+        <meta
+          name="description"
+          content={
+            lang === 'hi'
+              ? 'धनबाद जिला कबड्डी संघ (DDKA) द्वारा आयोजित कबड्डी मैचों, खिलाड़ियों और जिला प्रतियोगिताओं की फोटो गैलरी।'
+              : 'Photo gallery of Kabaddi matches, players and district championships organised by Dhanbad District Kabaddi Association (DDKA) in Dhanbad, Jharkhand.'
+          }
+        />
+      </Helmet>
+      <div className="py-16 md:py-24 bg-slate-50">
       <div className="max-w-7xl mx-auto px-3 md:px-6">
         <div className="text-center mb-12 md:mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
           <h1 className="text-4xl md:text-5xl font-oswald font-bold text-blue-900 mb-4 uppercase tracking-wide">{t.nav.gallery}</h1>
@@ -176,6 +193,7 @@ export const Gallery: React.FC<GalleryProps> = ({ lang }) => {
         </div>
       )}
     </div>
+    </>
   );
 };
 

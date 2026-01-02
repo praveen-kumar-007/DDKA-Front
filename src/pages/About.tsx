@@ -1,4 +1,5 @@
 import React from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
 import type { Language } from '../translations';
 import { translations } from '../translations';
@@ -83,7 +84,23 @@ export const About: React.FC<AboutProps> = ({ lang }) => {
   const chiefPatrons = committee.patrons.names;
 
   return (
-    <div className="py-12 md:py-24 animate-in fade-in slide-in-from-bottom-4 duration-700 bg-slate-50">
+    <>
+      <Helmet>
+        <title>
+          {lang === 'hi'
+            ? 'DDKA के बारे में | धनबाद जिला कबड्डी संघ'
+            : 'About DDKA | Dhanbad District Kabaddi Association, Jharkhand'}
+        </title>
+        <meta
+          name="description"
+          content={
+            lang === 'hi'
+              ? 'धनबाद जिला कबड्डी संघ (DDKA) की कार्यकारिणी समिति, पदाधिकारी, विजन, मिशन और संरक्षक मंडल के बारे में विस्तृत जानकारी।'
+              : 'Learn about the Dhanbad District Kabaddi Association (DDKA) leadership, committee members, vision, mission and patrons promoting Kabaddi in Dhanbad, Jharkhand.'
+          }
+        />
+      </Helmet>
+      <div className="py-12 md:py-24 animate-in fade-in slide-in-from-bottom-4 duration-700 bg-slate-50">
       <div className="max-w-[90rem] mx-auto px-4">
         
         {/* Hero Section */}
@@ -422,6 +439,7 @@ export const About: React.FC<AboutProps> = ({ lang }) => {
         
       </div>
     </div>
+    </>
   );
 };
 

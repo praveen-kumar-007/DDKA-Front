@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Calendar, Tag, ChevronRight, X, Share2, Copy } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -23,7 +24,17 @@ const News = () => {
   useEffect(() => { fetchNews(); }, []);
 
   return (
-    <div className="relative py-24 overflow-hidden bg-slate-50">
+    <>
+      <Helmet>
+        <title>
+          DDKA News & Updates | Dhanbad District Kabaddi Association
+        </title>
+        <meta
+          name="description"
+          content="Latest Kabaddi news, match updates, tournament announcements and results from Dhanbad District Kabaddi Association (DDKA) in Dhanbad, Jharkhand."
+        />
+      </Helmet>
+      <div className="relative py-24 overflow-hidden bg-slate-50">
       <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-blue-50 to-transparent pointer-events-none" />
       <div className="absolute top-20 right-0 w-64 h-64 bg-orange-100 rounded-full blur-3xl opacity-50 pointer-events-none" />
 
@@ -175,6 +186,7 @@ const News = () => {
         )}
       </div>
     </div>
+    </>
   );
 
 };

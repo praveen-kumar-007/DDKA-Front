@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
 import Hero from '../components/ui/Hero';
 import { Trophy, Users, Award, Zap, ExternalLink, Megaphone, Calendar, ArrowRight, Activity } from 'lucide-react';
 import NewsCard from '../components/ui/NewsCard';
@@ -46,7 +47,23 @@ export const Home: React.FC<HomeProps> = ({ lang, onNavigate }) => {
   }, []);
 
   return (
-    <div className="animate-in fade-in duration-500">
+    <>
+      <Helmet>
+        <title>
+          {lang === 'hi'
+            ? 'धनबाद जिला कबड्डी संघ (DDKA) | आधिकारिक वेबसाइट'
+            : 'Dhanbad District Kabaddi Association (DDKA) | Kabaddi in Dhanbad, Jharkhand'}
+        </title>
+        <meta
+          name="description"
+          content={
+            lang === 'hi'
+              ? 'धनबाद जिला कबड्डी संघ (DDKA) की आधिकारिक वेबसाइट – धनबाद, झारखंड में कबड्डी की खबरें, टूर्नामेंट, पंजीकरण और प्रशिक्षण की पूरी जानकारी।'
+              : 'Official website of Dhanbad District Kabaddi Association (DDKA) – news, tournaments, registrations and Kabaddi development programs in Dhanbad, Jharkhand.'
+          }
+        />
+      </Helmet>
+      <div className="animate-in fade-in duration-500">
       {/* Hero Section */}
       <Hero 
         onRegisterClick={() => onNavigate('register')} 
@@ -284,7 +301,8 @@ export const Home: React.FC<HomeProps> = ({ lang, onNavigate }) => {
           <Trophy className="absolute bottom-[-20px] left-[-20px] w-64 h-64 text-white/5 rotate-12" />
         </div>
       </section>
-    </div>
+      </div>
+    </>
   );
 };
 
