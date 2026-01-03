@@ -30,40 +30,40 @@ const Hero: React.FC<HeroProps> = ({ onRegisterClick, onScheduleClick, lang }) =
       {/* Decorative "Mat" Texture Overlay */}
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url('https://www.transparenttextures.com/patterns/carbon-fibre.png')` }}></div>
 
-      <div className="relative flex-grow max-w-7xl mx-auto px-4 w-full flex flex-col justify-center pt-32 pb-32 lg:pb-48">
+      <div className="relative flex-grow max-w-7xl mx-auto px-4 w-full flex flex-col justify-center pt-24 pb-16 lg:pt-32 lg:pb-48">
         <div className="max-w-5xl">
           {/* Top Badge */}
-          <div className="inline-flex items-center space-x-3 bg-white/5 backdrop-blur-md border border-white/10 px-5 py-2.5 rounded-full mb-10 group hover:bg-white/10 transition-all duration-500">
+          <div className="inline-flex items-center space-x-3 bg-white/5 backdrop-blur-md border border-white/10 px-5 py-2.5 rounded-full mb-6 lg:mb-10 group hover:bg-white/10 transition-all duration-500">
             <div className="bg-orange-600 p-1.5 rounded-full animate-pulse shadow-[0_0_15px_rgba(234,88,12,0.5)]">
               <Trophy size={16} className="text-white" />
             </div>
             <span className="text-xs font-black uppercase tracking-[0.2em] text-orange-500">{t.badge}</span>
           </div>
 
-          <h2 className="text-xl md:text-3xl font-bold text-white/70 mb-6 tracking-tight uppercase flex items-center gap-4">
+          <h2 className="text-xl md:text-3xl font-bold text-white/70 mb-4 lg:mb-6 tracking-tight uppercase flex items-center gap-4">
              <span className="h-px w-12 bg-orange-600"></span>
              {t.slogan}
           </h2>
 
-          <h1 className="text-5xl sm:text-8xl md:text-[10rem] font-black mb-10 leading-[0.85] uppercase tracking-tighter text-white">
+          <h1 className="text-5xl sm:text-8xl md:text-[10rem] font-black mb-6 lg:mb-10 leading-[0.85] uppercase tracking-tighter text-white">
             {t.title} <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-orange-400 to-white drop-shadow-2xl">
               {t.subtitle}
             </span>
           </h1>
           
-          <p className="text-lg sm:text-2xl text-slate-300 mb-14 leading-relaxed font-medium max-w-2xl border-l-4 border-orange-600 pl-8">
+          <p className="text-lg sm:text-2xl text-slate-300 mb-8 lg:mb-14 leading-relaxed font-medium max-w-2xl border-l-4 border-orange-600 pl-8">
             {t.description}
           </p>
 
           {/* Advanced Affiliation Glass Card */}
-          <div className="mb-16 relative group max-w-4xl">
+          <div className="mb-8 lg:mb-16 relative group max-w-4xl">
             <div className="absolute -inset-1 bg-gradient-to-r from-orange-600/20 to-blue-600/20 rounded-3xl blur-xl opacity-50 group-hover:opacity-100 transition duration-1000"></div>
-            <div className="relative bg-slate-900/40 backdrop-blur-2xl border border-white/10 p-8 rounded-3xl shadow-2xl overflow-hidden">
+            <div className="relative bg-slate-900/40 backdrop-blur-2xl border border-white/10 p-5 lg:p-8 rounded-3xl shadow-2xl overflow-hidden">
               {/* Inner Glow */}
               <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/5 to-transparent pointer-events-none"></div>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-8 relative z-10">
                 {[
                   { text: aff.line1, label: lang === 'hi' ? 'संबद्धता' : 'Affiliation', color: 'bg-orange-500' },
                   { text: aff.line2, label: lang === 'hi' ? 'पंजीकरण' : 'Registration', color: 'bg-orange-500' },
