@@ -25,6 +25,9 @@ import PlayerIDCardPage from './pages/PlayerIDCardPage';
 import AdminGalleryUpload from './pages/AdminGalleryUpload';
 import AdminContact from './pages/AdminContact';
 import Contact from './pages/Contact';
+import OurGems from './pages/OurGems';
+import AdminPlayersManagement from './pages/AdminPlayersManagement';
+import AdminRefereesManagement from './pages/AdminRefereesManagement';
 
 // Form Components
 import RegisterForm from './components/forms/RegisterForm';
@@ -84,6 +87,7 @@ const App: React.FC = () => {
           <Route path="/terms-conditions" element={<TermsConditions lang={lang} />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy lang={lang} />} />
           <Route path="/kabaddi-rules" element={<KabaddiRules lang={lang} />} />
+          <Route path="/our-gems" element={<OurGems lang={lang} />} />
           {/* Admin Gallery Upload Route (protected) */}
           <Route path="/admin/gallery" element={
             isAuthenticated ? <AdminGalleryUpload /> : <AdminLogin onLoginSuccess={() => setIsAuthenticated(true)} />
@@ -92,6 +96,14 @@ const App: React.FC = () => {
             <Route path="/admin/contact" element={
               isAuthenticated ? <AdminContact /> : <AdminLogin onLoginSuccess={() => setIsAuthenticated(true)} />
             } />
+          {/* Admin Players Management (protected) */}
+          <Route path="/admin/players" element={
+            isAuthenticated ? <AdminPlayersManagement /> : <AdminLogin onLoginSuccess={() => setIsAuthenticated(true)} />
+          } />
+          {/* Admin Referees Management (protected) */}
+          <Route path="/admin/referees" element={
+            isAuthenticated ? <AdminRefereesManagement /> : <AdminLogin onLoginSuccess={() => setIsAuthenticated(true)} />
+          } />
           {/* Admin News Upload Route (protected) */}
           <Route path="/admin-news-upload" element={
             isAuthenticated ? <AdminNewsUpload /> : <AdminLogin onLoginSuccess={() => setIsAuthenticated(true)} />

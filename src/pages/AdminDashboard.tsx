@@ -103,6 +103,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
   const searchFiltered = data.filter(item => 
     (item.fullName || item.instName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
     (item.transactionId || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (item.aadharNumber || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
     (item.phone || item.email || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -138,7 +139,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
         </div>
 
         {/* Admin Management Panel */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-10">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-10">
           <a href="/admin/gallery" className="flex flex-col items-center justify-center p-4 bg-white rounded-xl shadow border hover:bg-blue-50 transition-all">
             <ImageIcon size={32} className="text-blue-700 mb-2" />
             <span className="font-bold text-xs text-blue-900">Manage Gallery</span>
@@ -151,6 +152,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
             <Mail size={28} className="text-blue-700 mb-2" />
             <span className="font-bold text-xs text-blue-900">Contact Forms</span>
           </a>
+          <Link to="/admin/players" className="flex flex-col items-center justify-center p-4 bg-white rounded-xl shadow border hover:bg-orange-50 transition-all">
+            <Users size={28} className="text-orange-700 mb-2" />
+            <span className="font-bold text-xs text-orange-900">Our Champions</span>
+          </Link>
+          <Link to="/admin/referees" className="flex flex-col items-center justify-center p-4 bg-white rounded-xl shadow border hover:bg-slate-50 transition-all">
+            <Users size={28} className="text-slate-700 mb-2" />
+            <span className="font-bold text-xs text-slate-900">Referee Board</span>
+          </Link>
           <a href="#" onClick={() => setActiveTab('players')} className={`flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all ${activeTab === 'players' ? 'bg-blue-900 text-white' : 'bg-white hover:bg-blue-50 text-blue-900'}`}> 
             <Users size={28} className={activeTab === 'players' ? 'text-orange-400' : 'text-blue-900'} />
             <span className="font-bold text-xs">Player Details</span>
@@ -166,7 +175,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
           <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400" size={24} />
           <input 
             type="text" 
-            placeholder="Search by name, email, or Aadhar..." 
+            placeholder="Search by name, email, phone, Aadhar, or transaction ID..." 
             className="w-full pl-16 pr-6 py-4 bg-white border-4 border-white rounded-[2rem] shadow-xl focus:ring-8 focus:ring-blue-50 outline-none transition-all font-medium text-base"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
