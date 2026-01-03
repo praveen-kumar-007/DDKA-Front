@@ -462,7 +462,7 @@ const KabaddiRules: React.FC<KabaddiRulesProps> = ({ lang }) => {
                     <ul className="space-y-2">
                       <li className="text-slate-700 text-sm flex items-center gap-2">
                         <div className="w-1.5 h-1.5 bg-blue-900 rounded-full"></div>
-                        {isHi ? 'केवल डेड बॉल के समय संभव।' : 'Only during dead ball.'}
+                        {isHi ? 'केवल खेल रुके होने के दौरान संभव।' : 'Only during a break in play.'}
                       </li>
                       <li className="text-slate-700 text-sm flex items-center gap-2">
                         <div className="w-1.5 h-1.5 bg-blue-900 rounded-full"></div>
