@@ -88,6 +88,11 @@ const Footer: React.FC<FooterProps> = ({ lang }) => {
                       {lang === 'hi' ? 'DDKA कबड्डी नियम' : 'DDKA Kabaddi Rules'}
                     </Link>
                   </li>
+                  <li>
+                    <Link to="/our-gems" className="hover:text-orange-500 transition-colors">
+                      {lang === 'hi' ? 'गौरव मंदिर' : 'Hall of Fame'}
+                    </Link>
+                  </li>
                 </ul>
               </div>
               <div>
