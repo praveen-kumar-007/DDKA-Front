@@ -22,7 +22,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onPageChange, lang, onLang
       id: 'about', 
       dropdown: [
         { name: lang === 'hi' ? 'हमारे बारे में' : 'About Us', id: 'about' },
-        { name: lang === 'hi' ? 'गौरव मंदिर' : 'Hall of Fame', id: 'our-gems' },
+        { name: lang === 'hi' ? 'गौरव मंदिर' : 'Hall of Fame', id: 'hall-of-fame' },
         { name: t.nav.affiliatedInstitutions, id: 'affiliated-institutions' },
         { name: lang === 'hi' ? 'कबड्डी नियम' : 'Kabaddi Rules', id: 'kabaddi-rules' },
       ] 

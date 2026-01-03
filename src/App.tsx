@@ -87,7 +87,7 @@ const App: React.FC = () => {
           <Route path="/terms-conditions" element={<TermsConditions lang={lang} />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy lang={lang} />} />
           <Route path="/kabaddi-rules" element={<KabaddiRules lang={lang} />} />
-          <Route path="/our-gems" element={<OurGems lang={lang} />} />
+          <Route path="/hall-of-fame" element={<OurGems lang={lang} />} />
           {/* Admin Gallery Upload Route (protected) */}
           <Route path="/admin/gallery" element={
             isAuthenticated ? <AdminGalleryUpload /> : <AdminLogin onLoginSuccess={() => setIsAuthenticated(true)} />

@@ -89,7 +89,7 @@ const Footer: React.FC<FooterProps> = ({ lang }) => {
                     </Link>
                   </li>
                   <li>
-                    <Link to="/our-gems" className="hover:text-orange-500 transition-colors">
+                    <Link to="/hall-of-fame" className="hover:text-orange-500 transition-colors">
                       {lang === 'hi' ? 'गौरव मंदिर' : 'Hall of Fame'}
                     </Link>
                   </li>
