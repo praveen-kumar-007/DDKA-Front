@@ -16,6 +16,9 @@ interface TechnicalOfficial {
   mobile: string;
   education: string;
   email: string;
+  transactionId?: string;
+  examFee?: number;
+  receiptUrl?: string;
   signatureUrl: string;
   photoUrl: string;
   status: 'Pending' | 'Approved' | 'Rejected';
@@ -138,6 +141,18 @@ const AdminTechnicalOfficialDetails: React.FC = () => {
                 </div>
               </div>
             )}
+            {official.receiptUrl && (
+              <div className="w-full">
+                <p className="text-xs font-semibold text-slate-600 mb-1">Payment Screenshot</p>
+                <div className="border border-slate-200 rounded-lg p-2 bg-slate-50 flex items-center justify-center">
+                  <img
+                    src={official.receiptUrl}
+                    alt={`${official.candidateName} Payment Receipt`}
+                    className="max-h-40 object-contain"
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="md:col-span-2 space-y-4">
@@ -177,6 +192,17 @@ const AdminTechnicalOfficialDetails: React.FC = () => {
               <div>
                 <p className="text-xs font-semibold text-slate-500 uppercase">Blood Group</p>
                 <p className="text-sm text-slate-900">{official.bloodGroup || 'NA'}</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+              <div>
+                <p className="text-xs font-semibold text-slate-500 uppercase">Exam Fee</p>
+                <p className="text-sm text-slate-900">₹{official.examFee || 1000}</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-slate-500 uppercase">Transaction ID</p>
+                <p className="text-sm text-slate-900 break-words font-mono text-xs">{official.transactionId || '-'}</p>
               </div>
             </div>
 

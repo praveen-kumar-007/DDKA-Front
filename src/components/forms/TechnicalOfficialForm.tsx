@@ -34,13 +34,16 @@ const TechnicalOfficialForm: React.FC<TechnicalOfficialFormProps> = ({ lang }) =
     mobile: '',
     education: '',
     email: '',
+    transactionId: '',
     confirmation: false
   });
 
   const [signatureFile, setSignatureFile] = useState<File | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
+   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [signaturePreview, setSignaturePreview] = useState<string | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+   const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -70,7 +73,7 @@ const TechnicalOfficialForm: React.FC<TechnicalOfficialFormProps> = ({ lang }) =
     }));
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, key: 'signature' | 'photo') => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, key: 'signature' | 'photo' | 'receipt') => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -95,16 +98,33 @@ const TechnicalOfficialForm: React.FC<TechnicalOfficialFormProps> = ({ lang }) =
         return file.type.startsWith('image/') ? URL.createObjectURL(file) : null;
       });
     }
+
+    if (key === 'receipt') {
+      setReceiptFile(file);
+      setReceiptPreview(prev => {
+        if (prev) URL.revokeObjectURL(prev);
+        return file.type.startsWith('image/') ? URL.createObjectURL(file) : null;
+      });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!signatureFile || !photoFile) {
+    if (!signatureFile || !photoFile || !receiptFile) {
       alert(
         lang === 'hi'
-          ? 'कृपया हस्ताक्षर और पासपोर्ट साइज़ फोटो दोनों अपलोड करें।'
-          : 'Please upload both Signature and Passport Size Photo.'
+          ? 'कृपया हस्ताक्षर, पासपोर्ट साइज़ फोटो और भुगतान की स्क्रीिनशॉट अपलोड करें।'
+          : 'Please upload Signature, Passport Size Photo and Payment Screenshot.'
+      );
+      return;
+    }
+
+    if (!formData.transactionId.trim()) {
+      alert(
+        lang === 'hi'
+          ? 'कृपया भुगतान का ट्रांजैक्शन आईडी दर्ज करें।'
+          : 'Please enter the payment Transaction ID.'
       );
       return;
     }
@@ -136,9 +156,11 @@ const TechnicalOfficialForm: React.FC<TechnicalOfficialFormProps> = ({ lang }) =
       form.append('mobile', formData.mobile);
       form.append('education', formData.education);
       form.append('email', formData.email);
+      form.append('transactionId', formData.transactionId.toUpperCase().trim());
 
       if (signatureFile) form.append('signature', signatureFile);
       if (photoFile) form.append('photo', photoFile);
+      if (receiptFile) form.append('receipt', receiptFile);
 
       const response = await fetch(`${API_URL}/api/technical-officials/register`, {
         method: 'POST',
@@ -441,6 +463,95 @@ const TechnicalOfficialForm: React.FC<TechnicalOfficialFormProps> = ({ lang }) =
                 className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-200"
                 placeholder="e.g. B.P.Ed, M.P.Ed, Graduate"
               />
+            </div>
+          </div>
+        </section>
+
+        {/* Exam Fee & Payment */}
+        <section className="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-100 space-y-6">
+          <div className="flex items-center gap-3 border-b border-slate-100 pb-3 mb-1">
+            <div className="p-2 bg-purple-50 rounded-xl">
+              <Upload className="text-purple-600" size={22} />
+            </div>
+            <h2 className="text-lg sm:text-xl font-oswald font-bold text-slate-800 uppercase tracking-wide">
+              {lang === 'hi' ? 'परीक्षा शुल्क और भुगतान' : 'Exam Fee & Payment'}
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+            <div className="space-y-4 text-center">
+              <p className="text-sm font-semibold text-slate-700 uppercase tracking-widest">
+                {lang === 'hi' ? 'परीक्षा शुल्क' : 'Exam Fee'}
+              </p>
+              <p className="text-3xl sm:text-4xl font-oswald font-bold text-blue-900">₹1000</p>
+              <p className="text-xs text-slate-500">
+                {lang === 'hi'
+                  ? 'कृपया नीचे दिए गए QR कोड पर ₹1000 परीक्षा शुल्क का ऑनलाइन भुगतान करें और भुगतान की स्क्रीनशॉट अपलोड करें।'
+                  : 'Please pay ₹1000 exam fee to the QR code below and upload the payment screenshot.'}
+              </p>
+              <div className="mt-4 inline-block bg-white p-4 rounded-2xl border-4 border-slate-100 shadow-md">
+                <img
+                  src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1767538633/QR_1767538244_eukaxr.png"
+                  alt="DDKA Official QR Code"
+                  className="w-40 h-40 sm:w-52 sm:h-52 object-contain rounded-xl"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-5">
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-600 uppercase tracking-widest">
+                  {lang === 'hi' ? 'ट्रांजैक्शन आईडी *' : 'Transaction ID *'}
+                </label>
+                <input
+                  name="transactionId"
+                  required
+                  value={formData.transactionId}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-200 font-mono uppercase tracking-widest"
+                  placeholder={lang === 'hi' ? 'UPI/बैंक ट्रांजैक्शन आईडी दर्ज करें' : 'Enter UPI/Bank Transaction ID'}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-600 uppercase tracking-widest">
+                  {lang === 'hi' ? 'भुगतान स्क्रीनशॉट अपलोड करें *' : 'Upload Payment Screenshot *'}
+                </label>
+                <label className="block border-2 border-dashed border-slate-200 rounded-2xl p-4 cursor-pointer bg-slate-50 hover:border-blue-300 hover:bg-blue-50/40 transition-all">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleFileChange(e, 'receipt')}
+                    className="hidden"
+                  />
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-full bg-white shadow-sm">
+                      <Upload className="w-5 h-5 text-slate-500" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-xs font-semibold text-slate-700">
+                        {receiptFile
+                          ? (lang === 'hi' ? 'फाइल चुनी गई - स्क्रीनशॉट अपडेट करने के लिए फिर से क्लिक करें।' : 'File selected - click again to change screenshot.')
+                          : (lang === 'hi' ? 'भुगतान का स्क्रीनशॉट चुनने के लिए क्लिक करें।' : 'Click to select payment screenshot.')}
+                      </p>
+                      <p className="text-[10px] text-slate-500 mt-1">
+                        {lang === 'hi'
+                          ? 'केवल इमेज फाइल (JPG/PNG), अधिकतम 10 MB.'
+                          : 'Image files only (JPG/PNG), max 10 MB.'}
+                      </p>
+                    </div>
+                  </div>
+                  {receiptPreview && (
+                    <div className="mt-3 border border-slate-200 rounded-xl overflow-hidden bg-white">
+                      <img
+                        src={receiptPreview}
+                        alt="Payment Screenshot Preview"
+                        className="w-full max-h-52 object-contain bg-slate-50"
+                      />
+                    </div>
+                  )}
+                </label>
+              </div>
             </div>
           </div>
         </section>

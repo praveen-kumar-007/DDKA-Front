@@ -16,6 +16,9 @@ interface TechnicalOfficial {
   mobile: string;
   education: string;
   email: string;
+  transactionId?: string;
+  examFee?: number;
+  receiptUrl?: string;
   signatureUrl: string;
   photoUrl: string;
   status: 'Pending' | 'Approved' | 'Rejected';
@@ -189,6 +192,7 @@ const AdminTechnicalOfficialsManagement: React.FC = () => {
                   <th className="px-4 py-3 text-left text-xs font-bold uppercase">Name</th>
                   <th className="px-4 py-3 text-left text-xs font-bold uppercase">Contact</th>
                   <th className="px-4 py-3 text-left text-xs font-bold uppercase">Level</th>
+                  <th className="px-4 py-3 text-left text-xs font-bold uppercase">Payment</th>
                   <th className="px-4 py-3 text-left text-xs font-bold uppercase">Status</th>
                   <th className="px-4 py-3 text-left text-xs font-bold uppercase">Remarks</th>
                   <th className="px-4 py-3 text-right text-xs font-bold uppercase">Actions</th>
@@ -222,6 +226,21 @@ const AdminTechnicalOfficialsManagement: React.FC = () => {
                       <div>{off.playerLevel}</div>
                       <div className="text-xs text-slate-500">{off.gender}</div>
                       <div className="text-xs text-slate-500">Blood: {off.bloodGroup || 'NA'}</div>
+                    </td>
+                    <td className="px-4 py-3 text-xs text-slate-700">
+                      <div className="font-semibold">₹{off.examFee || 1000}</div>
+                      <div className="text-[11px] text-slate-500 break-words">
+                        TXN: {off.transactionId || '-'}
+                      </div>
+                      {off.receiptUrl && (
+                        <button
+                          type="button"
+                          onClick={() => window.open(off.receiptUrl, '_blank')}
+                          className="mt-1 inline-flex px-2 py-1 rounded-full bg-blue-50 text-blue-700 text-[11px] font-semibold hover:bg-blue-100"
+                        >
+                          View Receipt
+                        </button>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-sm">
                       <span className={`inline-flex px-3 py-1 rounded-full text-xs font-bold ${badgeColor(off.status)}`}>

@@ -213,6 +213,25 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ lang }) => {
         <div className="absolute -bottom-6 -right-6 sm:-bottom-10 sm:-right-10 w-32 h-32 sm:w-48 sm:h-48 bg-white/5 rounded-full blur-3xl"></div>
       </div>
 
+      {/* Sample Player ID card preview */}
+      <div className="bg-slate-50 border-t border-slate-200 px-6 sm:px-8 py-6 flex flex-col items-center gap-4 text-center">
+        <div className="text-sm text-slate-700 max-w-2xl">
+          <p className="font-semibold text-slate-900 mb-1">
+            {lang === 'hi' ? 'स्वीकृति के बाद प्राप्त खिलाड़ी आईडी कार्ड' : 'Player ID Card after Approval'}
+          </p>
+          <p>
+            {lang === 'hi'
+              ? 'पंजीकरण और शुल्क की सफल जांच के बाद खिलाड़ी को नीचे दिखाए गए के समान आधिकारिक DDKA प्लेयर आईडी कार्ड प्राप्त होगा।'
+              : 'After successful verification of your registration and fee, you will receive an official DDKA Player ID card similar to the one shown below.'}
+          </p>
+        </div>
+        <img
+          src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1767539444/Screenshot_2026-01-04_204017_ylfugp.png"
+          alt="Sample DDKA Player ID Card"
+          className="w-full max-w-sm rounded-xl border border-slate-200 shadow-md bg-white"
+        />
+      </div>
+
       {step === 1 ? (
         <form onSubmit={handleProceedToPayment} className="p-2 xs:p-4 sm:p-8 md:p-12 space-y-6 xs:space-y-8 sm:space-y-10 md:space-y-12">
           
@@ -391,7 +410,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ lang }) => {
             <div className="flex flex-col items-center w-full lg:w-auto min-w-[220px] xs:min-w-[260px] sm:min-w-[320px]">
               <div className="bg-white p-4 xs:p-6 sm:p-10 rounded-xl xs:rounded-[2rem] sm:rounded-[4rem] border-4 sm:border-8 border-white shadow-2xl mb-4 xs:mb-6 sm:mb-8 transform hover:scale-105 transition-transform duration-500">
                 <img 
-                  src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1766767120/QR_1766767090_adh5z3.png" 
+                  src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1767537928/QR_1767537816_nwcp3c.png" 
                   alt="DDKA Official QR Code" 
                   className="w-32 h-32 xs:w-40 xs:h-40 sm:w-64 sm:h-64 object-contain rounded-lg xs:rounded-2xl sm:rounded-3xl" 
                 />
