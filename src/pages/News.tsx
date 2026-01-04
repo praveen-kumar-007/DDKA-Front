@@ -67,7 +67,11 @@ const News = () => {
 
                   {/* Image Full Card */}
                   {item.images && item.images.length > 0 && (
-                    <img src={item.images[0]} alt="news-img" className="w-full h-56 object-cover" />
+                    <img
+                      src={item.images[0]}
+                      alt="news-img"
+                      className="w-full h-56 object-cover object-top"
+                    />
                   )}
 
                   {/* Text Card Section */}
