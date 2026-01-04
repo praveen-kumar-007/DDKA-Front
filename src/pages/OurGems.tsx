@@ -54,7 +54,14 @@ const OurGems: React.FC<OurGemsProps> = ({ lang }) => {
   const federationCupPlayers = players.filter(p => p.category === 'Federation Cup');
   const jplPlayers = players.filter(p => p.category === 'Jharkhand Premier League');
 
-  // Qualification hierarchy for referees
+  // Role and qualification hierarchy for referees
+  const roleRank = (qualification: string): number => {
+    const qual = qualification.toUpperCase();
+    if (qual.includes('CHAIRMAN')) return 0;
+    if (qual.includes('SECRETARY')) return 1;
+    return 2;
+  };
+
   const qualificationRank = (qualification: string): number => {
     const qual = qualification.toUpperCase();
     if (qual.includes('NIS')) return 1;
@@ -70,6 +77,8 @@ const OurGems: React.FC<OurGemsProps> = ({ lang }) => {
   const sortedFederationCupPlayers = [...federationCupPlayers].sort((a, b) => a.name.localeCompare(b.name));
   const sortedJplPlayers = [...jplPlayers].sort((a, b) => a.name.localeCompare(b.name));
   const sortedReferees = [...referees].sort((a, b) => {
+    const roleDiff = roleRank(a.qualification) - roleRank(b.qualification);
+    if (roleDiff !== 0) return roleDiff;
     const rankDiff = qualificationRank(a.qualification) - qualificationRank(b.qualification);
     return rankDiff !== 0 ? rankDiff : a.name.localeCompare(b.name);
   });
@@ -241,19 +250,67 @@ const OurGems: React.FC<OurGemsProps> = ({ lang }) => {
                   </div>
                   <div className="p-4 md:p-10">
                     <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
-                      {sortedReferees.map((referee) => (
-                        <div key={referee._id} className="bg-gradient-to-br from-white to-slate-50 rounded-xl p-3 md:p-6 border border-slate-200 hover:shadow-lg transition-all hover:scale-105">
-                          <div className="flex flex-col md:flex-row items-start gap-2 md:gap-4">
-                            <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-slate-800 to-cyan-700 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
-                              <Shield className="w-5 h-5 md:w-6 md:h-6 text-white" />
-                            </div>
-                            <div className="flex-1">
-                              <h3 className="text-sm md:text-lg font-bold text-slate-900 mb-1 md:mb-2 leading-tight">{referee.name}</h3>
-                              <p className="text-xs md:text-sm text-slate-600 font-medium leading-tight">{referee.qualification}</p>
+                      {sortedReferees.map((referee) => {
+                        const qualUpper = referee.qualification.toUpperCase();
+                        const isChairman = qualUpper.includes('CHAIRMAN');
+                        const isSecretary = qualUpper.includes('SECRETARY');
+                        const isOfficer = isChairman || isSecretary;
+
+                        return (
+                          <div
+                            key={referee._id}
+                            className={
+                              `rounded-xl p-3 md:p-6 border hover:shadow-lg transition-all hover:scale-105 ` +
+                              (isOfficer
+                                ? 'bg-gradient-to-br from-slate-900 via-indigo-800 to-cyan-700 border-amber-400 ring-2 ring-amber-300/70'
+                                : 'bg-gradient-to-br from-white to-slate-50 border-slate-200')
+                            }
+                          >
+                            <div className="flex flex-col md:flex-row items-start gap-2 md:gap-4">
+                              <div
+                                className={
+                                  'w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg ' +
+                                  (isOfficer
+                                    ? 'bg-gradient-to-br from-amber-400 via-amber-500 to-yellow-400 text-slate-900'
+                                    : 'bg-gradient-to-br from-slate-800 to-cyan-700')
+                                }
+                              >
+                                <Shield className="w-5 h-5 md:w-6 md:h-6 text-white" />
+                              </div>
+                              <div className="flex-1">
+                                {isOfficer && (
+                                  <div className="mb-1 md:mb-2 flex flex-wrap items-center gap-1">
+                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] md:text-xs font-semibold tracking-wide uppercase bg-amber-100 text-amber-800">
+                                      {isHi ? 'रेफरी बोर्ड अधिकारी' : 'Referee Board Officer'}
+                                    </span>
+                                    <span className="text-[10px] md:text-xs font-semibold uppercase text-amber-100/90">
+                                      {isChairman
+                                        ? (isHi ? 'चेयरमैन' : 'Chairman')
+                                        : (isHi ? 'सचिव' : 'Secretary')}
+                                    </span>
+                                  </div>
+                                )}
+                                <h3
+                                  className={
+                                    'text-sm md:text-lg font-bold mb-1 md:mb-2 leading-tight ' +
+                                    (isOfficer ? 'text-white' : 'text-slate-900')
+                                  }
+                                >
+                                  {referee.name}
+                                </h3>
+                                <p
+                                  className={
+                                    'text-xs md:text-sm font-medium leading-tight ' +
+                                    (isOfficer ? 'text-amber-100/90' : 'text-slate-600')
+                                  }
+                                >
+                                  {referee.qualification}
+                                </p>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
