@@ -99,6 +99,10 @@ const OurGems: React.FC<OurGemsProps> = ({ lang }) => {
               : 'DDKA Hall of Fame - Celebrating our proud champions and referee board including National players, Federation Cup and Jharkhand Premier League stars.'
           }
         />
+        <meta
+          name="keywords"
+          content="DDKA hall of fame, Dhanbad kabaddi champions, Jharkhand kabaddi players, national kabaddi players dhanbad, jaan kabaddi champions, kabaddi dhanbad jharkhand stars"
+        />
       </Helmet>
 
       <div className="min-h-screen bg-gradient-to-b from-stone-50 to-amber-50/20">

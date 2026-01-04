@@ -62,6 +62,10 @@ export const Home: React.FC<HomeProps> = ({ lang, onNavigate }) => {
               : 'Official website of Dhanbad District Kabaddi Association (DDKA) – news, tournaments, registrations and Kabaddi development programs in Dhanbad, Jharkhand.'
           }
         />
+        <meta
+          name="keywords"
+          content="Dhanbad District Kabaddi Association, DDKA, Dhanbad Kabaddi Association, Kabaddi Dhanbad, Kabaddi in Dhanbad, Kabaddi Jharkhand, Jharkhand Kabaddi Association, Kabaddi Association of Jharkhand Dhanbad, jaan kabaddi, jan kabaddi, jaan kabaddi dhanbad, jaan dhn kabaddi, dhanbad kabaddi district, kabaddi dhanbad jharkhand"
+        />
       </Helmet>
       <div className="animate-in fade-in duration-500">
       {/* Hero Section */}

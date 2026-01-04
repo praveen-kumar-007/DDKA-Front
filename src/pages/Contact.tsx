@@ -96,6 +96,10 @@ const Contact: React.FC<{ lang?: 'en' | 'hi' }> = ({ lang = 'en' }) => {
 							: 'Contact Dhanbad District Kabaddi Association (DDKA) – address, phone, email and contact form for Kabaddi-related queries in Dhanbad, Jharkhand.'
 					}
 				/>
+					<meta
+						name="keywords"
+						content="Contact DDKA, contact Dhanbad Kabaddi Association, Kabaddi enquiries Dhanbad, Kabaddi Jharkhand contact, jaan kabaddi contact, dhanbad kabaddi office, kabaddi association of jharkhand dhanbad"
+					/>
 			</Helmet>
 			<div className="min-h-screen bg-gradient-to-b from-slate-50 to-white py-0 px-0">
 			<div className="w-full bg-gradient-to-b from-orange-50 to-white py-16 px-2 text-center">

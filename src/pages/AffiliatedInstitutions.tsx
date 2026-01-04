@@ -61,6 +61,10 @@ const AffiliatedInstitutions: React.FC<AffiliatedInstitutionsProps> = ({ lang })
           name="description"
           content="List of schools, colleges, and clubs affiliated with the Dhanbad District Kabaddi Association (DDKA)."
         />
+        <meta
+          name="keywords"
+          content="DDKA affiliated institutions, kabaddi schools dhanbad, kabaddi clubs dhanbad, Jharkhand kabaddi institutions, kabaddi association of jharkhand dhanbad, jaan kabaddi schools"
+        />
       </Helmet>
 
       <div className="min-h-screen bg-slate-50 pb-16">

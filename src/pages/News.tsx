@@ -33,6 +33,10 @@ const News = () => {
           name="description"
           content="Latest Kabaddi news, match updates, tournament announcements and results from Dhanbad District Kabaddi Association (DDKA) in Dhanbad, Jharkhand."
         />
+        <meta
+          name="keywords"
+          content="Kabaddi news Dhanbad, DDKA news, Dhanbad kabaddi results, Jharkhand kabaddi news, kabaddi tournaments dhanbad, jaan kabaddi news, jan kabaddi news"
+        />
       </Helmet>
       <div className="relative py-24 overflow-hidden bg-slate-50">
       <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-blue-50 to-transparent pointer-events-none" />

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Shield, AlertCircle, FileText, Users, Award, CheckCircle, Building } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { Language } from '../translations';
@@ -6,6 +7,27 @@ import type { Language } from '../translations';
 const TermsConditions: React.FC<{ lang: Language }> = ({ lang }) => {
   const isHi = lang === 'hi';
   return (
+    <>
+    <Helmet>
+      <title>
+        {isHi
+          ? 'नियम एवं शर्तें | धनबाद जिला कबड्डी संघ (DDKA)'
+          : 'Terms & Conditions | Dhanbad District Kabaddi Association (DDKA)'}
+      </title>
+      <meta
+        name="description"
+        content={
+          isHi
+            ? 'धनबाद जिला कबड्डी संघ (DDKA) के खिलाड़ी और संस्थान पंजीकरण से संबंधित नियम, शर्तें और अनुशासन नीति।'
+            : 'Official terms and conditions for player and institution registration, membership and conduct under Dhanbad District Kabaddi Association (DDKA), Jharkhand.'
+        }
+      />
+      <meta
+        name="keywords"
+        content="DDKA terms and conditions, kabaddi registration rules dhanbad, kabaddi association of jharkhand rules, kabaddi dhanbad membership terms, jaan kabaddi rules dhanbad"
+      />
+    </Helmet>
+
     <div className="bg-slate-50 text-slate-900 min-h-screen">
       {/* Hero Section */}
       <section className="relative py-16 md:py-24 bg-blue-900 overflow-hidden">
@@ -570,6 +592,7 @@ const TermsConditions: React.FC<{ lang: Language }> = ({ lang }) => {
         </div>
       </section>
     </div>
+    </>
   );
 };
 

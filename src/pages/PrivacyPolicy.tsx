@@ -1,4 +1,5 @@
 import React from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Shield, Lock, Eye, Database, UserCheck, FileText, Mail } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { Language } from '../translations';
@@ -6,6 +7,27 @@ import type { Language } from '../translations';
 const PrivacyPolicy: React.FC<{ lang: Language }> = ({ lang }) => {
   const isHi = lang === 'hi';
   return (
+    <>
+    <Helmet>
+      <title>
+        {isHi
+          ? 'प्राइवेसी पॉलिसी | धनबाद जिला कबड्डी संघ (DDKA)'
+          : 'Privacy Policy | Dhanbad District Kabaddi Association (DDKA)'}
+      </title>
+      <meta
+        name="description"
+        content={
+          isHi
+            ? 'धनबाद जिला कबड्डी संघ (DDKA) द्वारा खिलाड़ियों और संस्थानों की व्यक्तिगत जानकारी के संग्रह, उपयोग और सुरक्षा से संबंधित गोपनीयता नीति।'
+            : 'Privacy policy explaining how Dhanbad District Kabaddi Association (DDKA) in Dhanbad, Jharkhand collects, uses and protects player and institution data.'
+        }
+      />
+      <meta
+        name="keywords"
+        content="DDKA privacy policy, kabaddi data privacy dhanbad, kabaddi association of jharkhand privacy, player data protection dhanbad, jaan kabaddi privacy"
+      />
+    </Helmet>
+
     <div className="min-h-screen bg-slate-50 text-slate-900">
       {/* Hero Section */}
       <section className="relative py-16 md:py-24 bg-blue-900 overflow-hidden">
@@ -476,6 +498,7 @@ const PrivacyPolicy: React.FC<{ lang: Language }> = ({ lang }) => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

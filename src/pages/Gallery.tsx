@@ -94,6 +94,10 @@ export const Gallery: React.FC<GalleryProps> = ({ lang }) => {
               : 'Photo gallery of Kabaddi matches, players and district championships organised by Dhanbad District Kabaddi Association (DDKA) in Dhanbad, Jharkhand.'
           }
         />
+        <meta
+          name="keywords"
+          content="Kabaddi photos Dhanbad, DDKA gallery, Dhanbad kabaddi images, Jharkhand kabaddi gallery, jaan kabaddi photos, jan kabaddi dhanbad"
+        />
       </Helmet>
       <div className="py-16 md:py-24 bg-slate-50">
       <div className="max-w-7xl mx-auto px-3 md:px-6">

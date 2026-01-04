@@ -12,6 +12,11 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://dhanbadkabaddiassociation.tech/affiliated-institutions</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://dhanbadkabaddiassociation.tech/gallery</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -27,6 +32,11 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://dhanbadkabaddiassociation.tech/hall-of-fame</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://dhanbadkabaddiassociation.tech/register</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -35,6 +45,11 @@
     <loc>https://dhanbadkabaddiassociation.tech/institution</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://dhanbadkabaddiassociation.tech/technical-official-registration</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://dhanbadkabaddiassociation.tech/contact</loc>

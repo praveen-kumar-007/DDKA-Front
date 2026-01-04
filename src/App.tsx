@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 
 // Layout Components
 import Navbar from './components/layout/Navbar';
@@ -130,27 +131,90 @@ const App: React.FC = () => {
           <Route path="/admin-secure-setup-dkka2024" element={<AdminSignup />} />
           
           <Route path="/register" element={
-            <div className="py-20 bg-slate-50 min-h-screen">
-              <div className="max-w-7xl mx-auto px-4">
-                <RegisterForm lang={lang} />
+            <>
+              <Helmet>
+                <title>
+                  {lang === 'hi'
+                    ? 'खिलाड़ी पंजीकरण | धनबाद जिला कबड्डी संघ (DDKA)'
+                    : 'Player Registration | Dhanbad District Kabaddi Association (DDKA)'}
+                </title>
+                <meta
+                  name="description"
+                  content={
+                    lang === 'hi'
+                      ? 'धनबाद जिला कबड्डी संघ (DDKA) के लिए ऑनलाइन खिलाड़ी पंजीकरण फ़ॉर्म – धनबाद, झारखंड के खिलाड़ियों के लिए।'
+                      : 'Online player registration form for Dhanbad District Kabaddi Association (DDKA) – for Kabaddi players from Dhanbad, Jharkhand.'
+                  }
+                />
+                <meta
+                  name="keywords"
+                  content="player registration dhanbad kabaddi, DDKA player registration, kabaddi registration dhanbad, kabaddi jharkhand player form, jaan kabaddi registration, jan kabaddi dhanbad"
+                />
+              </Helmet>
+              <div className="py-20 bg-slate-50 min-h-screen">
+                <div className="max-w-7xl mx-auto px-4">
+                  <RegisterForm lang={lang} />
+                </div>
               </div>
-            </div>
+            </>
           } />
 
           <Route path="/institution" element={
-            <div className="py-20 bg-slate-50 min-h-screen">
-              <div className="max-w-7xl mx-auto px-4">
-                <InstitutionForm lang={lang} />
+            <>
+              <Helmet>
+                <title>
+                  {lang === 'hi'
+                    ? 'संस्थान एफिलिएशन | धनबाद जिला कबड्डी संघ (DDKA)'
+                    : 'Institution Affiliation | Dhanbad District Kabaddi Association (DDKA)'}
+                </title>
+                <meta
+                  name="description"
+                  content={
+                    lang === 'hi'
+                      ? 'स्कूल, कॉलेज और क्लबों के लिए DDKA संस्थान एफिलिएशन पंजीकरण – धनबाद जिला कबड्डी संघ से जुड़ने के लिए ऑनलाइन फ़ॉर्म।'
+                      : 'Institution affiliation registration for schools, colleges and clubs with Dhanbad District Kabaddi Association (DDKA) in Dhanbad, Jharkhand.'
+                  }
+                />
+                <meta
+                  name="keywords"
+                  content="institution affiliation dhanbad kabaddi, DDKA institution registration, kabaddi school affiliation dhanbad, kabaddi club registration jharkhand, kabaddi association of jharkhand dhanbad, jaan kabaddi school affiliation"
+                />
+              </Helmet>
+              <div className="py-20 bg-slate-50 min-h-screen">
+                <div className="max-w-7xl mx-auto px-4">
+                  <InstitutionForm lang={lang} />
+                </div>
               </div>
-            </div>
+            </>
           } />
 
           <Route path="/technical-official-registration" element={
-            <div className="py-20 bg-slate-50 min-h-screen">
-              <div className="max-w-7xl mx-auto px-4">
-                <TechnicalOfficialForm lang={lang} />
+            <>
+              <Helmet>
+                <title>
+                  {lang === 'hi'
+                    ? 'टेक्निकल ऑफिशियल पंजीकरण | DDKA'
+                    : 'Technical Official Registration | DDKA Kabaddi Dhanbad'}
+                </title>
+                <meta
+                  name="description"
+                  content={
+                    lang === 'hi'
+                      ? 'धनबाद जिला कबड्डी संघ (DDKA) के लिए टेक्निकल ऑफिशियल / रेफरी पंजीकरण फ़ॉर्म – धनबाद और झारखंड के इच्छुक अधिकारियों के लिए।'
+                      : 'Technical official / referee registration form for Dhanbad District Kabaddi Association (DDKA) – for Kabaddi officials from Dhanbad and Jharkhand.'
+                  }
+                />
+                <meta
+                  name="keywords"
+                  content="technical official registration dhanbad kabaddi, kabaddi referees dhanbad, DDKA technical officials, kabaddi jharkhand referees, jaan kabaddi referee registration"
+                />
+              </Helmet>
+              <div className="py-20 bg-slate-50 min-h-screen">
+                <div className="max-w-7xl mx-auto px-4">
+                  <TechnicalOfficialForm lang={lang} />
+                </div>
               </div>
-            </div>
+            </>
           } />
 
           <Route path="/contact" element={<Contact lang={lang} />} />

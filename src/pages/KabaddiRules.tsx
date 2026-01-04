@@ -27,6 +27,10 @@ const KabaddiRules: React.FC<KabaddiRulesProps> = ({ lang }) => {
               : 'Detailed Kabaddi rules followed by Dhanbad District Kabaddi Association (DDKA) – court dimensions, team composition, raid and defense rules, fouls and scoring system as per AKFI standards.'
           }
         />
+        <meta
+          name="keywords"
+          content="Kabaddi rules Dhanbad, Kabaddi rules Jharkhand, AKFI kabaddi rules, DDKA kabaddi rules, kabaddi dhanbad jharkhand, jaan kabaddi rules, jan kabaddi rules"
+        />
       </Helmet>
       <div className="min-h-screen bg-slate-50">
         {/* Hero Section */}

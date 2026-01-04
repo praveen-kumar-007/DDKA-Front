@@ -99,6 +99,10 @@ export const About: React.FC<AboutProps> = ({ lang }) => {
               : 'Learn about the Dhanbad District Kabaddi Association (DDKA) leadership, committee members, vision, mission and patrons promoting Kabaddi in Dhanbad, Jharkhand.'
           }
         />
+        <meta
+          name="keywords"
+          content="About DDKA, Dhanbad District Kabaddi Association committee, Kabaddi association of Jharkhand Dhanbad, Dhanbad Kabaddi officials, Kabaddi Jharkhand leadership, jaan kabaddi dhanbad"
+        />
       </Helmet>
       <div className="py-12 md:py-24 animate-in fade-in slide-in-from-bottom-4 duration-700 bg-slate-50">
       <div className="max-w-[90rem] mx-auto px-4">
