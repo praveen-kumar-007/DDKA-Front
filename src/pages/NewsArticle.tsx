@@ -11,6 +11,7 @@ const NewsArticle = () => {
   const [news, setNews] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [isImageZoomed, setIsImageZoomed] = useState(false);
 
   useEffect(() => {
     const fetchNews = async () => {
@@ -85,10 +86,17 @@ const NewsArticle = () => {
         <div className="p-8 pb-0">
           <Link to="/news" className="flex items-center gap-2 text-blue-700 font-bold mb-6 hover:underline"><ArrowLeft size={18}/> Back to News</Link>
         </div>
-        {/* Main Image */}
+        {/* Main Image - full view with click-to-zoom */}
         {news.images && news.images.length > 0 && (
-          <div className="w-full flex justify-center mb-4">
-            <img src={news.images[0]} alt="news-img" className="w-full max-h-80 object-cover" style={{borderRadius: '0 0 1.5rem 1.5rem'}} />
+          <div className="w-full flex justify-center mb-4 overflow-hidden" style={{borderRadius: '0 0 1.5rem 1.5rem'}}>
+            <img
+              src={news.images[0]}
+              alt="news-img"
+              className={`w-full max-h-[80vh] object-contain transition-transform duration-300 ${
+                isImageZoomed ? 'scale-150 cursor-zoom-out' : 'scale-100 cursor-zoom-in'
+              }`}
+              onClick={() => setIsImageZoomed((prev) => !prev)}
+            />
           </div>
         )}
         <div className="p-8 pt-4">
