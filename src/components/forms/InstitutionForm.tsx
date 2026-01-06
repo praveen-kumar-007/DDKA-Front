@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { 
   Building, CheckCircle, Phone, MapPin, 
   Users, Info, Calendar, Hash, Ruler, Layers, Upload, X 
@@ -7,7 +7,6 @@ import { translations } from '../../translations';
 import type { Language } from '../../translations';
 import { FEES } from '../../constants';
 import { Link } from 'react-router-dom';
-import ReCAPTCHA from 'react-google-recaptcha';
 
 interface InstitutionFormProps {
   lang: Language;
@@ -27,10 +26,6 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
   // State for Institution Logo
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string>('');
-  const [botField, setBotField] = useState('');
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const recaptchaRef = useRef<ReCAPTCHA | null>(null);
-  const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY as string | undefined;
 
   const t = translations[lang].forms;
   const tp = translations[lang].payment;
@@ -120,12 +115,7 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
       alert("Please provide both Transaction ID and Payment Screenshot.");
       return;
     }
-
-    if (recaptchaSiteKey && !captchaToken) {
-      alert(lang === 'hi' ? 'कृपया फ़ॉर्म जमा करने से पहले reCAPTCHA पूरा करें।' : 'Please complete the reCAPTCHA before submitting.');
-      return;
-    }
-
+    
     setIsSubmitting(true);
 
     try {
@@ -140,12 +130,6 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
       });
       dataToSend.append('transactionId', transactionId.toUpperCase().trim());
       dataToSend.append('acceptedTerms', acceptedTerms ? 'true' : 'false');
-
-      // Honeypot & reCAPTCHA
-      dataToSend.append('botField', botField);
-      if (captchaToken) {
-        dataToSend.append('recaptchaToken', captchaToken);
-      }
       
       // Append the screenshot file
       dataToSend.append('screenshot', screenshot);
@@ -166,9 +150,6 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
 
       if (data.success) {
         setIsSuccess(true);
-        setBotField('');
-        setCaptchaToken(null);
-        recaptchaRef.current?.reset();
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
         alert(data.message || "Registration failed. Please try again.");
@@ -389,28 +370,6 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
                   )}
                 </p>
               </div>
-            </section>
-
-            {/* Honeypot + reCAPTCHA */}
-            <section className="space-y-4">
-              <input
-                type="text"
-                value={botField}
-                onChange={(e) => setBotField(e.target.value)}
-                autoComplete="off"
-                className="hidden"
-                aria-hidden="true"
-                tabIndex={-1}
-              />
-              {recaptchaSiteKey && (
-                <div className="pt-2">
-                  <ReCAPTCHA
-                    ref={recaptchaRef}
-                    sitekey={recaptchaSiteKey}
-                    onChange={(token) => setCaptchaToken(token)}
-                  />
-                </div>
-              )}
             </section>
 
             <div className="pt-6 sm:pt-10">

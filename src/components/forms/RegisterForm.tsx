@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { 
   User, Phone, FileText, Upload, CheckCircle, X, 
   Mail, Calendar, Droplets, Trophy, MessageSquare 
@@ -8,7 +8,6 @@ import type { Language } from '../../translations';
 import { FEES } from '../../constants';
 import { translations } from '../../translations';
 import { Link } from 'react-router-dom';
-import ReCAPTCHA from 'react-google-recaptcha';
 
 interface RegisterFormProps {
   lang: Language;
@@ -30,10 +29,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ lang }) => {
   });
   const [fileNames, setFileNames] = useState<{ [key: string]: string }>({});
   const [previews, setPreviews] = useState<{ [key: string]: string }>({});
-  const [botField, setBotField] = useState('');
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const recaptchaRef = useRef<ReCAPTCHA | null>(null);
-  const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY as string | undefined;
 
   const t = translations[lang].forms;
   const tp = translations[lang].payment;
@@ -134,13 +129,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ lang }) => {
         alert(lang === 'hi' ? "कृपया ट्रांजैक्शन आईडी और भुगतान रसीद अपलोड करें।" : "Please provide Transaction ID and upload Payment Receipt.");
         return;
     }
-
-    // Require captcha only if key is present
-    if (recaptchaSiteKey && !captchaToken) {
-      alert(lang === 'hi' ? 'कृपया फ़ॉर्म जमा करने से पहले reCAPTCHA पूरा करें।' : 'Please complete the reCAPTCHA before submitting.');
-      return;
-    }
-
+    
     setIsSubmitting(true);
     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -159,12 +148,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ lang }) => {
       // 2b. Append Terms acceptance
       dataToSend.append('acceptedTerms', acceptedTerms ? 'true' : 'false');
 
-      // 2c. Honeypot & reCAPTCHA
-      dataToSend.append('botField', botField);
-      if (captchaToken) {
-        dataToSend.append('recaptchaToken', captchaToken);
-      }
-
       // 3. Append the physical files (matching Multer keys on backend)
       if (selectedFiles.photo) dataToSend.append('photo', selectedFiles.photo);
       if (selectedFiles.front) dataToSend.append('front', selectedFiles.front);
@@ -181,9 +164,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ lang }) => {
 
       if (result.success) {
         setIsSuccess(true);
-        setBotField('');
-        setCaptchaToken(null);
-        recaptchaRef.current?.reset();
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
         alert(result.message || "Registration failed. Please try again.");
@@ -406,31 +386,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ lang }) => {
                 </div>
               ))}
             </div>
-          </section>
-
-          {/* Honeypot + reCAPTCHA */}
-          <section className="space-y-4">
-            {/* Hidden honeypot input to trap simple bots */}
-            <input
-              type="text"
-              value={botField}
-              onChange={(e) => setBotField(e.target.value)}
-              autoComplete="off"
-              className="hidden"
-              aria-hidden="true"
-              tabIndex={-1}
-            />
-
-            {/* Google reCAPTCHA widget if configured */}
-            {recaptchaSiteKey && (
-              <div className="pt-2">
-                <ReCAPTCHA
-                  ref={recaptchaRef}
-                  sitekey={recaptchaSiteKey}
-                  onChange={(token: string | null) => setCaptchaToken(token)}
-                />
-              </div>
-            )}
           </section>
 
           <div className="pt-4 xs:pt-6 sm:pt-10">

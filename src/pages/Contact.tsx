@@ -1,8 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Mail, MapPin, Phone, Info, ChevronDown, ChevronUp, Youtube, Instagram, Twitter, Facebook } from 'lucide-react';
 import { CONTACT_INFO, SOCIAL_LINKS } from '../constants';
-import ReCAPTCHA from 'react-google-recaptcha';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -46,16 +45,11 @@ const Contact: React.FC<{ lang?: 'en' | 'hi' }> = ({ lang = 'en' }) => {
 		phone: '',
 		subject: '',
 		message: '',
-		// honeypot field – stays empty for real users
-		botField: '',
 	});
 	const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>(
 		'idle'
 	);
 	const [faqOpen, setFaqOpen] = useState<number | null>(null);
-	const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-	const recaptchaRef = useRef<ReCAPTCHA | null>(null);
-	const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY as string | undefined;
 
 	const handleChange = (
 		e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -65,12 +59,6 @@ const Contact: React.FC<{ lang?: 'en' | 'hi' }> = ({ lang = 'en' }) => {
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-
-		// If a reCAPTCHA site key is configured, ensure user solved it
-		if (recaptchaSiteKey && !captchaToken) {
-			setStatus('error');
-			return;
-		}
 		setStatus('sending');
 		try {
 			const res = await fetch(`${API_URL}/api/contact`, {
@@ -78,17 +66,12 @@ const Contact: React.FC<{ lang?: 'en' | 'hi' }> = ({ lang = 'en' }) => {
 				headers: {
 					'Content-Type': 'application/json',
 				},
-				body: JSON.stringify({
-					...form,
-					recaptchaToken: captchaToken,
-				}),
+				body: JSON.stringify(form),
 			});
 			const result = await res.json().catch(() => null);
 			if (res.ok && result && result.success) {
 				setStatus('sent');
-				setForm({ name: '', email: '', phone: '', subject: '', message: '', botField: '' });
-				setCaptchaToken(null);
-				recaptchaRef.current?.reset();
+				setForm({ name: '', email: '', phone: '', subject: '', message: '' });
 			} else {
 				setStatus('error');
 			}
@@ -340,28 +323,6 @@ const Contact: React.FC<{ lang?: 'en' | 'hi' }> = ({ lang = 'en' }) => {
 										: 'Tell us more about your inquiry...'
 								}
 							/>
-							{/* Honeypot field for bots – visually hidden from real users */}
-							<input
-									type="text"
-									name="botField"
-									value={form.botField}
-									onChange={handleChange}
-									autoComplete="off"
-									className="hidden"
-									aria-hidden="true"
-									tabIndex={-1}
-								/>
-
-							{/* Google reCAPTCHA widget (shown only when site key is configured) */}
-							{recaptchaSiteKey && (
-								<div className="mt-2">
-									<ReCAPTCHA
-											ref={recaptchaRef}
-											sitekey={recaptchaSiteKey}
-											onChange={(token: string | null) => setCaptchaToken(token)}
-										/>
-								</div>
-							)}
 						</div>
 						<button
 							type="submit"
@@ -369,8 +330,12 @@ const Contact: React.FC<{ lang?: 'en' | 'hi' }> = ({ lang = 'en' }) => {
 							disabled={status === 'sending'}
 						>
 							{status === 'sending'
-								? (lang === 'hi' ? 'भेजा जा रहा है...' : 'Sending...')
-								: (lang === 'hi' ? 'भेजें' : 'Send Message')}
+								? lang === 'hi'
+									? 'भेजा जा रहा है...'
+									: 'Sending...'
+								: lang === 'hi'
+								? 'भेजें'
+								: 'Send Message'}
 						</button>
 						{status === 'sent' && (
 							<div className="text-green-600 text-sm font-bold mt-2">
