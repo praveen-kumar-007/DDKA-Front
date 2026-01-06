@@ -124,7 +124,7 @@ const KabaddiRules: React.FC<KabaddiRulesProps> = ({ lang }) => {
                       <div className="border-b border-slate-200 pb-3">
                         <h4 className="font-bold text-blue-900 mb-1 text-sm uppercase">{isHi ? 'सब-जूनियर (लड़के)' : 'Sub-Junior (Boys)'}</h4>
                         <div className="flex justify-between text-sm">
-                          <span className="text-slate-600">{isHi ? 'आकार:' : 'Size:'} 11m x 9m</span>
+                          <span className="text-slate-600">{isHi ? 'आकार:' : 'Size:'} 11m x 8m</span>
                           <span className="text-slate-600">{isHi ? 'लॉबी:' : 'Lobby:'} 1m</span>
                         </div>
                       </div>
