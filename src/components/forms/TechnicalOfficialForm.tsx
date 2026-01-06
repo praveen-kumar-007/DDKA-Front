@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   User,
   Calendar,
@@ -10,6 +10,7 @@ import {
   CheckCircle
 } from 'lucide-react';
 import type { Language } from '../../translations';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 interface TechnicalOfficialFormProps {
   lang: Language;
@@ -44,6 +45,10 @@ const TechnicalOfficialForm: React.FC<TechnicalOfficialFormProps> = ({ lang }) =
   const [signaturePreview, setSignaturePreview] = useState<string | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
    const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
+  const [botField, setBotField] = useState('');
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const recaptchaRef = useRef<ReCAPTCHA | null>(null);
+  const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY as string | undefined;
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -138,6 +143,15 @@ const TechnicalOfficialForm: React.FC<TechnicalOfficialFormProps> = ({ lang }) =
       return;
     }
 
+    if (recaptchaSiteKey && !captchaToken) {
+      alert(
+        lang === 'hi'
+          ? 'कृपया फ़ॉर्म जमा करने से पहले reCAPTCHA पूरा करें।'
+          : 'Please complete the reCAPTCHA before submitting.'
+      );
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -158,6 +172,11 @@ const TechnicalOfficialForm: React.FC<TechnicalOfficialFormProps> = ({ lang }) =
       form.append('email', formData.email);
       form.append('transactionId', formData.transactionId.toUpperCase().trim());
 
+      form.append('botField', botField);
+      if (captchaToken) {
+        form.append('recaptchaToken', captchaToken);
+      }
+
       if (signatureFile) form.append('signature', signatureFile);
       if (photoFile) form.append('photo', photoFile);
       if (receiptFile) form.append('receipt', receiptFile);
@@ -171,6 +190,9 @@ const TechnicalOfficialForm: React.FC<TechnicalOfficialFormProps> = ({ lang }) =
 
       if (result.success) {
         setIsSuccess(true);
+        setBotField('');
+        setCaptchaToken(null);
+        recaptchaRef.current?.reset();
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
         alert(result.message || 'Failed to submit application.');
@@ -637,6 +659,28 @@ const TechnicalOfficialForm: React.FC<TechnicalOfficialFormProps> = ({ lang }) =
                 : 'I confirm that all details provided above are true and correct to the best of my knowledge.'}
             </p>
           </div>
+        </section>
+
+        {/* Honeypot + reCAPTCHA (kept at the end, just before submission) */}
+        <section className="space-y-4">
+          <input
+            type="text"
+            value={botField}
+            onChange={(e) => setBotField(e.target.value)}
+            autoComplete="off"
+            className="hidden"
+            aria-hidden="true"
+            tabIndex={-1}
+          />
+          {recaptchaSiteKey && (
+            <div className="pt-2">
+              <ReCAPTCHA
+                ref={recaptchaRef}
+                sitekey={recaptchaSiteKey}
+                onChange={(token: string | null) => setCaptchaToken(token)}
+              />
+            </div>
+          )}
         </section>
 
         <div className="pt-2">
