@@ -5,6 +5,10 @@ import { useNavigate } from 'react-router-dom';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
+interface AdminPermissions {
+  canDelete?: boolean;
+}
+
 const AdminNewsUpload = () => {
   const [form, setForm] = useState({ title: '', content: '', category: '', isHighlight: false });
   const [images, setImages] = useState<File[]>([]);
@@ -18,6 +22,8 @@ const AdminNewsUpload = () => {
   const [editModal, setEditModal] = useState<{open: boolean, news: any|null}>({open: false, news: null});
   const [viewModal, setViewModal] = useState<{open: boolean, news: any|null}>({open: false, news: null});
   const navigate = useNavigate();
+  const [adminRole, setAdminRole] = useState<string | null>(null);
+  const [adminPermissions, setAdminPermissions] = useState<AdminPermissions | null>(null);
     // Edit news handler
     const handleEdit = (item: any) => {
       setEditModal({ open: true, news: item });
@@ -40,14 +46,33 @@ const AdminNewsUpload = () => {
   const fetchNews = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/api/news`);
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/api/news`, {
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
       const result = await res.json();
       if (result.success) setNews(result.data);
     } catch (e) {}
     setLoading(false);
   };
 
-  useEffect(() => { fetchNews(); }, []);
+  useEffect(() => {
+    fetchNews();
+    const storedRole = localStorage.getItem('adminRole');
+    const permsRaw = localStorage.getItem('adminPermissions');
+    setAdminRole(storedRole);
+    if (permsRaw) {
+      try {
+        setAdminPermissions(JSON.parse(permsRaw));
+      } catch (e) {
+        console.error('Failed to parse adminPermissions', e);
+      }
+    }
+  }, []);
+
+  const canDelete = adminRole === 'superadmin' && !!adminPermissions?.canDelete;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,7 +86,14 @@ const AdminNewsUpload = () => {
     formData.append('isHighlight', String(form.isHighlight));
     images.forEach(img => formData.append('images', img));
     try {
-      const res = await fetch(`${API_URL}/api/news`, { method: 'POST', body: formData });
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/api/news`, {
+        method: 'POST',
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: formData,
+      });
       const result = await res.json();
       if (result.success) {
         setForm({ title: '', content: '', category: '', isHighlight: false });
@@ -81,10 +113,14 @@ const AdminNewsUpload = () => {
 
   // Admin: update news status (publish/draft)
   const handleStatus = async (id: string, status: 'published' | 'draft') => {
+    const token = localStorage.getItem('token');
     await fetch(`${API_URL}/api/news/${id}/status`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status })
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({ status }),
     });
     fetchNews();
   };
@@ -92,7 +128,13 @@ const AdminNewsUpload = () => {
   // Admin: delete news
   const handleDelete = async (id: string) => {
     if (!window.confirm('Delete this news post?')) return;
-    await fetch(`${API_URL}/api/news/${id}`, { method: 'DELETE' });
+    const token = localStorage.getItem('token');
+    await fetch(`${API_URL}/api/news/${id}`, {
+      method: 'DELETE',
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    });
     fetchNews();
   };
 
@@ -178,7 +220,9 @@ const AdminNewsUpload = () => {
               <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button onClick={() => setViewModal({ open: true, news: item })} className="p-1 rounded hover:bg-blue-50"><Eye size={18}/></button>
                 <button onClick={() => handleEdit(item)} className="p-1 rounded hover:bg-yellow-50"><Edit2 size={18}/></button>
-                <button onClick={() => handleDelete(item._id)} className="p-1 rounded hover:bg-red-50"><X size={18}/></button>
+                {canDelete && (
+                  <button onClick={() => handleDelete(item._id)} className="p-1 rounded hover:bg-red-50"><X size={18}/></button>
+                )}
               </div>
               {item.images && item.images.length > 0 && (
                 <div className="flex gap-2 mb-2">

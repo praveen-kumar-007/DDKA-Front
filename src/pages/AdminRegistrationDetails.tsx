@@ -17,6 +17,7 @@ const AdminRegistrationDetails = () => {
   const [customRole, setCustomRole] = useState<string>('');
   const [customIdInput, setCustomIdInput] = useState<string>('');
   const [showIdOptions, setShowIdOptions] = useState<boolean>(false);
+  const [adminRole, setAdminRole] = useState<string | null>(null);
 
   // Generate ID (with optional custom ID and role)
   const generateIdNo = async () => {
@@ -47,10 +48,12 @@ const AdminRegistrationDetails = () => {
     }
 
     try {
+      const token = localStorage.getItem('token');
       const response = await fetch(`${API_URL}/api/players/assign-id`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
           id: data._id,
@@ -90,10 +93,12 @@ const AdminRegistrationDetails = () => {
     if (!confirmed) return;
 
     try {
+      const token = localStorage.getItem('token');
       const response = await fetch(`${API_URL}/api/players/clear-id`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({ id: data._id, transactionId: data.transactionId }),
       });
@@ -116,8 +121,33 @@ const AdminRegistrationDetails = () => {
     if (!id) return;
     setLoading(true);
     setError(null);
+    // Resolve admin role from localStorage or JWT token
+    let storedRole = localStorage.getItem('adminRole');
+    if (!storedRole) {
+      const tokenRaw = localStorage.getItem('token');
+      if (tokenRaw) {
+        try {
+          const payloadPart = tokenRaw.split('.')[1];
+          const decoded = JSON.parse(atob(payloadPart));
+          if (decoded && typeof decoded.role === 'string') {
+            storedRole = decoded.role;
+            localStorage.setItem('adminRole', decoded.role);
+          }
+        } catch (e) {
+          console.error('Failed to decode admin role from token', e);
+        }
+      }
+    }
+    if (storedRole) {
+      setAdminRole(storedRole);
+    }
+    const token = localStorage.getItem('token');
 
-    fetch(`${API_URL}/api/players/${id}`)
+    fetch(`${API_URL}/api/players/${id}`, {
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    })
       .then(async (res) => {
         if (res.ok) {
           const result = await res.json();
@@ -142,7 +172,11 @@ const AdminRegistrationDetails = () => {
           }
         }
         // Try institution if not found as player
-        return fetch(`${API_URL}/api/institutions/${id}`);
+        return fetch(`${API_URL}/api/institutions/${id}`, {
+          headers: {
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+        });
       })
       .then(async (res) => {
         if (res === 'found') return; // do nothing if already found
@@ -245,12 +279,14 @@ const AdminRegistrationDetails = () => {
                     </button>
                   )}
                   {data?.idNo && (
-                    <button
-                      onClick={handleDeleteId}
-                      className="px-4 py-2 rounded-full bg-red-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-red-700 transition-all"
-                    >
-                      Delete ID
-                    </button>
+                    adminRole === 'superadmin' && (
+                      <button
+                        onClick={handleDeleteId}
+                        className="px-4 py-2 rounded-full bg-red-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-red-700 transition-all"
+                      >
+                        Delete ID
+                      </button>
+                    )
                   )}
                 </>
               )}

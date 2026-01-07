@@ -7,6 +7,10 @@ interface Referee {
   qualification: string;
 }
 
+interface AdminPermissions {
+  canDelete?: boolean;
+}
+
 const AdminRefereesManagement: React.FC = () => {
   const [referees, setReferees] = useState<Referee[]>([]);
   const [loading, setLoading] = useState(true);
@@ -17,9 +21,25 @@ const AdminRefereesManagement: React.FC = () => {
     qualification: ''
   });
 
+  const [adminRole, setAdminRole] = useState<string | null>(null);
+  const [adminPermissions, setAdminPermissions] = useState<AdminPermissions | null>(null);
+
   useEffect(() => {
+    const storedRole = localStorage.getItem('adminRole');
+    const permsRaw = localStorage.getItem('adminPermissions');
+    setAdminRole(storedRole);
+    if (permsRaw) {
+      try {
+        setAdminPermissions(JSON.parse(permsRaw));
+      } catch (e) {
+        console.error('Failed to parse adminPermissions', e);
+      }
+    }
+
     fetchReferees();
   }, []);
+
+  const canDelete = adminRole === 'superadmin' && !!adminPermissions?.canDelete;
 
   const fetchReferees = async () => {
     try {
@@ -232,13 +252,15 @@ const AdminRefereesManagement: React.FC = () => {
                         >
                           <Edit2 className="w-5 h-5" />
                         </button>
-                        <button
-                          onClick={() => handleDelete(referee._id)}
-                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                          title="Delete"
-                        >
-                          <Trash2 className="w-5 h-5" />
-                        </button>
+                        {canDelete && (
+                          <button
+                            onClick={() => handleDelete(referee._id)}
+                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-5 h-5" />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>

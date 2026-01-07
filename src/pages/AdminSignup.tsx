@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { User, ShieldCheck, AlertCircle, CheckCircle, Eye, EyeOff } from 'lucide-react';
+import { User, ShieldCheck, AlertCircle, CheckCircle, Eye, EyeOff, Mail } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const AdminSignup: React.FC = () => {
   const [adminId, setAdminId] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [error, setError] = useState('');
@@ -65,6 +66,15 @@ const AdminSignup: React.FC = () => {
       setError('Admin ID must be at least 3 characters');
       return;
     }
+    if (!email.trim()) {
+      setError('Email is required');
+      return;
+    }
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(email.trim())) {
+      setError('Please enter a valid email address');
+      return;
+    }
     if (!password) {
       setError('Password is required');
       return;
@@ -85,6 +95,7 @@ const AdminSignup: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           adminId: adminId.trim(),
+          email: email.trim(),
           password,
           confirmPassword: confirm
         })
@@ -122,28 +133,6 @@ const AdminSignup: React.FC = () => {
     );
   }
 
-  if (adminExists) {
-    return (
-      <div className="min-h-[80vh] flex items-center justify-center bg-slate-50 px-4">
-        <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in zoom-in duration-500">
-          <div className="bg-blue-900 p-8 text-center text-white">
-            <CheckCircle size={48} className="mx-auto mb-4 text-green-400" />
-            <h2 className="text-2xl font-bold uppercase tracking-tight">Admin Account Exists</h2>
-          </div>
-          <div className="p-8 text-center">
-            <p className="text-slate-700 mb-6">An admin account has already been created. Please proceed to login.</p>
-            <button
-              onClick={() => navigate('/admin-portal-access')}
-              className="w-full bg-blue-900 hover:bg-orange-600 text-white font-bold py-3 rounded-2xl transition-all"
-            >
-              Go to Login
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-[80vh] flex items-center justify-center bg-slate-50 px-4">
       <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in zoom-in duration-500">
@@ -156,6 +145,12 @@ const AdminSignup: React.FC = () => {
         </div>
 
         <form onSubmit={handleSignup} className="p-8 space-y-5">
+          {adminExists && (
+            <div className="bg-blue-50 text-blue-700 p-4 rounded-xl text-xs font-bold flex items-center gap-2 border border-blue-100">
+              <CheckCircle size={16} />
+              First admin (SUPERADMIN) already exists. New accounts will be NORMAL ADMINS without delete rights. Permissions can be managed by the superadmin.
+            </div>
+          )}
           {error && (
             <div className="bg-red-50 text-red-600 p-4 rounded-xl text-sm font-bold flex items-center gap-2 border border-red-100 animate-pulse">
               <AlertCircle size={18} /> {error}
@@ -184,6 +179,21 @@ const AdminSignup: React.FC = () => {
             {adminId.length > 0 && adminId.length < 3 && (
               <p className="text-xs text-orange-600 ml-1">Minimum 3 characters required</p>
             )}
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Email</label>
+            <div className="relative">
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+              <input
+                required
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-orange-500 outline-none transition-all font-medium"
+                placeholder="Enter admin email"
+              />
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -245,7 +255,7 @@ const AdminSignup: React.FC = () => {
 
           <button
             type="submit"
-            disabled={isLoading || !adminId || !password || !confirm || password !== confirm}
+            disabled={isLoading || !adminId || !email || !password || !confirm || password !== confirm}
             className="w-full bg-blue-900 hover:bg-orange-600 disabled:bg-slate-400 text-white font-oswald text-lg uppercase py-4 rounded-2xl shadow-xl transition-all active:scale-95 disabled:cursor-not-allowed"
           >
             {isLoading ? 'Creating Account...' : 'Create Admin Account'}

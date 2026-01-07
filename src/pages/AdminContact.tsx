@@ -3,6 +3,10 @@ import { Mail, Phone, Trash2, CheckCircle, XCircle, RefreshCcw, Eye, ListChecks 
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
+interface AdminPermissions {
+  canDelete?: boolean;
+}
+
 interface ContactMessage {
   _id: string;
   name: string;
@@ -21,10 +25,18 @@ const AdminContact: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'contacts' | 'newsletter'>('contacts');
   const [selected, setSelected] = useState<ContactMessage | null>(null);
 
+  const [adminRole, setAdminRole] = useState<string | null>(null);
+  const [adminPermissions, setAdminPermissions] = useState<AdminPermissions | null>(null);
+
   const fetchContacts = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/api/contact`);
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/api/contact`, {
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
       const result = await res.json();
       if (result.success) setItems(result.data);
     } catch (e) {
@@ -37,7 +49,12 @@ const AdminContact: React.FC = () => {
   const fetchNewsletters = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/api/contact/newsletter/all`);
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/api/contact/newsletter/all`, {
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
       const result = await res.json();
       if (result.success) setNewsletters(result.data);
     } catch (e) {
@@ -53,14 +70,30 @@ const AdminContact: React.FC = () => {
       window.location.href = '/admin-portal-access';
       return;
     }
+    const storedRole = localStorage.getItem('adminRole');
+    const permsRaw = localStorage.getItem('adminPermissions');
+    setAdminRole(storedRole);
+    if (permsRaw) {
+      try {
+        setAdminPermissions(JSON.parse(permsRaw));
+      } catch (e) {
+        console.error('Failed to parse adminPermissions', e);
+      }
+    }
     fetchContacts();
   }, []);
 
+  const canDelete = adminRole === 'superadmin' && !!adminPermissions?.canDelete;
+
   const updateStatus = async (id: string, status: 'New' | 'Read' | 'Rejected') => {
     try {
+      const token = localStorage.getItem('token');
       const res = await fetch(`${API_URL}/api/contact/status`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({ id, status }),
       });
       if (res.ok) fetchContacts();
@@ -72,7 +105,13 @@ const AdminContact: React.FC = () => {
   const deleteMessage = async (id: string) => {
     if (!window.confirm('Delete this message permanently?')) return;
     try {
-      const res = await fetch(`${API_URL}/api/contact/${id}`, { method: 'DELETE' });
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/api/contact/${id}`, {
+        method: 'DELETE',
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
       if (res.ok) fetchContacts();
     } catch (e) {
       console.error('Failed to delete message', e);
@@ -82,7 +121,13 @@ const AdminContact: React.FC = () => {
   const deleteNewsletter = async (id: string) => {
     if (!window.confirm('Delete this subscriber?')) return;
     try {
-      const res = await fetch(`${API_URL}/api/contact/newsletter/${id}`, { method: 'DELETE' });
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/api/contact/newsletter/${id}`, {
+        method: 'DELETE',
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
       if (res.ok) fetchNewsletters();
     } catch (e) {
       console.error('Failed to delete newsletter subscription', e);
@@ -214,13 +259,15 @@ const AdminContact: React.FC = () => {
                           >
                             <XCircle size={16} />
                           </button>
-                          <button
-                            onClick={() => deleteMessage(item._id)}
-                            className="p-2 bg-slate-100 text-slate-400 rounded-2xl hover:bg-slate-950 hover:text-white transition-all active:scale-90"
-                            title="Delete"
-                          >
-                            <Trash2 size={16} />
-                          </button>
+                          {canDelete && (
+                            <button
+                              onClick={() => deleteMessage(item._id)}
+                              className="p-2 bg-slate-100 text-slate-400 rounded-2xl hover:bg-slate-950 hover:text-white transition-all active:scale-90"
+                              title="Delete"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -254,13 +301,15 @@ const AdminContact: React.FC = () => {
                       </td>
                       <td className="p-4">
                         <div className="flex justify-end gap-2">
-                          <button
-                            onClick={() => deleteNewsletter(n._id)}
-                            className="p-2 bg-slate-100 text-slate-400 rounded-2xl hover:bg-slate-950 hover:text-white transition-all active:scale-90"
-                            title="Delete subscriber"
-                          >
-                            <Trash2 size={16} />
-                          </button>
+                          {canDelete && (
+                            <button
+                              onClick={() => deleteNewsletter(n._id)}
+                              className="p-2 bg-slate-100 text-slate-400 rounded-2xl hover:bg-slate-950 hover:text-white transition-all active:scale-90"
+                              title="Delete subscriber"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>

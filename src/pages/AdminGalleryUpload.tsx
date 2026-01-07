@@ -4,6 +4,10 @@ import { useNavigate } from 'react-router-dom';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
+interface AdminPermissions {
+  canDelete?: boolean;
+}
+
 const AdminGalleryUpload = () => {
   const [images, setImages] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -11,6 +15,8 @@ const AdminGalleryUpload = () => {
   const [error, setError] = useState('');
   const [gallery, setGallery] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [adminRole, setAdminRole] = useState<string | null>(null);
+  const [adminPermissions, setAdminPermissions] = useState<AdminPermissions | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,12 +24,30 @@ const AdminGalleryUpload = () => {
     if (sessionStorage.getItem('isAdminAuthenticated') !== 'true') {
       navigate('/');
     }
+
+    const storedRole = localStorage.getItem('adminRole');
+    const permsRaw = localStorage.getItem('adminPermissions');
+    setAdminRole(storedRole);
+    if (permsRaw) {
+      try {
+        setAdminPermissions(JSON.parse(permsRaw));
+      } catch (e) {
+        console.error('Failed to parse adminPermissions', e);
+      }
+    }
   }, [navigate]);
+
+  const canDelete = adminRole === 'superadmin' && !!adminPermissions?.canDelete;
 
   const fetchGallery = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/api/gallery`);
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/api/gallery`, {
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
       const result = await res.json();
       if (result.success) setGallery(result.data);
     } catch (e) {}
@@ -40,7 +64,14 @@ const AdminGalleryUpload = () => {
     const formData = new FormData();
     images.forEach(img => formData.append('images', img));
     try {
-      const res = await fetch(`${API_URL}/api/gallery`, { method: 'POST', body: formData });
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/api/gallery`, {
+        method: 'POST',
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: formData,
+      });
       const result = await res.json();
       if (result.success) {
         setImages([]);
@@ -58,7 +89,13 @@ const AdminGalleryUpload = () => {
 
   const handleDelete = async (id: string) => {
     if (!window.confirm('Delete this image?')) return;
-    await fetch(`${API_URL}/api/gallery/${id}`, { method: 'DELETE' });
+    const token = localStorage.getItem('token');
+    await fetch(`${API_URL}/api/gallery/${id}`, {
+      method: 'DELETE',
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    });
     fetchGallery();
   };
 
@@ -107,7 +144,9 @@ const AdminGalleryUpload = () => {
             {gallery.map((img) => (
               <div key={img._id} className="relative group bg-white rounded-xl shadow border p-2 flex flex-col items-center">
                 <img src={img.url} alt="gallery-img" className="w-full h-40 object-cover rounded-lg" />
-                <button onClick={() => handleDelete(img._id)} className="absolute top-2 right-2 bg-white rounded-full p-1 shadow hover:bg-red-100 opacity-0 group-hover:opacity-100 transition-opacity"><X size={16} /></button>
+                {canDelete && (
+                  <button onClick={() => handleDelete(img._id)} className="absolute top-2 right-2 bg-white rounded-full p-1 shadow hover:bg-red-100 opacity-0 group-hover:opacity-100 transition-opacity"><X size={16} /></button>
+                )}
               </div>
             ))}
           </div>

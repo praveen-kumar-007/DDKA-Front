@@ -9,6 +9,10 @@ interface Player {
   achievements: string;
 }
 
+interface AdminPermissions {
+  canDelete?: boolean;
+}
+
 const AdminPlayersManagement: React.FC = () => {
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
@@ -21,9 +25,24 @@ const AdminPlayersManagement: React.FC = () => {
     achievements: ''
   });
 
+  const [adminRole, setAdminRole] = useState<string | null>(null);
+  const [adminPermissions, setAdminPermissions] = useState<AdminPermissions | null>(null);
+
   useEffect(() => {
     fetchPlayers();
+    const storedRole = localStorage.getItem('adminRole');
+    const permsRaw = localStorage.getItem('adminPermissions');
+    setAdminRole(storedRole);
+    if (permsRaw) {
+      try {
+        setAdminPermissions(JSON.parse(permsRaw));
+      } catch (e) {
+        console.error('Failed to parse adminPermissions', e);
+      }
+    }
   }, []);
+
+  const canDelete = adminRole === 'superadmin' && !!adminPermissions?.canDelete;
 
   const fetchPlayers = async () => {
     try {
@@ -284,13 +303,15 @@ const AdminPlayersManagement: React.FC = () => {
                         >
                           <Edit2 className="w-5 h-5" />
                         </button>
-                        <button
-                          onClick={() => handleDelete(player._id)}
-                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                          title="Delete"
-                        >
-                          <Trash2 className="w-5 h-5" />
-                        </button>
+                        {canDelete && (
+                          <button
+                            onClick={() => handleDelete(player._id)}
+                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-5 h-5" />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>

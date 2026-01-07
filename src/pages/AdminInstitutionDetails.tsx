@@ -10,11 +10,18 @@ const AdminInstitutionDetails = () => {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [adminRole, setAdminRole] = useState<string | null>(null);
 
   const handleDelete = async () => {
     if (!window.confirm("Permanently delete this institution? This cannot be undone.")) return;
     try {
-      const response = await fetch(`${API_URL}/api/institutions/${id}`, { method: 'DELETE' });
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/institutions/${id}`, {
+        method: 'DELETE',
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
       if (response.ok) {
         navigate('/admin-portal-access');
       } else {
@@ -29,8 +36,33 @@ const AdminInstitutionDetails = () => {
     if (!id) return;
     setLoading(true);
     setError(null);
+    // Resolve admin role from localStorage or JWT token
+    let storedRole = localStorage.getItem('adminRole');
+    if (!storedRole) {
+      const tokenRaw = localStorage.getItem('token');
+      if (tokenRaw) {
+        try {
+          const payloadPart = tokenRaw.split('.')[1];
+          const decoded = JSON.parse(atob(payloadPart));
+          if (decoded && typeof decoded.role === 'string') {
+            storedRole = decoded.role;
+            localStorage.setItem('adminRole', decoded.role);
+          }
+        } catch (e) {
+          console.error('Failed to decode admin role from token', e);
+        }
+      }
+    }
+    if (storedRole) {
+      setAdminRole(storedRole);
+    }
+    const token = localStorage.getItem('token');
 
-    fetch(`${API_URL}/api/institutions/${id}`)
+    fetch(`${API_URL}/api/institutions/${id}`, {
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    })
       .then(async (res) => {
         if (!res.ok) throw new Error('Not found');
         const result = await res.json();
@@ -95,12 +127,14 @@ const AdminInstitutionDetails = () => {
             >
               Go to Dashboard
             </button>
-            <button
-              onClick={handleDelete}
-              className="flex items-center gap-2 px-4 py-2 rounded-full bg-red-50 text-red-600 text-xs font-bold uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all border border-red-100"
-            >
-              <Trash2 size={16} /> Delete Record
-            </button>
+            {adminRole === 'superadmin' && (
+              <button
+                onClick={handleDelete}
+                className="flex items-center gap-2 px-4 py-2 rounded-full bg-red-50 text-red-600 text-xs font-bold uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all border border-red-100"
+              >
+                <Trash2 size={16} /> Delete Record
+              </button>
+            )}
           </div>
 
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-4">

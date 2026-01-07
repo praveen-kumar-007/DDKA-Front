@@ -39,7 +39,7 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
     
     // Validation
     if (!adminId.trim() || !password) {
-      setError('Please enter both ID and password');
+      setError('Please enter ID/email and password');
       return;
     }
 
@@ -64,15 +64,23 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
           localStorage.setItem('token', result.token);
         }
 
+        // Persist role and permissions for UI-level access control
+        if (result.role) {
+          localStorage.setItem('adminRole', result.role);
+        }
+        if (result.permissions) {
+          localStorage.setItem('adminPermissions', JSON.stringify(result.permissions));
+        }
+
         sessionStorage.setItem('isAdminAuthenticated', 'true');
         setTimeout(() => onLoginSuccess(), 300);
       } else {
         // Provide more specific error messages
         const errorMsg = result.message || 'Login failed. Please try again.';
         if (errorMsg.includes('Invalid')) {
-          setError('❌ Invalid Admin ID or Password. Please check and try again.');
+          setError('❌ Invalid Admin ID / Email or Password. Please check and try again.');
         } else if (errorMsg.includes('required')) {
-          setError('⚠️ Admin ID and Password are required.');
+          setError('⚠️ Admin ID / Email and Password are required.');
         } else {
           setError(`❌ ${errorMsg}`);
         }
@@ -120,7 +128,7 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
           )}
 
           <div className="space-y-2">
-            <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Admin ID</label>
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Admin ID or Email</label>
             <div className="relative">
               <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
               <input 
@@ -130,7 +138,7 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
                 onChange={(e) => setAdminId(e.target.value)}
                 disabled={isLoading}
                 className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-orange-500 outline-none transition-all font-medium disabled:bg-slate-100"
-                placeholder="Enter admin ID"
+                placeholder="Enter admin ID or email"
               />
             </div>
           </div>
@@ -169,7 +177,7 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
           </button>
         </form>
         <div className="p-6 bg-slate-50 text-center border-t border-slate-100 space-y-3">
-          <p className="text-sm text-green-700 font-bold">✓ Secure Admin Access</p>
+            <p className="text-sm text-green-700 font-bold">✓ Secure Admin Access</p>
           <p className="text-[10px] text-slate-400 uppercase font-bold tracking-widest">
             Dhanbad District Kabaddi Association
           </p>

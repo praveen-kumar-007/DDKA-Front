@@ -26,11 +26,18 @@ interface TechnicalOfficial {
   createdAt: string;
 }
 
+interface AdminPermissions {
+  canDelete?: boolean;
+}
+
 const AdminTechnicalOfficialsManagement: React.FC = () => {
   const [officials, setOfficials] = useState<TechnicalOfficial[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<TechnicalOfficial | null>(null);
   const [editForm, setEditForm] = useState<Partial<TechnicalOfficial>>({});
+
+  const [adminRole, setAdminRole] = useState<string | null>(null);
+  const [adminPermissions, setAdminPermissions] = useState<AdminPermissions | null>(null);
 
   const navigate = useNavigate();
 
@@ -59,8 +66,22 @@ const AdminTechnicalOfficialsManagement: React.FC = () => {
   };
 
   useEffect(() => {
+    // Load admin role & permissions for delete access control
+    const storedRole = localStorage.getItem('adminRole');
+    const permsRaw = localStorage.getItem('adminPermissions');
+    setAdminRole(storedRole);
+    if (permsRaw) {
+      try {
+        setAdminPermissions(JSON.parse(permsRaw));
+      } catch (e) {
+        console.error('Failed to parse adminPermissions', e);
+      }
+    }
+
     fetchOfficials();
   }, []);
+
+  const canDelete = adminRole === 'superadmin' && !!adminPermissions?.canDelete;
 
   const handleStatusChange = async (id: string, status: 'Pending' | 'Approved' | 'Rejected') => {
     if (status === 'Rejected' && !window.confirm('Are you sure you want to reject this application?')) return;
@@ -286,13 +307,15 @@ const AdminTechnicalOfficialsManagement: React.FC = () => {
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>
-                        <button
-                          onClick={() => handleDelete(off._id)}
-                          className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-50 text-red-700 hover:bg-red-100"
-                          title="Delete"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                        {canDelete && (
+                          <button
+                            onClick={() => handleDelete(off._id)}
+                            className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-50 text-red-700 hover:bg-red-100"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>

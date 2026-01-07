@@ -31,6 +31,7 @@ import AdminPlayersManagement from './pages/AdminPlayersManagement';
 import AdminRefereesManagement from './pages/AdminRefereesManagement';
 import AdminTechnicalOfficialsManagement from './pages/AdminTechnicalOfficialsManagement';
 import AdminTechnicalOfficialDetails from './pages/AdminTechnicalOfficialDetails';
+import AdminManageAdmins from './pages/AdminManageAdmins';
 
 // Form Components
 import RegisterForm from './components/forms/RegisterForm';
@@ -118,6 +119,11 @@ const App: React.FC = () => {
           {/* Admin News Upload Route (protected) */}
           <Route path="/admin-news-upload" element={
             isAuthenticated ? <AdminNewsUpload /> : <AdminLogin onLoginSuccess={() => setIsAuthenticated(true)} />
+          } />
+
+          {/* Superadmin: Manage Admins */}
+          <Route path="/admin/manage-admins" element={
+            isAuthenticated ? <AdminManageAdmins /> : <AdminLogin onLoginSuccess={() => setIsAuthenticated(true)} />
           } />
           
           {/* Admin Route with Auth Check */}
