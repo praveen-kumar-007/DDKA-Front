@@ -173,15 +173,6 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
           <p className="text-[10px] text-slate-400 uppercase font-bold tracking-widest">
             Dhanbad District Kabaddi Association
           </p>
-          <div className="pt-3 border-t border-slate-200">
-            <p className="text-[11px] text-slate-600 mb-2">No admin account yet?</p>
-            <a 
-              href="/admin-secure-setup-dkka2024" 
-              className="text-[11px] text-blue-600 hover:text-blue-800 font-bold underline"
-            >
-              Create admin account here
-            </a>
-          </div>
         </div>
       </div>
     </div>
