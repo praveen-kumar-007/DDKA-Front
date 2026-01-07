@@ -48,6 +48,35 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+
+    if (name === 'year') {
+      // Allow only up to 4 digits for establishment year
+      const digits = value.replace(/\D/g, '').slice(0, 4);
+      setFormData(prev => ({ ...prev, [name]: digits }));
+      return;
+    }
+
+    if (name === 'totalPlayers') {
+      // Allow only numeric value for total players (up to 4 digits)
+      const digits = value.replace(/\D/g, '').slice(0, 4);
+      setFormData(prev => ({ ...prev, [name]: digits }));
+      return;
+    }
+
+    if (name === 'area') {
+      // Allow only numeric characters for ground area in sq.ft
+      const digits = value.replace(/\D/g, '');
+      setFormData(prev => ({ ...prev, [name]: digits }));
+      return;
+    }
+
+    if (name === 'officePhone' || name === 'altPhone') {
+      // Restrict phones to digits only, max 10 digits
+      const digits = value.replace(/\D/g, '').slice(0, 10);
+      setFormData(prev => ({ ...prev, [name]: digits }));
+      return;
+    }
+
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -237,7 +266,17 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-gray-700 flex items-center gap-1"><Calendar size={14}/> {lang === 'hi' ? 'स्थापना वर्ष' : 'Year of Estb.'}</label>
-                  <input required type="number" name="year" value={formData.year} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border rounded-xl outline-none" placeholder="2024" />
+                  <input
+                    required
+                    name="year"
+                    value={formData.year}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 bg-gray-50 border rounded-xl outline-none"
+                    placeholder="2024"
+                    maxLength={4}
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                  />
                 </div>
                 <div className="space-y-2 md:col-span-2 lg:col-span-1">
                   <label className="text-sm font-bold text-gray-700 flex items-center gap-1">
@@ -293,11 +332,30 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-gray-700">{lang === 'hi' ? 'कुल खिलाड़ी' : 'Total Kabaddi Players'}</label>
-                  <input required type="number" name="totalPlayers" value={formData.totalPlayers} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border rounded-xl outline-none" placeholder="0" />
+                  <input
+                    required
+                    name="totalPlayers"
+                    value={formData.totalPlayers}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 bg-gray-50 border rounded-xl outline-none"
+                    placeholder="0"
+                    maxLength={4}
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                  />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-gray-700 flex items-center gap-1"><Ruler size={14}/> {lang === 'hi' ? 'खेल का मैदान (वर्ग फुट)' : 'Playground Area (sq.ft)'}</label>
-                  <input required name="area" value={formData.area} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border rounded-xl outline-none" placeholder="e.g. 2000" />
+                  <input
+                    required
+                    name="area"
+                    value={formData.area}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 bg-gray-50 border rounded-xl outline-none"
+                    placeholder="e.g. 2000"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                  />
                   <p className="text-xs text-gray-500">
                     {lang === 'hi'
                       ? 'यदि सटीक क्षेत्रफल ज्ञात न हो, तो अनुमानित आंकड़ा दर्ज करें।'
@@ -324,11 +382,31 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-gray-700">{t.labels.officePhone}</label>
-                  <input required name="officePhone" value={formData.officePhone} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border rounded-xl outline-none" placeholder="+91 XXXX XXXXXX" />
+                  <input
+                    required
+                    name="officePhone"
+                    value={formData.officePhone}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 bg-gray-50 border rounded-xl outline-none"
+                    placeholder="9876543210"
+                    maxLength={10}
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                  />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-gray-700">{lang === 'hi' ? 'वैकल्पिक फोन' : 'Alternative Phone'}</label>
-                  <input required name="altPhone" value={formData.altPhone} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border rounded-xl outline-none" placeholder="+91 XXXX XXXXXX" />
+                  <input
+                    required
+                    name="altPhone"
+                    value={formData.altPhone}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 bg-gray-50 border rounded-xl outline-none"
+                    placeholder="9876543211"
+                    maxLength={10}
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                  />
                 </div>
                 <div className="md:col-span-2 space-y-2">
                   <label className="text-sm font-bold text-gray-700">{t.labels.email}</label>
