@@ -12,8 +12,8 @@ export const SOCIAL_LINKS = {
 };
 
 export const FEES = {
-  PLAYER: 400,
-  INSTITUTION: 2000
+  PLAYER: 250,
+  INSTITUTION: 1600
 };
 
 export const MOCK_NEWS = [

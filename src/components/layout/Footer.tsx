@@ -145,11 +145,11 @@ const Footer: React.FC<FooterProps> = ({ lang }) => {
                   </li>
                   <li className="pt-2 text-[11px] text-slate-300">
                     <span className="font-semibold text-white">Player Registration Fee:</span>{' '}
-                    <span className="font-semibold text-orange-400">₹400</span>
+                    <span className="font-semibold text-orange-400">₹250</span>
                   </li>
                   <li className="text-[11px] text-slate-300">
                     <span className="font-semibold text-white">Institution Registration Fee:</span>{' '}
-                    <span className="font-semibold text-orange-400">₹2000</span>
+                    <span className="font-semibold text-orange-400">₹1600</span>
                   </li>
                 </ul>
               </div>

@@ -470,7 +470,7 @@ const InstitutionForm: React.FC<InstitutionFormProps> = ({ lang }) => {
             <div className="flex flex-col items-center w-full">
               <div className="bg-white p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-2xl border border-blue-50 mb-4 sm:mb-8 transform hover:scale-105 transition-transform">
                 <img 
-                  src={"https://res.cloudinary.com/dcqo5qt7b/image/upload/v1766767120/QR_1766767090_adh5z3.png"} 
+                  src={"/QR-1600.png"} 
                   alt="UPI QR Code" 
                   className="w-40 h-40 sm:w-64 sm:h-64 object-contain rounded-lg sm:rounded-xl" 
                 />

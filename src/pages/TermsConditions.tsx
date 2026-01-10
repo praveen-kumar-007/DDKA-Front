@@ -310,11 +310,11 @@ const TermsConditions: React.FC<{ lang: Language }> = ({ lang }) => {
                     <div className="bg-orange-50 border border-orange-100 rounded-2xl p-6 mb-6">
                       <div className="flex items-center justify-between mb-4">
                         <span className="font-bold text-blue-900">Player Registration Fee:</span>
-                        <span className="text-3xl font-black text-orange-600">₹400/-</span>
+                        <span className="text-3xl font-black text-orange-600">₹250/-</span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="font-bold text-blue-900">Institution / Academy Registration Fee:</span>
-                        <span className="text-3xl font-black text-orange-600">₹2000/-</span>
+                        <span className="text-3xl font-black text-orange-600">₹1600/-</span>
                       </div>
                       <p className="text-xs text-slate-500 mt-4 italic">*Fees are subject to revision by DDKA. Any change will be communicated through official channels.</p>
                     </div>
@@ -338,7 +338,7 @@ const TermsConditions: React.FC<{ lang: Language }> = ({ lang }) => {
               {isHi && (
                 <div className="space-y-4">
                   <p className="leading-relaxed">
-                    वर्तमान संरचना के अनुसार खिलाड़ी पंजीकरण शुल्क ₹400/- तथा संस्थान / एकेडमी पंजीकरण शुल्क ₹2000/- निर्धारित है, जो पंजीकरण के समय जमा करना अनिवार्य है। शुल्क सामान्यतः वापस नहीं किए जाते और डीडीकेए द्वारा आवश्यकतानुसार इसमें परिवर्तन किया जा सकता है, जिसकी सूचना आधिकारिक माध्यमों से दी जाएगी।
+                    वर्तमान संरचना के अनुसार खिलाड़ी पंजीकरण शुल्क ₹250/- तथा संस्थान / एकेडमी पंजीकरण शुल्क ₹1600/- निर्धारित है, जो पंजीकरण के समय जमा करना अनिवार्य है। शुल्क सामान्यतः वापस नहीं किए जाते और डीडीकेए द्वारा आवश्यकतानुसार इसमें परिवर्तन किया जा सकता है, जिसकी सूचना आधिकारिक माध्यमों से दी जाएगी।
                   </p>
                   <p className="leading-relaxed">
                     टूर्नामेंट, शिविर, किट या यात्रा आदि के लिए अतिरिक्त शुल्क लागू हो सकते हैं। भुगतान UPI, बैंक ट्रांसफ़र, नकद या समय‑समय पर अधिसूचित अन्य माध्यमों से स्वीकार किए जा सकते हैं। सदस्यों को अपने भुगतान की रसीद या साक्ष्य सुरक्षित रखने की सलाह दी जाती है।

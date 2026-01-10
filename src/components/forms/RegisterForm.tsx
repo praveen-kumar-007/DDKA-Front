@@ -410,7 +410,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ lang }) => {
             <div className="flex flex-col items-center w-full lg:w-auto min-w-[220px] xs:min-w-[260px] sm:min-w-[320px]">
               <div className="bg-white p-4 xs:p-6 sm:p-10 rounded-xl xs:rounded-[2rem] sm:rounded-[4rem] border-4 sm:border-8 border-white shadow-2xl mb-4 xs:mb-6 sm:mb-8 transform hover:scale-105 transition-transform duration-500">
                 <img 
-                  src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1767537928/QR_1767537816_nwcp3c.png" 
+                  src="/QR-250.png" 
                   alt="DDKA Official QR Code" 
                   className="w-32 h-32 xs:w-40 xs:h-40 sm:w-64 sm:h-64 object-contain rounded-lg xs:rounded-2xl sm:rounded-3xl" 
                 />
