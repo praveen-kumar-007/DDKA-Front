@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   CheckCircle, XCircle, Trash2, 
   Users, Building, RefreshCcw, Search, Eye,
@@ -33,6 +33,27 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
 
   const [adminRole, setAdminRole] = useState<string | null>(null);
   const [adminPermissions, setAdminPermissions] = useState<AdminPermissions | null>(null);
+  const [showDocs, setShowDocs] = useState(false);
+  const docsRef = useRef<HTMLDivElement | null>(null);
+
+  // Close docs dropdown on outside click or Escape
+  useEffect(() => {
+    function handleDocClick(e: MouseEvent) {
+      if (!showDocs) return;
+      if (docsRef.current && !docsRef.current.contains(e.target as Node)) {
+        setShowDocs(false);
+      }
+    }
+    function handleEsc(e: KeyboardEvent) {
+      if (e.key === 'Escape') setShowDocs(false);
+    }
+    document.addEventListener('mousedown', handleDocClick);
+    document.addEventListener('keydown', handleEsc);
+    return () => {
+      document.removeEventListener('mousedown', handleDocClick);
+      document.removeEventListener('keydown', handleEsc);
+    };
+  }, [showDocs]);
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -414,6 +435,56 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
               <Users size={28} className="text-red-700 mb-2" />
               <span className="font-bold text-xs text-red-900">Manage Admins</span>
             </Link>
+          )}
+
+          {adminRole === 'superadmin' && (
+            <div className="relative" ref={docsRef}>
+              <button 
+                type="button"
+                aria-expanded={showDocs}
+                aria-controls="important-docs-dropdown"
+                onClick={() => setShowDocs(s => !s)}
+                className="flex flex-col items-center justify-center p-4 bg-white rounded-xl shadow border hover:bg-emerald-50 transition-all min-h-[92px]"
+              >
+                <ImageIcon size={28} className="text-emerald-700 mb-2" />
+                <span className="font-bold text-xs text-emerald-900">Important Docs</span>
+              </button>
+
+              {showDocs && (
+                <div id="important-docs-dropdown" role="menu" className="absolute z-50 mt-2 left-1/2 -translate-x-1/2 w-64 sm:w-72 bg-white shadow-lg rounded-lg p-3 border ring-1 ring-slate-100">
+                  <div className="flex items-center justify-between mb-2">
+                    <strong className="text-sm">Important Docs</strong>
+                    <button onClick={() => setShowDocs(false)} aria-label="Close" className="text-slate-400 hover:text-slate-600">✕</button>
+                  </div>
+
+                  <nav className="flex flex-col gap-1">
+                    <a href="/Important%20DOCS/EntryForm.html" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 py-2 px-2 rounded hover:bg-slate-50">
+                      <span className="w-6 text-slate-600">📄</span>
+                      <span className="text-sm">Entry Form</span>
+                      <span className="ml-auto text-slate-400">↗</span>
+                    </a>
+
+                    <a href="/Important%20DOCS/Technical%20ID%20Card.html" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 py-2 px-2 rounded hover:bg-slate-50">
+                      <span className="w-6 text-slate-600">🪪</span>
+                      <span className="text-sm">Technical ID Card</span>
+                      <span className="ml-auto text-slate-400">↗</span>
+                    </a>
+
+                    <a href="/Important%20DOCS/Official%20Certificate.html" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 py-2 px-2 rounded hover:bg-slate-50">
+                      <span className="w-6 text-slate-600">📜</span>
+                      <span className="text-sm">Official Certificate</span>
+                      <span className="ml-auto text-slate-400">↗</span>
+                    </a>
+
+                    <a href="/Important%20DOCS/certificate%202.html" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 py-2 px-2 rounded hover:bg-slate-50">
+                      <span className="w-6 text-slate-600">🏅</span>
+                      <span className="text-sm">Certificate 2</span>
+                      <span className="ml-auto text-slate-400">↗</span>
+                    </a>
+                  </nav>
+                </div>
+              )}
+            </div>
           )}
           {/* Player Details tab - requires canAccessPlayerDetails */}
           <button

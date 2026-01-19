@@ -193,11 +193,12 @@
             margin-bottom: 8px;
             font-size: 15px;
             color: var(--text-main);
-            border-bottom: 1px dotted #ccc;
             display: flex;
             align-items: center;
             white-space: nowrap; /* keep label and dots on one line */
         }
+        /* only show dotted border when field is empty */
+        .field.empty { border-bottom: 1px dotted #ccc; padding-bottom:6px; }
 
         .label {
             font-weight: bold;
@@ -206,9 +207,30 @@
         }
 
         .value {
-            color: #333;
+            color: #0b0b0b;
             flex: 1;
+            font-weight: 700;
+            font-size: 16px;
+            letter-spacing: 0.2px;
         }
+
+        /* certificate name inside description */
+        #certified-name {
+            font-weight: 700;
+            color: #0b0b0b;
+            font-size: 15px;
+        }
+
+        /* Descriptive Text Section */
+        @media print {
+            .editor-panel, .toolbar { display: none !important; }
+            body { background: #fff; }
+        }
+
+        .toolbar { display:flex; gap:8px; align-items:center; margin-top:8px; }
+        .toolbar button { padding:6px 10px; background:#1a4a8c; color:#fff; border:none; border-radius:4px; cursor:pointer; }
+        .toolbar button.secondary { background:#f57c00; }
+        .toolbar button.ghost { background:#fff; color:#1a4a8c; border:1px solid #ddd; }
 
         /* Descriptive Text Section */
         .description-text {
@@ -280,9 +302,69 @@
             padding: 6px 0 2px 0;
             text-transform: uppercase;
         }
+
+        /* Editor panel for live input */
+        .editor-panel {
+            width: var(--card-width);
+            margin-bottom: 12px;
+            background: #fff;
+            border-radius: 8px;
+            padding: 10px;
+            border: 2px dashed #ddd;
+            box-sizing: border-box;
+        }
+        .editor-panel label { display:block; font-weight:700; margin-top:8px; font-size:13px; }
+        .editor-panel input[type="text"], .editor-panel input[type="date"], .editor-panel select {
+            width: calc(100% - 12px);
+            padding:6px;
+            margin-top:4px;
+            border:1px solid #ccc;
+            border-radius:4px;
+            box-sizing:border-box;
+        }
+        .editor-row { display:flex; gap:8px; align-items:center; }
+        .editor-row .col { flex:1; }
     </style>
 </head>
 <body>
+
+    <div class="editor-panel">
+        <div class="editor-row">
+            <div class="col">
+                <label for="input-sno">S. No</label>
+                <input id="input-sno" type="text" placeholder="Enter S. No.">
+            </div>
+            <div class="col">
+                <label for="input-name">Name</label>
+                <input id="input-name" type="text" placeholder="Enter name">
+            </div>
+        </div>
+        <div class="editor-row">
+            <div class="col">
+                <label for="input-uid">UID No</label>
+                <input id="input-uid" type="text" placeholder="Enter UID">
+            </div>
+            <div class="col">
+                <label for="input-dob">Date of Birth</label>
+                <input id="input-dob" type="date">
+            </div>
+        </div>
+        <div class="editor-row">
+            <div class="col">
+                <label for="input-grade">Grade</label>
+                <input id="input-grade" type="text" placeholder="Enter grade">
+            </div>
+            <div class="col">
+                <label for="input-photo">Photo Upload</label>
+                <input id="input-photo" type="file" accept="image/*">
+            </div>
+        </div>
+        <div class="toolbar">
+            <button id="clear-btn" type="button">Clear</button>
+            <button id="print-btn" type="button" class="secondary">Print</button>
+            <button id="save-jpg-btn" type="button" class="ghost">Save as JPG</button>
+        </div>
+    </div>
 
     <div class="id-card">
         <header class="main-header">
@@ -306,19 +388,19 @@
 
         <div class="card-body">
             <div class="info-fields">
-                <div class="field"><span class="label">S. No:</span> <span class="value">........................</span></div>
-                <div class="field"><span class="label">Name:</span> <span class="value">........................</span></div>
-                <div class="field"><span class="label">UID No:</span> <span class="value">........................</span></div>
-                <div class="field"><span class="label">Date of Birth:</span> <span class="value">........................</span></div>
-                <div class="field"><span class="label">Grade:</span> <span class="value">........................</span></div>
+                <div class="field empty" id="field-sno"><span class="label">S. No:</span> <span class="value" id="sno"></span></div>
+                <div class="field empty" id="field-name"><span class="label">Name:</span> <span class="value" id="name"></span></div>
+                <div class="field empty" id="field-uid"><span class="label">UID No:</span> <span class="value" id="uid"></span></div>
+                <div class="field empty" id="field-dob"><span class="label">Date of Birth:</span> <span class="value" id="dob"></span></div>
+                <div class="field empty" id="field-grade"><span class="label">Grade:</span> <span class="value" id="grade"></span></div>
             </div>
             <div class="photo-space">
-                <img src="https://res.cloudinary.com/dmmll82la/image/upload/v1766047322/sp-club/passports/passport-1766047320820-328224026.png" alt="Technical Official Photo">
+                <img id="photo-img" src="https://res.cloudinary.com/dmmll82la/image/upload/v1766047322/sp-club/passports/passport-1766047320820-328224026.png" alt="Technical Official Photo" data-default-src="https://res.cloudinary.com/dmmll82la/image/upload/v1766047322/sp-club/passports/passport-1766047320820-328224026.png">
             </div>
         </div>
 
         <div class="description-text">
-            This is to certify that <span class="dotted-line" style="min-width: 150px;"></span> has successfully completed the Technical Official Training Course held on 18 January 2026 at GM Public School, Gomoh, Dhanbad, Jharkhand 828401 and is hereby authorized to serve as a Technical Official.
+            This is to certify that <span class="dotted-line" id="certified-name" style="min-width: 150px;"></span> has successfully completed the Technical Official Training Course held on 18 January 2026 at GM Public School, Gomoh, Dhanbad, Jharkhand 828401 and is hereby authorized to serve as a Technical Official.
         </div>
 
         <div class="signature-area">
@@ -353,5 +435,112 @@
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        (function(){
+            const inputs = {
+                'input-sno': 'sno',
+                'input-name': 'name',
+                'input-uid': 'uid',
+                'input-dob': 'dob',
+                'input-grade': 'grade'
+            };
+
+            const fieldMap = {
+                'input-sno': 'field-sno',
+                'input-name': 'field-name',
+                'input-uid': 'field-uid',
+                'input-dob': 'field-dob',
+                'input-grade': 'field-grade'
+            };
+
+            function updateField(inputId) {
+                const el = document.getElementById(inputId);
+                const target = document.getElementById(inputs[inputId]);
+                const wrapper = document.getElementById(fieldMap[inputId]);
+                if (!el || !target || !wrapper) return;
+                const val = el.value.trim();
+                target.textContent = val;
+                if (val === '') {
+                    wrapper.classList.add('empty');
+                } else {
+                    wrapper.classList.remove('empty');
+                }
+                if (inputId === 'input-name') {
+                    const cert = document.getElementById('certified-name');
+                    if (cert) {
+                        cert.textContent = val;
+                        if (val === '') cert.classList.add('dotted-line'); else cert.classList.remove('dotted-line');
+                    }
+                }
+            }
+
+            Object.keys(inputs).forEach(inp => {
+                const el = document.getElementById(inp);
+                if (!el) return;
+                // initialize
+                updateField(inp);
+                el.addEventListener('input', () => updateField(inp));
+            });
+
+            const photoInput = document.getElementById('input-photo');
+            const photoImg = document.getElementById('photo-img');
+            const defaultSrc = (photoImg && (photoImg.dataset && photoImg.dataset.defaultSrc)) || (photoImg && photoImg.src) || '';
+
+            if (photoInput && photoImg) {
+                photoInput.addEventListener('change', function(e){
+                    const file = this.files && this.files[0];
+                    if (!file) {
+                        photoImg.src = defaultSrc;
+                        return;
+                    }
+                    const reader = new FileReader();
+                    reader.onload = function(ev){ photoImg.src = ev.target.result; };
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            const clearBtn = document.getElementById('clear-btn');
+            if (clearBtn) {
+                clearBtn.addEventListener('click', () => {
+                    Object.keys(inputs).forEach(inp=>{
+                        const el = document.getElementById(inp);
+                        const tgt = document.getElementById(inputs[inp]);
+                        const wrapper = document.getElementById(fieldMap[inp]);
+                        if (el) el.value = '';
+                        if (tgt) tgt.textContent = '';
+                        if (wrapper) wrapper.classList.add('empty');
+                    });
+                    const cert = document.getElementById('certified-name'); if (cert) { cert.textContent = ''; cert.classList.add('dotted-line'); }
+                    if (photoImg) photoImg.src = defaultSrc;
+                    if (photoInput) photoInput.value = '';
+                });
+            }
+
+            const printBtn = document.getElementById('print-btn');
+            if (printBtn) printBtn.addEventListener('click', () => {
+                window.print();
+            });
+
+            const saveBtn = document.getElementById('save-jpg-btn');
+            if (saveBtn) saveBtn.addEventListener('click', async () => {
+                const el = document.querySelector('.id-card');
+                if (!el) return;
+                try {
+                    const canvas = await html2canvas(el, {scale:2, backgroundColor: '#ffffff'});
+                    const data = canvas.toDataURL('image/jpeg', 0.95);
+                    const a = document.createElement('a');
+                    a.href = data;
+                    a.download = 'ddka-id.jpg';
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                } catch (err) {
+                    alert('Failed to export image: ' + (err && err.message));
+                }
+            });
+
+        })();
+    </script>
 </body>
 </html>
