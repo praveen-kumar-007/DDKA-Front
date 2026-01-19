@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional ID Card - DDKA & JSKA</title>
+    <style>
+        :root {
+            /* Variables for easy customization */
+            --primary-red: #d32f2f;
+            --primary-green: #2e7d32;
+            --accent-orange: #f57c00;
+            --ddka-blue: #1a4a8c;
+            --jska-gold: #fbc02d;
+            --text-main: #222;
+            --border-light: #ddd;
+            --card-width: 400px;
+            --card-height: 660px; /* taller so all content fits comfortably inside the frame */
+        }
+
+        body {
+            background-color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* Card Container */
+        .id-card {
+            width: var(--card-width);
+            height: var(--card-height);
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+            border: 3px solid var(--ddka-blue);
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            padding: 12px 18px 20px 18px; /* slightly closer to top, comfortable at bottom */
+        }
+
+        /* DDKA watermark behind all content */
+        .id-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: url('https://res.cloudinary.com/dmmll82la/image/upload/v1766683651/ddka-logo_ywnhyh.png');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 260px 260px;
+            opacity: 0.15; /* 15% visibility */
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ensure real content sits above the watermark */
+        .id-card > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Top Header */
+        .main-header {
+            text-align: center;
+            padding: 6px 12px;
+            margin-bottom: 6px;
+            background: #fff;
+            border-radius: 10px;
+            border: 2px solid var(--ddka-blue);
+            border-top-color: var(--primary-red);
+            border-bottom-color: var(--primary-green);
+            border-left-color: var(--accent-orange);
+            border-right-color: var(--accent-orange);
+        }
+
+        .jska-title {
+            color: var(--primary-red);
+            font-size: 18px;
+            font-weight: 900;
+            margin: 0;
+            text-transform: uppercase;
+        }
+
+        .ddka-subtitle {
+            color: var(--primary-green);
+            font-size: 14px;
+            font-weight: 800;
+            margin: 2px 0;
+        }
+
+        /* Logo and Title Section */
+        .logo-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 15px 2px 15px;
+        }
+
+        .logo {
+            width: 72px;
+            height: 72px;
+            aspect-ratio: 1/1;
+            border-radius: 50%;
+            border: 2px solid #eee;
+            display: inline-flex;
+            flex: 0 0 auto;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+            background: #f9f9f9;
+            overflow: hidden;
+        }
+
+        .logo img {
+            width: auto;
+            height: 100%;
+            aspect-ratio: 1/1;
+            object-fit: cover;
+            border-radius: 50%;
+            display: block;
+        }
+
+        /* Remove outer border on the DDKA and JSKA logo containers */
+        .ddka-logo { border: none; color: var(--ddka-blue); }
+        .jska-logo { border: none; color: var(--primary-red); }
+
+        .official-title {
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        .official-title h1 {
+            color: var(--accent-orange);
+            font-size: 16px;
+            margin: 0;
+            text-transform: capitalize;
+            line-height: 1.1;
+        }
+
+        .official-title h2 {
+            color: var(--accent-orange);
+            font-size: 22px;
+            margin: 2px 0 0 0;
+            text-transform: uppercase;
+            line-height: 1.15;
+            letter-spacing: 0.8px;
+        }
+
+        /* Body Section */
+        .card-body {
+            padding: 12px 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .info-fields {
+            width: 60%;
+        }
+
+        .photo-space {
+            width: 100px;
+            height: 120px;
+            border: 2px solid var(--ddka-blue);
+            border-top-color: var(--primary-red);
+            border-bottom-color: var(--primary-green);
+            border-left-color: var(--accent-orange);
+            border-right-color: var(--accent-orange);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: #777;
+            background: #fafafa;
+            overflow: hidden;
+        }
+
+        .photo-space img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .field {
+            margin-bottom: 8px;
+            font-size: 15px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            white-space: nowrap; /* keep label and dots on one line */
+        }
+        /* only show dotted border when field is empty */
+        .field.empty { border-bottom: 1px dotted #ccc; padding-bottom:6px; }
+
+        .label {
+            font-weight: bold;
+            width: 115px; /* enough space so text doesn't wrap */
+            display: inline-block;
+        }
+
+        .value {
+            color: #333;
+            flex: 1;
+        }
+
+        /* Descriptive Text Section */
+        @media print {
+            .editor-panel, .toolbar { display: none !important; }
+            body { background: #fff; }
+        }
+
+        .toolbar { display:flex; gap:8px; align-items:center; margin-top:8px; }
+        .toolbar button { padding:6px 10px; background:#1a4a8c; color:#fff; border:none; border-radius:4px; cursor:pointer; }
+        .toolbar button.secondary { background:#f57c00; }
+        .toolbar button.ghost { background:#fff; color:#1a4a8c; border:1px solid #ddd; }
+
+        /* Descriptive Text Section */
+        .description-text {
+            padding: 6px 14px 0 14px;
+            font-size: 13px; /* increased by two points */
+            line-height: 1.4;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .dotted-line {
+            border-bottom: 2px dotted #000;
+            display: inline-block;
+            min-width: 120px;
+        }
+
+        /* Footer / Signatures */
+        .signature-area {
+            margin-top: auto;
+            padding: 6px 10px 4px;
+            text-align: center;
+        }
+
+        .sig-official-header {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 40px;
+            text-decoration: underline;
+        }
+
+        .sig-grid {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+        }
+
+        .sig-box {
+            width: 30%;
+            font-size: 10px;
+            line-height: 1.15;
+        }
+
+        .sig-name {
+            font-weight: bold;
+            font-size: 11px;
+            margin-bottom: 2px;
+        }
+
+        .sig-img {
+            display: block;
+            height: 38px;
+            max-width: 140px;
+            margin: 0 auto 6px;
+            object-fit: contain;
+        }
+
+        .sig-line {
+            border-top: 1.5px solid #000;
+            margin-top: 5px;
+            padding-top: 3px;
+        }
+
+        .footer-banner {
+            background-color: #fff;
+            color: var(--primary-green);
+            text-align: center;
+            font-weight: 900;
+            font-size: 12px;
+            padding: 6px 0 2px 0;
+            text-transform: uppercase;
+        }
+
+        /* Editor panel for live input */
+        .editor-panel {
+            width: var(--card-width);
+            margin-bottom: 12px;
+            background: #fff;
+            border-radius: 8px;
+            padding: 10px;
+            border: 2px dashed #ddd;
+            box-sizing: border-box;
+        }
+        .editor-panel label { display:block; font-weight:700; margin-top:8px; font-size:13px; }
+        .editor-panel input[type="text"], .editor-panel input[type="date"], .editor-panel select {
+            width: calc(100% - 12px);
+            padding:6px;
+            margin-top:4px;
+            border:1px solid #ccc;
+            border-radius:4px;
+            box-sizing:border-box;
+        }
+        .editor-row { display:flex; gap:8px; align-items:center; }
+        .editor-row .col { flex:1; }
+    </style>
+</head>
+<body>
+
+    <div class="editor-panel">
+        <div class="editor-row">
+            <div class="col">
+                <label for="input-sno">S. No</label>
+                <input id="input-sno" type="text" placeholder="Enter S. No.">
+            </div>
+            <div class="col">
+                <label for="input-name">Name</label>
+                <input id="input-name" type="text" placeholder="Enter name">
+            </div>
+        </div>
+        <div class="editor-row">
+            <div class="col">
+                <label for="input-uid">UID No</label>
+                <input id="input-uid" type="text" placeholder="Enter UID">
+            </div>
+            <div class="col">
+                <label for="input-dob">Date of Birth</label>
+                <input id="input-dob" type="date">
+            </div>
+        </div>
+        <div class="editor-row">
+            <div class="col">
+                <label for="input-grade">Grade</label>
+                <input id="input-grade" type="text" placeholder="Enter grade">
+            </div>
+            <div class="col">
+                <label for="input-photo">Photo Upload</label>
+                <input id="input-photo" type="file" accept="image/*">
+            </div>
+        </div>
+        <div class="toolbar">
+            <button id="clear-btn" type="button">Clear</button>
+            <button id="print-btn" type="button" class="secondary">Print</button>
+            <button id="save-jpg-btn" type="button" class="ghost">Save as JPG</button>
+        </div>
+    </div>
+
+    <div class="id-card">
+        <header class="main-header">
+            <h1 class="jska-title">DHANBAD DISTRICT KABADDI ASSOCIATION</h1>
+            <p class="ddka-subtitle">Affiliated - Jharkhand State Kabaddi Association (AKFI)</p>
+            <p class="ddka-subtitle">Org - DDKA</p>
+        </header>
+
+        <div class="logo-row">
+            <div class="logo ddka-logo">
+                <img src="https://res.cloudinary.com/dmmll82la/image/upload/v1766683651/ddka-logo_ywnhyh.png" alt="DDKA Logo">
+            </div>
+            <div class="official-title">
+                <h1>DISTRICT</h1>
+                <h2>Kabaddi Technical Official</h2>
+            </div>
+            <div class="logo jska-logo">
+                <img src="https://res.cloudinary.com/dmmll82la/image/upload/v1767452076/WhatsApp_Image_2026-01-03_at_1.57.17_PM_liagkr.jpg" alt="JSKA Logo">
+            </div>
+        </div>
+
+        <div class="card-body">
+            <div class="info-fields">
+                <div class="field empty" id="field-sno"><span class="label">S. No:</span> <span class="value" id="sno"></span></div>
+                <div class="field empty" id="field-name"><span class="label">Name:</span> <span class="value" id="name"></span></div>
+                <div class="field empty" id="field-uid"><span class="label">UID No:</span> <span class="value" id="uid"></span></div>
+                <div class="field empty" id="field-dob"><span class="label">Date of Birth:</span> <span class="value" id="dob"></span></div>
+                <div class="field empty" id="field-grade"><span class="label">Grade:</span> <span class="value" id="grade"></span></div>
+            </div>
+            <div class="photo-space">
+                <img id="photo-img" src="https://res.cloudinary.com/dmmll82la/image/upload/v1766047322/sp-club/passports/passport-1766047320820-328224026.png" alt="Technical Official Photo" data-default-src="https://res.cloudinary.com/dmmll82la/image/upload/v1766047322/sp-club/passports/passport-1766047320820-328224026.png">
+            </div>
+        </div>
+
+        <div class="description-text">
+            This is to certify that <span class="dotted-line" id="certified-name" style="min-width: 150px;"></span> has successfully completed the Technical Official Training Course held on 18 January 2026 at GM Public School, Gomoh, Dhanbad, Jharkhand 828401 and is hereby authorized to serve as a Technical Official.
+        </div>
+
+        <div class="signature-area">
+            
+            <div class="sig-grid">
+                <div class="sig-box">
+                    <img class="sig-img" src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1768749957/Tilak_Ram_Sahu_srluua.png" alt="Rajeev Signature">
+                    <div class="sig-name">Rajeev Srivastav</div>
+                    <div>President</div>
+                    <div class="sig-line"></div>
+                </div>
+                
+                <div class="sig-box">
+                    <img class="sig-img" src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1768749991/Mintoo_Thakur_Sign_cg8gxm.png" alt="Mintoo Signature">
+                    <div class="sig-name">Mintoo Thakur</div>
+                    <div>Secretary</div>
+                    <div class="sig-line"></div>
+                </div>
+
+                <div class="sig-box">
+                    <img class="sig-img" src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1768749926/Pappu_Kumar_Yadav_Sign_bj2xlm.png" alt="Pappu Signature">
+                    <div class="sig-name">Pappu Kr. Yadav</div>
+                    <div>Chairman<br>
+                        Refree Bord (DDKA)</div>
+                    <div class="sig-line"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-banner">
+            DHANBAD DISTRICT KABADDI ASSOCIATION
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        (function(){
+            const inputs = {
+                'input-sno': 'sno',
+                'input-name': 'name',
+                'input-uid': 'uid',
+                'input-dob': 'dob',
+                'input-grade': 'grade'
+            };
+
+            const fieldMap = {
+                'input-sno': 'field-sno',
+                'input-name': 'field-name',
+                'input-uid': 'field-uid',
+                'input-dob': 'field-dob',
+                'input-grade': 'field-grade'
+            };
+
+            function updateField(inputId) {
+                const el = document.getElementById(inputId);
+                const target = document.getElementById(inputs[inputId]);
+                const wrapper = document.getElementById(fieldMap[inputId]);
+                if (!el || !target || !wrapper) return;
+                const val = el.value.trim();
+                target.textContent = val;
+                if (val === '') {
+                    wrapper.classList.add('empty');
+                } else {
+                    wrapper.classList.remove('empty');
+                }
+                if (inputId === 'input-name') {
+                    const cert = document.getElementById('certified-name');
+                    if (cert) {
+                        cert.textContent = val;
+                        if (val === '') cert.classList.add('dotted-line'); else cert.classList.remove('dotted-line');
+                    }
+                }
+            }
+
+            Object.keys(inputs).forEach(inp => {
+                const el = document.getElementById(inp);
+                if (!el) return;
+                // initialize
+                updateField(inp);
+                el.addEventListener('input', () => updateField(inp));
+            });
+
+            const photoInput = document.getElementById('input-photo');
+            const photoImg = document.getElementById('photo-img');
+            const defaultSrc = (photoImg && (photoImg.dataset && photoImg.dataset.defaultSrc)) || (photoImg && photoImg.src) || '';
+
+            if (photoInput && photoImg) {
+                photoInput.addEventListener('change', function(e){
+                    const file = this.files && this.files[0];
+                    if (!file) {
+                        photoImg.src = defaultSrc;
+                        return;
+                    }
+                    const reader = new FileReader();
+                    reader.onload = function(ev){ photoImg.src = ev.target.result; };
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            const clearBtn = document.getElementById('clear-btn');
+            if (clearBtn) {
+                clearBtn.addEventListener('click', () => {
+                    Object.keys(inputs).forEach(inp=>{
+                        const el = document.getElementById(inp);
+                        const tgt = document.getElementById(inputs[inp]);
+                        const wrapper = document.getElementById(fieldMap[inp]);
+                        if (el) el.value = '';
+                        if (tgt) tgt.textContent = '';
+                        if (wrapper) wrapper.classList.add('empty');
+                    });
+                    const cert = document.getElementById('certified-name'); if (cert) { cert.textContent = ''; cert.classList.add('dotted-line'); }
+                    if (photoImg) photoImg.src = defaultSrc;
+                    if (photoInput) photoInput.value = '';
+                });
+            }
+
+            const printBtn = document.getElementById('print-btn');
+            if (printBtn) printBtn.addEventListener('click', () => {
+                window.print();
+            });
+
+            const saveBtn = document.getElementById('save-jpg-btn');
+            if (saveBtn) saveBtn.addEventListener('click', async () => {
+                const el = document.querySelector('.id-card');
+                if (!el) return;
+                try {
+                    const canvas = await html2canvas(el, {scale:2, backgroundColor: '#ffffff'});
+                    const data = canvas.toDataURL('image/jpeg', 0.95);
+                    const a = document.createElement('a');
+                    a.href = data;
+                    a.download = 'ddka-id.jpg';
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                } catch (err) {
+                    alert('Failed to export image: ' + (err && err.message));
+                }
+            });
+
+        })();
+    </script>
+</body>
+</html>

@@ -458,25 +458,25 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
                   </div>
 
                   <nav className="flex flex-col gap-1">
-                    <a href="/Important%20DOCS/EntryForm.html" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 py-2 px-2 rounded hover:bg-slate-50">
+                      <a href="/important-docs/entry-form.html" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 py-2 px-2 rounded hover:bg-slate-50">
                       <span className="w-6 text-slate-600">📄</span>
                       <span className="text-sm">Entry Form</span>
                       <span className="ml-auto text-slate-400">↗</span>
                     </a>
 
-                    <a href="/Important%20DOCS/Technical%20ID%20Card.html" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 py-2 px-2 rounded hover:bg-slate-50">
+                    <a href="/important-docs/technical-id-card.html" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 py-2 px-2 rounded hover:bg-slate-50">
                       <span className="w-6 text-slate-600">🪪</span>
                       <span className="text-sm">Technical ID Card</span>
                       <span className="ml-auto text-slate-400">↗</span>
                     </a>
 
-                    <a href="/Important%20DOCS/Official%20Certificate.html" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 py-2 px-2 rounded hover:bg-slate-50">
+                    <a href="/important-docs/official-certificate.html" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 py-2 px-2 rounded hover:bg-slate-50">
                       <span className="w-6 text-slate-600">📜</span>
                       <span className="text-sm">Official Certificate</span>
                       <span className="ml-auto text-slate-400">↗</span>
                     </a>
 
-                    <a href="/Important%20DOCS/certificate%202.html" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 py-2 px-2 rounded hover:bg-slate-50">
+                    <a href="/important-docs/certificate-2.html" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 py-2 px-2 rounded hover:bg-slate-50">
                       <span className="w-6 text-slate-600">🏅</span>
                       <span className="text-sm">Certificate 2</span>
                       <span className="ml-auto text-slate-400">↗</span>

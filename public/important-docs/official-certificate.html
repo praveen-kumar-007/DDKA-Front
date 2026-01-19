@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>DDKA Certificate — Standalone</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#0f1724;--muted:#9ca3af;--accent:#FF8A00;--accent2:#0062FF;--accent3:#00D15E}
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial;background:linear-gradient(180deg,#071025 0%, #071a2b 60%);min-height:100vh;color:#fff;display:flex;flex-direction:column;align-items:center}
+
+    .app{display:flex;gap:24px;padding:28px;width:100%;max-width:1400px;margin:0 auto}
+    aside{width:360px;background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));padding:20px;border-radius:14px;border-left:1px solid rgba(255,255,255,0.02);backdrop-filter:blur(6px)}
+    label.input{display:block;margin-bottom:10px}
+    input[type=text]{width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#fff}
+    input[type=file]{display:none}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:#fff;font-weight:800;cursor:pointer;transition:all .18s}
+    .btn:hover{transform:translateY(-2px)}
+    .btn.primary{background:linear-gradient(90deg,var(--accent),#E11D48);border:none;box-shadow:0 8px 24px rgba(225,29,72,0.12)}
+    .btn.ghost{background:rgba(255,255,255,0.02)}
+    .preview-wrap{flex:1;display:flex;justify-content:center;align-items:center;padding-top:12px;padding-bottom:12px}
+    .certificate{display:flex;flex-direction:column;width:min(1100px,96vw);max-width:1100px;height:auto;aspect-ratio:1100/780;background:#fff;color:#111;border-radius:14px;padding:32px;box-sizing:border-box;position:relative;overflow:hidden;border:10px solid #fff;box-shadow:0 40px 90px rgba(10,25,40,0.6)}
+    .logo-watermark{position:absolute;inset:0;background-image:url('https://res.cloudinary.com/dmmll82la/image/upload/v1766683651/ddka-logo_ywnhyh.png');background-repeat:repeat;background-position:center;background-size:220px;opacity:0.06;transform:rotate(-12deg);pointer-events:none;z-index:6;mix-blend-mode:multiply;filter:grayscale(1) contrast(0.9)}
+    .logo-watermark-large{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%) rotate(-10deg);width:60%;height:60%;background-image:url('https://res.cloudinary.com/dmmll82la/image/upload/v1766683651/ddka-logo_ywnhyh.png');background-repeat:no-repeat;background-position:center;background-size:contain;opacity:0.12;pointer-events:none;z-index:7;mix-blend-mode:soft-light;filter:grayscale(1) saturate(0.2)}
+    @media print{.logo-watermark,.logo-watermark-large{opacity:0.1}}
+    .certificate::before{content:'';position:absolute;inset:0;background-image:linear-gradient(transparent 95%, rgba(0,0,0,0.02) 95%), linear-gradient(90deg, rgba(0,0,0,0.02) 95%, transparent 95%);opacity:0.6;pointer-events:none}
+    .certificate .top-bar{position:absolute;top:0;left:0;width:100%;height:8px;background:linear-gradient(90deg,var(--accent),#E11D48,#0062FF)}
+    .certificate .bottom-bar{position:absolute;bottom:0;left:0;width:100%;height:8px;background:linear-gradient(90deg,#0062FF,var(--accent3),var(--accent))}
+    .content{flex:1;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:10;padding-bottom:12px}
+    .color-slash{position:absolute;border-radius:50%;filter:blur(36px);opacity:0.12}
+    .color-slash{position:absolute;border-radius:50%;filter:blur(36px);opacity:0.12}
+    .slash-1{width:220px;height:220px;left:-60px;top:-40px;background:var(--accent)}
+    .slash-2{width:160px;height:160px;right:-40px;bottom:120px;background:#00D1C7}
+    .header{display:flex;justify-content:space-between;align-items:center;position:relative;z-index:10;padding-bottom:8px}
+    .logo{display:flex;align-items:center;gap:16px}
+    .logo > div{text-align:center}
+    .logo .badge{width:96px;height:96px;border-radius:12px;background:linear-gradient(180deg,#f6fbff,#eef5ff);display:flex;align-items:center;justify-content:center;font-weight:900;color:#222;overflow:hidden}
+    .logo img{display:block}
+    .hindi-line{font-family:'Noto Sans Devanagari', serif;font-weight:800;font-size:clamp(20px,1.4vw,20px);background:linear-gradient(90deg,#FF8A00,#E11D48,#0062FF,#00D15E);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:0.03em;margin-bottom:6px}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside> ... (same content as original Official Certificate) ... </aside>
+    <div class="preview-wrap"> ... (certificate preview) ... </div>
+  </div>
+</body>
+</html>

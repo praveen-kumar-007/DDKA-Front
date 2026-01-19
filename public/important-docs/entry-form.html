@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DDKA Entry Form - Final</title>
+    <style>
+        /* ---- Color Palette ---- */
+        :root {
+            --primary-blue: #003366;
+            --secondary-blue: #4a7eb3;
+            --accent-gold: #d4af37;
+            --alert-red: #b30000;
+            --text-dark: #333333;
+            --table-header-bg: #003366;
+            --table-row-even: #f2f7ff;
+            --photo-box-bg: #fffdf0;
+            --page-bg: #f4f4f9;
+        }
+
+        /* ---- A4 Page Setup ---- */
+        @page {
+            size: A4;
+            margin: 0;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--page-bg);
+            font-family: "Times New Roman", Times, serif;
+            color: var(--text-dark);
+        }
+        .page-container {
+             padding: 30px 0;
+        }
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 15mm 20mm;
+            margin: 0 auto 30px auto;
+            background: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
+            border-top: 5px solid var(--primary-blue);
+            display: block; 
+        }
+
+        /* ---- WATERMARK SETTINGS ---- */
+        .page::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            z-index: 0;
+            background-image: url(https://res.cloudinary.com/dmmll82la/image/upload/v1766683651/ddka-logo_ywnhyh.png); 
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: 50%;
+            opacity: 0.15;        /* 15% Visibility */
+            background-color: transparent; /* Ensures no extra background color is added */
+            pointer-events: none;
+        }
+
+        /* Ensures text sits on top of the watermark */
+        .content-layer {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* ---- Header Section ---- */
+        h1 {
+            text-align: center;
+            text-transform: uppercase;
+            margin: 5px 0 5px 0;
+            font-size: 24px;
+            color: var(--primary-blue);
+            line-height: 1.2;
+        }
+        h2 {
+            text-align: center;
+            margin: 5px 0 10px 0;
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--secondary-blue);
+        }
+        
+        .header-note {
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+            font-style: italic;
+            color: var(--accent-gold);
+            margin-bottom: 20px;
+            text-decoration: underline;
+        }
+
+        /* ---- Inputs ---- */
+        .school-input {
+            margin-bottom: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--primary-blue);
+        }
+        .school-line {
+            display: inline-block;
+            border-bottom: 2px solid var(--primary-blue);
+            width: 78%;
+        }
+
+        /* ---- Table ---- */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+            background: transparent; /* Ensures watermark shows through */
+        }
+        th, td {
+            border: 1px solid var(--secondary-blue);
+            text-align: center;
+            vertical-align: middle;
+        }
+        th {
+            background-color: var(--table-header-bg);
+            color: white;
+            font-weight: bold;
+            font-size: 13px;
+            padding: 8px 2px;
+            text-transform: uppercase;
+        }
+        td {
+            height: 88px; 
+            padding: 2px;
+            font-size: 15px;
+        }
+        /* Semi-transparent background for rows so watermark shows faintly */
+        tbody tr:nth-child(even) { 
+            background-color: rgba(242, 247, 255, 0.7); 
+        }
+        
+        .col-sn { width: 6%; font-weight: bold; color: var(--primary-blue);}
+        .col-name { width: 35%; text-align: left; padding-left: 10px; }
+        .col-class { width: 10%; }
+        .col-dob { width: 14%; }
+        .col-adm { width: 10%; }
+        .col-photo { width: 25%; background-color: rgba(255, 255, 255, 0.8) !important; }
+
+        .photo-box {
+            border: 2px dashed var(--accent-gold);
+            width: 60px;
+            height: 75px; 
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-gold);
+            font-weight: bold;
+            font-size: 10px;
+            background: var(--photo-box-bg);
+        }
+
+        /* ---- Warning/Requirement Box ---- */
+        .requirement-box {
+            border: 2px solid var(--alert-red);
+            background-color: rgba(255, 240, 240, 0.9);
+            padding: 10px;
+            margin: 15px 0 25px 0;
+            font-size: 13px;
+            text-align: left;
+            color: var(--alert-red);
+        }
+        .requirement-box strong {
+            text-transform: uppercase;
+            text-decoration: underline;
+        }
+
+        /* ---- Footer Signatures ---- */
+        .footer-sigs {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 20px;
+            color: var(--primary-blue);
+        }
+        .footer-left { width: 55%; }
+        .footer-right { width: 35%; text-align: center; }
+        
+        .sign-line {
+            margin-bottom: 25px;
+            font-size: 15px;
+            display: flex;
+        }
+        .sign-label { font-weight: bold; width: 120px; }
+        .sign-space {
+            border-bottom: 2px solid var(--secondary-blue);
+            flex-grow: 1;
+        }
+        .stamp-box {
+            border: 3px solid var(--primary-blue);
+            height: 100px;
+            width: 100%;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 10px;
+            font-weight: bold;
+            background: rgba(0, 51, 102, 0.03);
+        }
+
+        /* ---- Bottom Notes ---- */
+        .page-break-note {
+            text-align: center;
+            margin-top: 5px;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: var(--primary-blue);
+            font-size: 14px;
+        }
+        .staple-note {
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            font-style: italic;
+            border-top: 1px solid #ccc;
+            padding-top: 5px;
+            width: 60%;
+            margin: 10px auto 0 auto;
+        }
+
+        /* ---- Print Rules ---- */
+        @media print {
+            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .page-container { padding: 0; }
+            .page { margin: 0; box-shadow: none; border: none; width: 100%; height: auto; break-after: page; page-break-after: always; }
+            .page:last-child { break-after: auto; page-break-after: auto; }
+            /* Ensure background colors print */
+            tbody tr:nth-child(even) { background-color: rgba(242, 247, 255, 0.7) !important; }
+        }
+    </style>
+</head>
+<body>
+<div style="text-align:center; margin-top:20px; margin-bottom:10px;">
+    <button onclick="window.print()" style="background:var(--primary-blue);color:white;padding:8px 18px;border:none;border-radius:4px;cursor:pointer;margin-right:10px;font-size:16px;">Print Form</button>
+    <button onclick="downloadPDF()" style="background:var(--accent-gold);color:var(--primary-blue);padding:8px 18px;border:none;border-radius:4px;cursor:pointer;font-size:16px;">Download as PDF</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+function downloadPDF() {
+    var element = document.querySelector('.page-container');
+    var opt = {
+        margin:       0,
+        filename:     'DDKA_Entry_Form.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(element).save();
+}
+</script>
+
+<div class="page-container">
+
+    <div class="page">
+        <div class="content-layer">
+            
+            <h1>Dhanbad District Kabaddi Association Entry Form</h1>
+            <h2>Inter District Dhanbad Kabaddi Tour 2026 (Page 1 of 2)</h2>
+            <div class="header-note">Note: All participants must be in Proper Sports Kit</div>
+
+            <div class="school-input">
+                Name of School: <span class="school-line"></span>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th class="col-sn">S.N.</th>
+                        <th class="col-name">Name of Students</th>
+                        <th class="col-class">Class</th>
+                        <th class="col-dob">Date of Birth</th>
+                        <th class="col-adm">Adm. No.</th>
+                        <th class="col-photo">Photograph Attested by the Principal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr> <td class="col-sn">1</td> <td class="col-name"></td> <td></td> <td></td> <td></td> <td class="col-photo"><div class="photo-box">PASTE PHOTO</div></td> </tr>
+                    <tr> <td class="col-sn">2</td> <td class="col-name"></td> <td></td> <td></td> <td></td> <td class="col-photo"><div class="photo-box">PASTE PHOTO</div></td> </tr>
+                    <tr> <td class="col-sn">3</td> <td class="col-name"></td> <td></td> <td></td> <td></td> <td class="col-photo"><div class="photo-box">PASTE PHOTO</div></td> </tr>
+                    <tr> <td class="col-sn">4</td> <td class="col-name"></td> <td></td> <td></td> <td></td> <td class="col-photo"><div class="photo-box">PASTE PHOTO</div></td> </tr>
+                    <tr> <td class="col-sn">5</td> <td class="col-name"></td> <td></td> <td></td> <td></td> <td class="col-photo"><div class="photo-box">PASTE PHOTO</div></td> </tr>
+                    <tr> <td class="col-sn">6</td> <td class="col-name"></td> <td></td> <td></td> <td></td> <td class="col-photo"><div class="photo-box">PASTE PHOTO</div></td> </tr>
+                    <tr> <td class="col-sn">7</td> <td class="col-name"></td> <td></td> <td></td> <td></td> <td class="col-photo"><div class="photo-box">PASTE PHOTO</div></td> </tr>
+                </tbody>
+            </table>
+
+            <div class="page-break-note">... Continued on Page 2 ...</div>
+            <div class="staple-note">Please staple both pages together securely.</div>
+            
+        </div>
+    </div>
+
+
+    <div class="page">
+        <div class="content-layer">
+            
+            <h1>Dhanbad District Kabaddi Association Entry Form</h1>
+            <h2>Inter District Dhanbad Kabaddi Tour 2026 (Page 2 of 2)</h2>
+            <div class="header-note">Note: All participants must be in Proper Sports Kit</div>
+
+            <div class="school-input">
+                Name of School: <span class="school-line"></span>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th class="col-sn">S.N.</th>
+                        <th class="col-name">Name of Students</th>
+                        <th class="col-class">Class</th>
+                        <th class="col-dob">Date of Birth</th>
+                        <th class="col-adm">Adm. No.</th>
+                        <th class="col-photo">Photograph Attested by the Principal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr> <td class="col-sn">8</td> <td class="col-name"></td> <td></td> <td></td> <td></td> <td class="col-photo"><div class="photo-box">PASTE PHOTO</div></td> </tr>
+                    <tr> <td class="col-sn">9</td> <td class="col-name"></td> <td></td> <td></td> <td></td> <td class="col-photo"><div class="photo-box">PASTE PHOTO</div></td> </tr>
+                    <tr> <td class="col-sn">10</td> <td class="col-name"></td> <td></td> <td></td> <td></td> <td class="col-photo"><div class="photo-box">PASTE PHOTO</div></td> </tr>
+                    <tr> <td class="col-sn">11</td> <td class="col-name"></td> <td></td> <td></td> <td></td> <td class="col-photo"><div class="photo-box">PASTE PHOTO</div></td> </tr>
+                    <tr> <td class="col-sn">12</td> <td class="col-name"></td> <td></td> <td></td> <td></td> <td class="col-photo"><div class="photo-box">PASTE PHOTO</div></td> </tr>
+                </tbody>
+            </table>
+
+            <div class="requirement-box">
+                <strong>Important:</strong> The Institute/School must provide a separate <u>Official School Letterhead</u> verifying the team and listing the students above. This form will not be accepted without the accompanying verification letter.
+            </div>
+
+            <div class="footer-sigs">
+                <div class="footer-left">
+                    <div class="sign-line"><span class="sign-label">Team Coach:</span><span class="sign-space"></span></div>
+                    <div class="sign-line"><span class="sign-label">Team Manager:</span><span class="sign-space"></span></div>
+                    <div class="sign-line"><span class="sign-label">School Seal:</span><span class="sign-space" style="border-bottom: none;"></span></div>
+                </div>
+                <div class="footer-right">
+                    <div class="stamp-box">
+                        Principal Sig with Stamp
+                    </div>
+                </div>
+            </div>
+            
+             <div class="staple-note" style="margin-top: 30px;">Please staple both pages together securely.</div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
