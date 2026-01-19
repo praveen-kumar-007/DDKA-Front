@@ -53,7 +53,11 @@
             position: absolute;
             top: 0; left: 0; bottom: 0; right: 0;
             z-index: 0;
+            
+            /* 👇👇👇 IMPORTANT: USE A PNG IMAGE WITH A TRANSPARENT BACKGROUND 👇👇👇 */
             background-image: url(https://res.cloudinary.com/dmmll82la/image/upload/v1766683651/ddka-logo_ywnhyh.png); 
+            /* 👆👆👆 If your image has a white background, it will look like a translucent box. */
+            
             background-position: center;
             background-repeat: no-repeat;
             background-size: 50%;
@@ -238,6 +242,7 @@
         }
     </style>
 </head>
+
 <body>
 <div style="text-align:center; margin-top:20px; margin-bottom:10px;">
     <button onclick="window.print()" style="background:var(--primary-blue);color:white;padding:8px 18px;border:none;border-radius:4px;cursor:pointer;margin-right:10px;font-size:16px;">Print Form</button>

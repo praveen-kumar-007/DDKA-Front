@@ -11,40 +11,479 @@
     html,body{height:100%}
     body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial;background:linear-gradient(180deg,#071025 0%, #071a2b 60%);min-height:100vh;color:#fff;display:flex;flex-direction:column;align-items:center}
 
+
+    /* App layout */
     .app{display:flex;gap:24px;padding:28px;width:100%;max-width:1400px;margin:0 auto}
+
+    /* Sidebar */
     aside{width:360px;background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));padding:20px;border-radius:14px;border-left:1px solid rgba(255,255,255,0.02);backdrop-filter:blur(6px)}
     label.input{display:block;margin-bottom:10px}
     input[type=text]{width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#fff}
     input[type=file]{display:none}
+
+    /* Buttons */
     .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:#fff;font-weight:800;cursor:pointer;transition:all .18s}
     .btn:hover{transform:translateY(-2px)}
     .btn.primary{background:linear-gradient(90deg,var(--accent),#E11D48);border:none;box-shadow:0 8px 24px rgba(225,29,72,0.12)}
     .btn.ghost{background:rgba(255,255,255,0.02)}
+
+    /* Preview */
     .preview-wrap{flex:1;display:flex;justify-content:center;align-items:center;padding-top:12px;padding-bottom:12px}
+
+    /* Certificate styling: use column layout so signatures are part of flow */
+    /* Responsive sizing: fit to viewport on small screens while keeping a consistent aspect ratio */
     .certificate{display:flex;flex-direction:column;width:min(1100px,96vw);max-width:1100px;height:auto;aspect-ratio:1100/780;background:#fff;color:#111;border-radius:14px;padding:32px;box-sizing:border-box;position:relative;overflow:hidden;border:10px solid #fff;box-shadow:0 40px 90px rgba(10,25,40,0.6)}
-    .logo-watermark{position:absolute;inset:0;background-image:url('https://res.cloudinary.com/dmmll82la/image/upload/v1766683651/ddka-logo_ywnhyh.png');background-repeat:repeat;background-position:center;background-size:220px;opacity:0.06;transform:rotate(-12deg);pointer-events:none;z-index:6;mix-blend-mode:multiply;filter:grayscale(1) contrast(0.9)}
+
+    /* Logo watermark layers: repeating grid + large centered logo (low opacity to deter copying) */
+    .logo-watermark{
+      position:absolute;inset:0;background-image:url('https://res.cloudinary.com/dmmll82la/image/upload/v1766683651/ddka-logo_ywnhyh.png');background-repeat:repeat;background-position:center;background-size:220px;opacity:0.06;transform:rotate(-12deg);pointer-events:none;z-index:6;mix-blend-mode:multiply;filter:grayscale(1) contrast(0.9);
+    }
     .logo-watermark-large{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%) rotate(-10deg);width:60%;height:60%;background-image:url('https://res.cloudinary.com/dmmll82la/image/upload/v1766683651/ddka-logo_ywnhyh.png');background-repeat:no-repeat;background-position:center;background-size:contain;opacity:0.12;pointer-events:none;z-index:7;mix-blend-mode:soft-light;filter:grayscale(1) saturate(0.2)}
     @media print{.logo-watermark,.logo-watermark-large{opacity:0.1}}
+
+    /* Decorative background grid */
     .certificate::before{content:'';position:absolute;inset:0;background-image:linear-gradient(transparent 95%, rgba(0,0,0,0.02) 95%), linear-gradient(90deg, rgba(0,0,0,0.02) 95%, transparent 95%);opacity:0.6;pointer-events:none}
+    /* Top & bottom accent bars (visual only) */
     .certificate .top-bar{position:absolute;top:0;left:0;width:100%;height:8px;background:linear-gradient(90deg,var(--accent),#E11D48,#0062FF)}
     .certificate .bottom-bar{position:absolute;bottom:0;left:0;width:100%;height:8px;background:linear-gradient(90deg,#0062FF,var(--accent3),var(--accent))}
+
+    /* Main content wrapper: keep centered but do not overlap signatures */
     .content{flex:1;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:10;padding-bottom:12px}
+    .content .center{margin-bottom:0}
+
+    /* Soft color slashes */
     .color-slash{position:absolute;border-radius:50%;filter:blur(36px);opacity:0.12}
+
+    /* Soft color slashes */
     .color-slash{position:absolute;border-radius:50%;filter:blur(36px);opacity:0.12}
     .slash-1{width:220px;height:220px;left:-60px;top:-40px;background:var(--accent)}
     .slash-2{width:160px;height:160px;right:-40px;bottom:120px;background:#00D1C7}
+
     .header{display:flex;justify-content:space-between;align-items:center;position:relative;z-index:10;padding-bottom:8px}
     .logo{display:flex;align-items:center;gap:16px}
     .logo > div{text-align:center}
     .logo .badge{width:96px;height:96px;border-radius:12px;background:linear-gradient(180deg,#f6fbff,#eef5ff);display:flex;align-items:center;justify-content:center;font-weight:900;color:#222;overflow:hidden}
     .logo img{display:block}
     .hindi-line{font-family:'Noto Sans Devanagari', serif;font-weight:800;font-size:clamp(20px,1.4vw,20px);background:linear-gradient(90deg,#FF8A00,#E11D48,#0062FF,#00D15E);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:0.03em;margin-bottom:6px}
+    .title{font-weight:900;color:#E11D48;font-size:clamp(20px,2.2vw,32px);line-height:1.05;letter-spacing:0.4px}
+
+    /* Header meta (two centered full-form lines) */
+    .header-meta{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:8px;font-size:13px;color:#475569}
+    .header-meta .meta-line{font-weight:700;color:#0f1724;letter-spacing:0.02em}
+    .header-meta .meta-line .sep{opacity:0.5;margin:0 10px;color:#475569;font-weight:600} 
+
+    .photo{width:140px;height:160px;background:#f7faff;border-radius:10px;display:flex;align-items:center;justify-content:center;overflow:visible;border:2px solid rgba(3,102,214,0.06);box-shadow:inset 0 -6px 24px rgba(0,0,0,0.03);position:relative}
+    /* Photo watermark overlay (small corner logo) — stays in the photo corner to avoid faces */
+    .photo::after{content:'';position:absolute;right:8px;bottom:8px;width:44px;height:44px;background-image:url('https://res.cloudinary.com/dmmll82la/image/upload/v1766683651/ddka-logo_ywnhyh.png');background-repeat:no-repeat;background-position:center;background-size:contain;opacity:0.16;pointer-events:none;z-index:4;mix-blend-mode:soft-light;filter:grayscale(1) saturate(0.2);border-radius:6px;background-color:rgba(255,255,255,0.02)}
+    /* Bridged watermark that intentionally straddles the photo and certificate white area for blending */
+    .photo::before{content:'';position:absolute;left:-36px;bottom:-12px;width:120px;height:120px;background-image:url('https://res.cloudinary.com/dmmll82la/image/upload/v1766683651/ddka-logo_ywnhyh.png');background-repeat:no-repeat;background-position:center;background-size:contain;opacity:0.10;pointer-events:none;z-index:3;mix-blend-mode:multiply;filter:grayscale(1) blur(0.6px) contrast(0.9);transform:rotate(-6deg);border-radius:8px}
+    /* Soft fade to help blend the bridged watermark into the white certificate area */
+    .photo .bridge-fade{position:absolute;left:-10px;bottom:-10px;width:80px;height:120px;background:linear-gradient(90deg,rgba(255,255,255,0.0) 0%, rgba(255,255,255,0.6) 100%);z-index:2;pointer-events:none;border-radius:6px}
+    /* Ensure uploaded <img> stays under the watermark */
+    .photo img{position:relative;z-index:1;width:100%;height:100%;object-fit:cover}
+    @media print{.photo::after{opacity:0.22} .photo::before{opacity:0.14}}
+    /* Smaller watermark on narrow screens */
+    @media (max-width:780px){.photo::after{width:32px;height:32px;right:6px;bottom:6px;opacity:0.14} .photo::before{left:-28px;bottom:-6px;width:88px;height:88px;opacity:0.08}}
+
+    .center{text-align:center;margin-top:22px}
+    .name-row{display:flex;flex-direction:column;align-items:center;gap:10px}
+    h1.name{font-size:48px;margin:12px 0;color:#111}
+
+    /* Grade badge shown on certificate */
+    .grade-wrap{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:2px}
+    .grade-badge{display:inline-block;padding:8px 20px;border-radius:999px;color:#fff;font-weight:900;font-size:28px;vertical-align:middle;box-shadow:0 8px 18px rgba(16,24,40,0.12)}
+    .grade-A{background:linear-gradient(90deg,#FFD166,#F0A202)}
+    .grade-B{background:linear-gradient(90deg,#0062FF,#00D1C7)}
+    .grade-C{background:linear-gradient(90deg,#FF8A00,#E11D48)}
+    .grade-label{display:block;font-size:12px;font-weight:700;color:#475569}
+
+    .info{display:flex;justify-content:center;align-items:center;gap:36px;margin-bottom:18px;margin-top:8px}
+    .chip{padding:12px;border-radius:10px;background:#fbfdff;border-left:6px solid var(--accent);min-width:240px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;min-height:110px;position:relative}
+
+    /* Grade badge inside chip */
+    /* Hide circular badge inside middle chip (text-only grade) */
+    #chip-grade-badge{display:none !important}
+    .chip .grade-label{font-size:15px;color:#111;font-weight:800;margin-top:6px}
+
+    /* Center grade area inside middle chip */
+    #chip-grade{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+
+    /* Decorative left bar */
+    .chip::before{content:'';position:absolute;left:-6px;top:14px;height:82px;width:6px;border-top-left-radius:10px;border-bottom-left-radius:10px;background:linear-gradient(180deg,var(--accent),#E11D48)}
+    .chip:first-child::before{background:linear-gradient(180deg,#0062FF,#00D1C7)}
+    .chip:last-child::before{background:linear-gradient(180deg,#B6D13A,#FF8A00)}
+
+    /* Responsive chips */
+    @media (max-width:980px){
+      /* Stack sidebar and preview on narrow viewports */
+      .app{flex-direction:column;padding:12px}
+      aside{width:100%;margin-bottom:12px}
+      .preview-wrap{padding:12px}
+
+      /* Compact certificate spacing for mobile */
+      .certificate{padding:18px;width:100%;aspect-ratio:1100/780}
+      .hindi-line{font-size:13px}
+      .title{font-size:18px}
+      h1.name{font-size:36px}
+
+      /* Chips & info adjustments */
+      .info{flex-direction:column;gap:10px}
+      .chip{min-width:100%;min-height:80px}
+
+      /* Signature area adjustments */
+      .signatures{height:140px;margin-top:-10px}
+      .signatures .sig img{max-height:88px}
+      .signatures .sig:nth-child(1) img{max-height:120px}
+    }
+
+    /* Short info (Affiliation / Registration / Recognition) - concise */
+    .short-info{display:flex;justify-content:center;gap:22px;margin-top:14px;margin-bottom:6px}
+    .short-info > div{min-width:160px;background:transparent;padding:6px 8px;border-radius:8px;display:flex;align-items:center;gap:10px}
+    .short-info img{height:22px;width:auto;border-radius:4px}
+    .short-info strong{display:block;font-weight:800;color:#0f1724;font-size:12px;letter-spacing:0.06em}
+    .short-info .muted{color:#475569;font-size:12px;font-weight:700;margin-top:0}
+
+    .signatures{height:110px;display:flex;z-index:12;border-bottom-left-radius:10px;border-bottom-right-radius:10px;overflow:hidden}
+    .sig{flex:1;padding:12px 16px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end}
+    .sig .who{font-weight:800;text-transform:uppercase}
+
+    /* Per-signature gradient accents */
+    .signatures .sig:nth-child(1){background:linear-gradient(180deg,#0062FF,#00D1C7)}
+    .signatures .sig:nth-child(2){background:linear-gradient(180deg,#00D1C7,#00D15E)}
+    .signatures .sig:nth-child(3){background:linear-gradient(180deg,#00D15E,#B6D13A)}
+    /* Larger, more visible signatures */
+    .signatures .sig img{max-height:72px;max-width:90%;transition:transform .18s ease, opacity .18s ease}
+    /* Make the first signature slightly larger (≈1.3×) and nudge it up so it sits above the name */
+    .signatures .sig:nth-child(1) img{max-height:96px;max-width:92%;transform:translateY(-8px);margin-bottom:8px;z-index:8}     
+
+    .commend{margin-top:12px;padding:12px;border-left:4px solid rgba(0,209,94,0.2);background:rgba(0,209,94,0.05);border-radius:6px}
+
+    .thumb{width:64px;height:64px;border-radius:10px;background:transparent;display:flex;align-items:center;justify-content:center;overflow:hidden;border:1px solid rgba(255,255,255,0.04)}
+    .thumb img{width:100%;height:100%;object-fit:contain}
+
+    .sig-row{display:grid;gap:8px}
+    .sig-row .sig-item{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01))}
+    .small-btn{background:transparent;border:none;color:#f87171;cursor:pointer}
+
+
+    /* non-printable helper */
+    .no-print{display:block}
+    @media print{.no-print{display:none}aside, .btn{display:none}} 
   </style>
 </head>
 <body>
   <div class="app">
-    <aside> ... (same content as original Official Certificate) ... </aside>
-    <div class="preview-wrap"> ... (certificate preview) ... </div>
+    <aside>
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
+        <div class="thumb"><img src="https://res.cloudinary.com/dmmll82la/image/upload/v1766683651/ddka-logo_ywnhyh.png" alt="DDKA" /></div>
+        <div>
+          <div style="font-weight:900">CHAMPIONSHIP</div>
+          <div style="font-size:12px;color:var(--muted)">DDKA Certification Engine</div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:12px;font-weight:800;color:var(--muted);margin-bottom:8px">Referee Information</div>
+        <label class="input">Full Name<input id="name" type="text" value="John Doe"></label>
+        <label class="input">Father's Name<input id="father" type="text" value="Parent Name"></label>
+        <div style="display:flex;gap:8px"><label class="input" style="flex:1">Official ID (last 4)<input id="reg-suffix" type="text" maxlength="4" placeholder="12YT" title="Enter last 4 characters (alphanumeric)" style="text-transform:uppercase"></label><label class="input" style="flex:1">Exam Date<input id="date" type="text" value="2026-01-01"></label></div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <label class="input" style="flex:1">Score (%)<input id="score" type="number" min="0" max="100" placeholder="e.g. 82"></label>
+          <label class="input" style="width:100px">Grade<select id="grade-select"><option value="">Auto</option><option value="A">A</option><option value="B">B</option><option value="C">C</option></select></label>
+        </div> 
+      </div>
+
+      <div style="margin-top:12px">
+        <div style="font-size:12px;font-weight:800;color:var(--muted);margin-bottom:8px">Portrait Capture</div>
+        <label style="display:flex;gap:8px;align-items:center;padding:8px;border-radius:8px;cursor:pointer;background:rgba(255,255,255,0.02)">
+          <div id="photo-thumb" class="thumb">📷</div>
+          <div style="font-weight:800">Update Photo</div>
+          <input id="photo-input" type="file" accept="image/*" style="display:none">
+        </label>
+      </div>
+
+      <div style="margin-top:12px">
+        <div style="font-size:12px;font-weight:800;color:var(--muted);margin-bottom:8px">Official Signatures</div>
+        <div class="sig-row">
+          <div class="sig-item"><div style="display:flex;align-items:center"><img src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1768747850/Tilak_Ram_Sahu_srluua.png" alt="Tilak sign" style="height:36px;object-fit:contain;margin-right:8px;border-radius:4px"/><div><strong style="color:var(--accent)">Tilak Ram Sahu</strong><div style="font-size:12px;color:var(--muted)">Chief Examiner (Referee Board JSKA)</div></div></div><div><button class="small-btn" data-idx="0">Remove</button><label style="padding:6px;background:rgba(255,255,255,0.03);border-radius:6px;cursor:pointer"><input data-idx="0" class="sig-input" type="file" accept="image/*" style="display:none">Upload</label></div></div>
+          <div class="sig-item"><div style="display:flex;align-items:center"><img src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1768747850/Mintoo_Thakur_Sign_cg8gxm.png" alt="Mintoo sign" style="height:36px;object-fit:contain;margin-right:8px;border-radius:4px"/><div><strong style="color:var(--accent)">Mintoo Thakur (NIS)</strong><div style="font-size:12px;color:var(--muted)">Association Secretary</div></div></div><div><button class="small-btn" data-idx="1">Remove</button><label style="padding:6px;background:rgba(255,255,255,0.03);border-radius:6px;cursor:pointer"><input data-idx="1" class="sig-input" type="file" accept="image/*" style="display:none">Upload</label></div></div>
+          <div class="sig-item"><div style="display:flex;align-items:center"><img src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1768747850/Pappu_Kumar_Yadav_Sign_bj2xlm.png" alt="Pappu sign" style="height:36px;object-fit:contain;margin-right:8px;border-radius:4px"/><div><strong style="color:var(--accent)">Pappu Kumar Yadav</strong><div style="font-size:12px;color:var(--muted)">Chairman Refree Board(DDKA)</div></div></div><div><button class="small-btn" data-idx="2">Remove</button><label style="padding:6px;background:rgba(255,255,255,0.03);border-radius:6px;cursor:pointer"><input data-idx="2" class="sig-input" type="file" accept="image/*" style="display:none">Upload</label></div></div>
+        </div>
+      </div> 
+
+      <div style="margin-top:12px">
+        <div style="display:flex;gap:8px;flex-direction:column">
+          <button id="ai-btn" class="btn primary">✨ AI Language Assist</button>
+          <div style="display:flex;gap:8px;margin-top:8px"><button id="download-btn" class="btn">⬇️ Download PNG</button><button id="print-btn" class="btn">🖨 Print PDF</button></div>
+          <button id="reset-btn" class="btn" style="margin-top:8px">↺ Reset Workspace</button>
+        </div>
+      </div>
+    </aside>
+
+    <div class="preview-wrap">
+      <div id="certificate" class="certificate">
+        <div class="top-bar"></div>
+        <div class="bottom-bar"></div>
+        <div class="logo-watermark" aria-hidden="true"></div>
+        <div class="logo-watermark-large" aria-hidden="true"></div>
+        <div class="color-slash slash-1"></div>
+        <div class="color-slash slash-2"></div>
+        <div class="content">
+        <div class="header">
+          <div class="logo">
+            <div class="badge"><img id="logo-img" src="https://res.cloudinary.com/dmmll82la/image/upload/v1766683651/ddka-logo_ywnhyh.png" alt="DDKA" style="width:100%;height:100%;object-fit:contain" /></div>
+            <div>
+              <div class="hindi-line">मिट्टी का खेल, देश का खेल, कबड्डी अपना खेल</div>
+              <div class="title">Dhanbad District Kabaddi Association</div>
+              <div class="header-meta">
+                <div class="meta-line">Affiliated To - JHARKHAND STATE KABADDI ASSOCIATION <span class="sep">|</span> Registered with 1860 Govt. of Jharkhand</div>
+                <div class="meta-line">Recognition - Affiliated for - A.K.F.I. &amp; Jharkhand Olympic Association</div>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:8px;justify-content:center;align-items:center">
+                <img src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1767429051/WhatsApp_Image_2026-01-03_at_1.57.17_PM_qg7rs3.jpg" alt="JSKA" style="height:60px;object-fit:contain;border-radius:6px" />
+                <img src="https://res.cloudinary.com/dmmll82la/image/upload/v1766683651/akfi-logo_sydpx7.png" alt="AKFI" style="height:65px;object-fit:contain;border-radius:6px" />
+              </div>
+            </div>
+          </div>
+          <div id="photo-area" class="photo">Referee Photo</div>
+        </div>
+
+        <div class="center">
+          <div style="display:inline-block;padding:12px 40px;background:#111;color:#fff;border-radius:999px;transform:skewX(-12deg);margin-top:18px"><span style="display:inline-block;transform:skewX(12deg);font-weight:900;font-size:24px;letter-spacing:2px">District Referee Certificate 2026</span></div>
+
+          <div style="margin-top:18px;color:#6b7280;font-weight:800;letter-spacing:2px">This document verifies the qualification of</div>
+          <div class="name-row">
+            <div class="name-box"><h1 id="cert-name" class="name">John Doe</h1></div>
+          </div>
+
+          <div class="info">
+            <div class="chip">
+              <div style="font-size:10px;color:#7b7f86;font-weight:800;letter-spacing:2px">Parent Identity</div>
+              <div style="font-weight:700" id="cert-father">Parent Name</div>
+            </div>
+            <div class="chip">
+              <div style="font-size:10px;color:#7b7f86;font-weight:800;letter-spacing:2px">Grade</div>
+              <div id="chip-grade"><span id="chip-grade-badge" class="grade-badge" style="display:none"></span><span id="chip-grade-label" class="grade-label" style="display:none"></span></div>
+            </div>
+            <div class="chip">
+              <div style="font-size:10px;color:#7b7f86;font-weight:800;letter-spacing:2px">Official ID</div>
+              <div style="font-weight:700;font-family:monospace" id="cert-reg">REG-0001</div>
+            </div>
+          </div> 
+
+          <div id="cert-body" style="color:#4b5563;max-width:780px;margin:0 auto">who has qualified the <strong style="color:var(--accent2)">District Kabaddi Referee Examination 2026</strong>. Held on <span id="cert-date">2026-01-01</span> at SP Kabaddi Group Dhanbad, authorized by the Governing Body of Dhanbad District Kabaddi Association.</div>
+
+
+
+          <div id="commendation" class="commend" style="display:none;margin-top:12px"></div>
+        </div>
+        </div>
+
+        <div class="signatures">
+          <div class="sig"><div style="min-height:45px" id="sig-img-0"><img src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1768747850/Tilak_Ram_Sahu_srluua.png" alt="Tilak sign" style="max-height:96px;max-width:92%;object-fit:contain;"/></div><div class="who">Tilak Ram Sahu</div><div style="font-size:12px;color:#6b7280">Chief Examiner (Referee Board JSKA)</div></div>
+          <div class="sig"><div style="min-height:45px" id="sig-img-1"><img src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1768747850/Mintoo_Thakur_Sign_cg8gxm.png" alt="Mintoo sign" style="max-height:72px;max-width:90%;object-fit:contain;"/></div><div class="who">Mintoo Thakur (NIS)</div><div style="font-size:12px;color:#6b7280">Association Secretary(DDKA)</div></div>
+          <div class="sig"><div style="min-height:45px" id="sig-img-2"><img src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1768747850/Pappu_Kumar_Yadav_Sign_bj2xlm.png" alt="Pappu sign" style="max-height:72px;max-width:90%;object-fit:contain;"/></div><div class="who">Pappu Kumar Yadav</div><div style="font-size:12px;color:#6b7280">Chairman Refree Board(DDKA)</div></div>
+        </div>
+      </div>
+    </div>
   </div>
+
+  <script src="https://unpkg.com/html-to-image@1.11.11/dist/html-to-image.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    (function(){
+      // Elements
+      const nameInput = document.getElementById('name');
+      const fatherInput = document.getElementById('father');
+      const regInput = document.getElementById('reg-suffix');
+      const dateInput = document.getElementById('date');
+      const certName = document.getElementById('cert-name');
+      const certFather = document.getElementById('cert-father');
+      const certReg = document.getElementById('cert-reg');
+      const certDate = document.getElementById('cert-date');
+      const photoInput = document.getElementById('photo-input');
+      const photoThumb = document.getElementById('photo-thumb');
+      const photoArea = document.getElementById('photo-area');
+      const downloadBtn = document.getElementById('download-btn');
+      const printBtn = document.getElementById('print-btn');
+      const aiBtn = document.getElementById('ai-btn');
+      const resetBtn = document.getElementById('reset-btn');
+      const commendEl = document.getElementById('commendation');
+      const cert = document.getElementById('certificate');
+
+      const sigInputs = Array.from(document.querySelectorAll('.sig-input'));
+      const sigRemoves = Array.from(document.querySelectorAll('.small-btn'));
+      const sigImgs = [document.getElementById('sig-img-0'),document.getElementById('sig-img-1'),document.getElementById('sig-img-2')];
+      const DEFAULT_SIGS = [
+        'https://res.cloudinary.com/dcqo5qt7b/image/upload/v1768747850/Tilak_Ram_Sahu_srluua.png',
+        'https://res.cloudinary.com/dcqo5qt7b/image/upload/v1768747850/Mintoo_Thakur_Sign_cg8gxm.png',
+        'https://res.cloudinary.com/dcqo5qt7b/image/upload/v1768747850/Pappu_Kumar_Yadav_Sign_bj2xlm.png'
+      ];
+      // Ensure default signatures are present if a slot is empty (first load or after manual removal)
+      sigImgs.forEach((el, idx) => {
+        if (el && !el.querySelector('img')) {
+          const img = document.createElement('img'); img.src = DEFAULT_SIGS[idx];
+          if (idx === 0) { img.style.maxHeight='96px'; img.style.maxWidth='92%'; }
+          else { img.style.maxHeight='72px'; img.style.maxWidth='90%'; }
+          img.style.objectFit='contain'; el.appendChild(img);
+        }
+      });
+
+      function updateFields(){
+        certName.textContent = nameInput.value || '_________________';
+        certFather.textContent = fatherInput.value || '________________';
+        const suffix = (regInput.value || '').toUpperCase().trim();
+        certReg.textContent = suffix ? 'DDKA-2026-' + suffix : 'DDKA-2026-____';
+        certDate.textContent = dateInput.value || 'DATE';
+      }
+
+      // Input bindings
+      [nameInput,fatherInput,regInput,dateInput].forEach(inp => inp.addEventListener('input', updateFields));
+
+      // Suffix validation: uppercase + alphanumeric + max 4 chars
+      regInput.addEventListener('input', ()=>{
+        regInput.value = regInput.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,4);
+        updateFields();
+      });
+
+      // Photo upload
+      photoInput.addEventListener('change', (e)=>{
+        const f = e.target.files && e.target.files[0];
+        if(!f) return;
+        const r = new FileReader();
+        r.onload = ()=>{
+          photoThumb.innerHTML = '';
+          const img = document.createElement('img'); img.src = r.result; img.style.width='100%'; img.style.height='100%'; img.style.objectFit='cover';
+          photoThumb.appendChild(img);
+          photoArea.innerHTML = '';
+          const img2 = document.createElement('img'); img2.src = r.result; img2.style.width='100%'; img2.style.height='100%'; img2.style.objectFit='cover';
+          photoArea.appendChild(img2);
+        };
+        r.readAsDataURL(f);
+      });
+
+      // Signatures
+      sigInputs.forEach(inp => inp.addEventListener('change', (e)=>{
+        const idx = +inp.dataset.idx; const f = inp.files && inp.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{
+          sigImgs[idx].innerHTML=''; const img=document.createElement('img'); img.src=r.result; 
+          // Make the first signature slightly larger (≈1.3×)
+          if (idx === 0) { img.style.maxHeight='62px'; img.style.maxWidth='86%'; }
+          else { img.style.maxHeight='48px'; img.style.maxWidth='80%'; }
+          img.style.objectFit='contain'; sigImgs[idx].appendChild(img);
+        }; r.readAsDataURL(f);
+      }));
+
+      sigRemoves.forEach(btn => btn.addEventListener('click', (e)=>{
+        const idx = +btn.dataset.idx; sigImgs[idx].innerHTML=''; const inp = document.querySelector('.sig-input[data-idx="'+idx+'"]'); if(inp) inp.value='';
+      }));
+
+      // AI commendation stub
+      async function enhanceCommendation(name){
+        // Short formal 1-2 sentence commendation
+        return `For outstanding dedication and exemplary officiating, we heartily congratulate ${name} on successful qualification.`;
+      }
+
+      aiBtn.addEventListener('click', async ()=>{
+        aiBtn.disabled=true; aiBtn.textContent='Optimizing...';
+        const text = await enhanceCommendation(nameInput.value || 'the candidate');
+        commendEl.style.display='block'; commendEl.textContent='"'+text+'"';
+        aiBtn.disabled=false; aiBtn.textContent='✨ AI Language Assist';
+      });
+
+      // Download
+      downloadBtn.addEventListener('click', async ()=>{
+        downloadBtn.disabled = true; downloadBtn.textContent = 'Rendering...';
+        try{
+          const dataUrl = await window.htmlToImage.toPng(cert, {cacheBust:true, pixelRatio:3, backgroundColor:'#ffffff'});
+          const a=document.createElement('a'); a.href=dataUrl; a.download = 'DDKA-Certificate-'+(nameInput.value||'candidate').replace(/\s+/g,'-')+'.png'; a.click();
+        }catch(err){ alert('Could not generate PNG. Try Print.'); console.error(err); }
+        downloadBtn.disabled=false; downloadBtn.textContent='⬇️ Download PNG';
+      });
+
+      // Download high-resolution PDF (preserves colors)
+      const downloadPdfBtn = document.getElementById('download-pdf-btn');
+      if (downloadPdfBtn) {
+        downloadPdfBtn.addEventListener('click', async ()=>{
+          downloadPdfBtn.disabled = true; downloadPdfBtn.textContent = 'Rendering PDF...';
+          try{
+            // increase pixelRatio for higher resolution (4 or 6 if you need bigger file)
+            const dataUrl = await window.htmlToImage.toPng(cert, {cacheBust:true, pixelRatio:4, backgroundColor:'#ffffff'});
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('landscape','pt','a4');
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
+            pdf.addImage(dataUrl, 'PNG', 0, 0, pageWidth, pageHeight);
+            pdf.save('DDKA-Certificate-'+(nameInput.value||'candidate').replace(/\s+/g,'-')+'.pdf');
+          }catch(err){ alert('Could not create PDF. Try downloading PNG then converting to PDF.'); console.error(err); }
+          downloadPdfBtn.disabled=false; downloadPdfBtn.textContent='📄 Download PDF';
+        });
+      }
+
+      printBtn.addEventListener('click', ()=>{
+        const proceed = confirm('Printing may produce grayscale output depending on printer settings. For best color preservation, use the "📄 Download PDF" button. Proceed to print?');
+        if (!proceed) return;
+        window.print();
+      });
+
+      // Reset
+      resetBtn.addEventListener('click', ()=>{
+        if(!confirm('Reset all data?')) return; nameInput.value='John Doe'; fatherInput.value='Parent Name'; regInput.value=''; dateInput.value='2026-01-01'; updateFields(); photoThumb.innerHTML='📷'; photoArea.innerHTML='Referee Photo';
+        // restore default signature images
+        sigImgs.forEach((el, idx) => {
+          el.innerHTML = '';
+          const img = document.createElement('img'); img.src = DEFAULT_SIGS[idx];
+          if (idx === 0) { img.style.maxHeight='96px'; img.style.maxWidth='92%'; }
+          else { img.style.maxHeight='72px'; img.style.maxWidth='90%'; }
+          img.style.objectFit='contain'; el.appendChild(img);
+        });
+        commendEl.style.display='none';
+      });
+
+      // Grade calculation helpers
+      const scoreInput = document.getElementById('score');
+      const gradeSelect = document.getElementById('grade-select');
+      const chipBadge = document.getElementById('chip-grade-badge');
+      const chipLabel = document.getElementById('chip-grade-label');
+
+      function getGradeFromPercent(p){
+        if (p >= 80) return 'A';
+        if (p >= 50) return 'B';
+        if (p >= 33) return 'C';
+        return 'C'; // minimum grade C
+      }
+
+      function setGrade(g){
+        if(!g){ chipBadge.style.display='none'; chipLabel.style.display='none'; return; }
+        // Remove circle badge, show text-only grade
+        chipBadge.style.display = 'none';
+        chipLabel.textContent = 'Grade ' + g;
+        chipLabel.style.display = 'inline-block';
+        // Add a class on chip for color styling if needed
+        const parentChip = document.getElementById('chip-grade').closest('.chip');
+        parentChip.classList.remove('grade-A','grade-B','grade-C');
+        parentChip.classList.add('grade-' + g);
+      }
+
+      scoreInput.addEventListener('input', ()=>{
+        const v = parseFloat(scoreInput.value);
+        if (!isNaN(v)){
+          const g = getGradeFromPercent(v);
+          setGrade(g);
+          gradeSelect.value = g;
+        } else {
+          setGrade(''); gradeSelect.value = '';
+        }
+      });
+
+      gradeSelect.addEventListener('change', ()=>{
+        const g = gradeSelect.value;
+        if (g){ setGrade(g); scoreInput.value = ''; }
+        else { setGrade(''); }
+      });
+
+      // Init
+      updateFields();
+    })();
+  </script>
 </body>
 </html>
