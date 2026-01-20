@@ -74,14 +74,18 @@
 
     .photo{width:140px;height:160px;background:#f7faff;border-radius:10px;display:flex;align-items:center;justify-content:center;overflow:visible;border:2px solid rgba(3,102,214,0.06);box-shadow:inset 0 -6px 24px rgba(0,0,0,0.03);position:relative}
     /* Photo watermark overlay (small corner logo) — stays in the photo corner to avoid faces */
-    .photo::after{content:'';position:absolute;right:8px;bottom:8px;width:44px;height:44px;background-image:url('https://res.cloudinary.com/dmmll82la/image/upload/v1766683651/ddka-logo_ywnhyh.png');background-repeat:no-repeat;background-position:center;background-size:contain;opacity:0.16;pointer-events:none;z-index:4;mix-blend-mode:soft-light;filter:grayscale(1) saturate(0.2);border-radius:6px;background-color:rgba(255,255,255,0.02)}
+    .photo::after{content:'';position:absolute;right:8px;bottom:8px;width:56px;height:56px;background-image:url('https://res.cloudinary.com/dmmll82la/image/upload/v1766683651/ddka-logo_ywnhyh.png');background-repeat:no-repeat;background-position:center;background-size:contain;opacity:0.32;pointer-events:none;z-index:6;mix-blend-mode:normal;filter:grayscale(0) contrast(1);border-radius:6px;background-color:rgba(255,255,255,0.0)}
     /* Bridged watermark that intentionally straddles the photo and certificate white area for blending */
     .photo::before{content:'';position:absolute;left:-36px;bottom:-12px;width:120px;height:120px;background-image:url('https://res.cloudinary.com/dmmll82la/image/upload/v1766683651/ddka-logo_ywnhyh.png');background-repeat:no-repeat;background-position:center;background-size:contain;opacity:0.10;pointer-events:none;z-index:3;mix-blend-mode:multiply;filter:grayscale(1) blur(0.6px) contrast(0.9);transform:rotate(-6deg);border-radius:8px}
+    /* Ensure small thumbs can host watermarks */
+    .thumb{position:relative}
+    /* Technical ID photo watermark (stronger) */
+    #technical-id .thumb::after{content:'';position:absolute;right:8px;bottom:8px;width:56px;height:56px;background-image:url('https://res.cloudinary.com/dmmll82la/image/upload/v1766683651/ddka-logo_ywnhyh.png');background-repeat:no-repeat;background-position:center;background-size:contain;opacity:0.32;pointer-events:none;z-index:6;mix-blend-mode:normal;filter:grayscale(0) contrast(1);border-radius:6px}
     /* Soft fade to help blend the bridged watermark into the white certificate area */
     .photo .bridge-fade{position:absolute;left:-10px;bottom:-10px;width:80px;height:120px;background:linear-gradient(90deg,rgba(255,255,255,0.0) 0%, rgba(255,255,255,0.6) 100%);z-index:2;pointer-events:none;border-radius:6px}
     /* Ensure uploaded <img> stays under the watermark */
     .photo img{position:relative;z-index:1;width:100%;height:100%;object-fit:cover}
-    @media print{.photo::after{opacity:0.22} .photo::before{opacity:0.14}}
+    @media print{.photo::after{opacity:0.5} .photo::before{opacity:0.14} #technical-id .thumb::after{opacity:0.5}}
     /* Smaller watermark on narrow screens */
     @media (max-width:780px){.photo::after{width:32px;height:32px;right:6px;bottom:6px;opacity:0.14} .photo::before{left:-28px;bottom:-6px;width:88px;height:88px;opacity:0.08}}
 
@@ -168,7 +172,27 @@
 
     /* non-printable helper */
     .no-print{display:block}
-    @media print{.no-print{display:none}aside, .btn{display:none}} 
+    /* Print layout: force A4 landscape, preserve background colors and prevent layout reflow */
+    @page { size: A4 landscape; margin: 0; }
+    @media print{
+      html, body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .no-print{display:none}
+      aside, .btn{display:none !important}
+      .certificate{
+        width: 297mm !important;
+        height: 210mm !important;
+        max-width: none !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        border: none !important;
+        overflow: visible !important;
+        page-break-inside: avoid;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .logo-watermark, .logo-watermark-large { opacity: 0.06 !important; filter: none !important; }
+      .certificate * { transform: none !important; }
+    }
   </style>
 </head>
 <body>
@@ -214,7 +238,14 @@
       <div style="margin-top:12px">
         <div style="display:flex;gap:8px;flex-direction:column">
           <button id="ai-btn" class="btn primary">✨ AI Language Assist</button>
-          <div style="display:flex;gap:8px;margin-top:8px"><button id="download-btn" class="btn">⬇️ Download PNG</button><button id="print-btn" class="btn">🖨 Print PDF</button></div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button id="download-btn" class="btn">⬇️ Download PNG</button>
+            <button id="download-pdf-btn" class="btn primary">📄 Download PDF (HD)</button>
+            <button id="print-btn" class="btn">🖨 Print</button>
+          </div>
+          <div class="no-print" style="margin-top:8px;font-size:12px;color:var(--muted)">
+            Tip: For best results, use "📄 Download PDF (HD)". If printing from the browser, enable "Background graphics" and set Scale to 100% in the print dialog.
+          </div>
           <button id="reset-btn" class="btn" style="margin-top:8px">↺ Reset Workspace</button>
         </div>
       </div>
@@ -390,39 +421,63 @@
         aiBtn.disabled=false; aiBtn.textContent='✨ AI Language Assist';
       });
 
-      // Download
+      // Download (high-res PNG)
       downloadBtn.addEventListener('click', async ()=>{
         downloadBtn.disabled = true; downloadBtn.textContent = 'Rendering...';
         try{
-          const dataUrl = await window.htmlToImage.toPng(cert, {cacheBust:true, pixelRatio:3, backgroundColor:'#ffffff'});
+          // Target at least Full HD width (1920 px)
+          const rect = cert.getBoundingClientRect();
+          const targetWidthPx = 1920;
+          const pixelRatio = Math.max(1, Math.min(6, Math.ceil(targetWidthPx / rect.width)));
+          const dataUrl = await window.htmlToImage.toPng(cert, {cacheBust:true, pixelRatio:pixelRatio, backgroundColor:'#ffffff'});
           const a=document.createElement('a'); a.href=dataUrl; a.download = 'DDKA-Certificate-'+(nameInput.value||'candidate').replace(/\s+/g,'-')+'.png'; a.click();
-        }catch(err){ alert('Could not generate PNG. Try Print.'); console.error(err); }
+        }catch(err){ alert('Could not generate PNG. Try Download PDF (HD).'); console.error(err); }
         downloadBtn.disabled=false; downloadBtn.textContent='⬇️ Download PNG';
       });
 
-      // Download high-resolution PDF (preserves colors)
+      // Generate high-resolution PDF (A4 @ 300 DPI) and open in new tab (preserves colors)
+      async function generateHDPDF({dpi=300, openInNewTab=true} = {}) {
+        const rect = cert.getBoundingClientRect();
+        // A4 landscape in inches
+        const a4Inches = { width: 11.6929, height: 8.2677 };
+        const targetWidthPx = Math.round(a4Inches.width * dpi);
+        const pixelRatio = Math.max(1, Math.ceil(targetWidthPx / rect.width));
+        const dataUrl = await window.htmlToImage.toPng(cert, {cacheBust:true, pixelRatio: pixelRatio, backgroundColor:'#ffffff'});
+        const img = new Image(); img.src = dataUrl; await img.decode();
+        const { jsPDF } = window.jspdf;
+        // Create PDF with exact image px dimensions to avoid resampling
+        const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [img.width, img.height] });
+        pdf.addImage(img, 'PNG', 0, 0, img.width, img.height);
+        if (openInNewTab) {
+          const blob = pdf.output('blob');
+          const url = URL.createObjectURL(blob);
+          window.open(url, '_blank');
+        } else {
+          pdf.save('DDKA-Certificate-'+(nameInput.value||'candidate').replace(/\s+/g,'-')+'.pdf');
+        }
+      }
+
+      // Hook up Download PDF (HD) button
       const downloadPdfBtn = document.getElementById('download-pdf-btn');
       if (downloadPdfBtn) {
         downloadPdfBtn.addEventListener('click', async ()=>{
           downloadPdfBtn.disabled = true; downloadPdfBtn.textContent = 'Rendering PDF...';
           try{
-            // increase pixelRatio for higher resolution (4 or 6 if you need bigger file)
-            const dataUrl = await window.htmlToImage.toPng(cert, {cacheBust:true, pixelRatio:4, backgroundColor:'#ffffff'});
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF('landscape','pt','a4');
-            const pageWidth = pdf.internal.pageSize.getWidth();
-            const pageHeight = pdf.internal.pageSize.getHeight();
-            pdf.addImage(dataUrl, 'PNG', 0, 0, pageWidth, pageHeight);
-            pdf.save('DDKA-Certificate-'+(nameInput.value||'candidate').replace(/\s+/g,'-')+'.pdf');
+            await generateHDPDF({dpi:300, openInNewTab:false});
           }catch(err){ alert('Could not create PDF. Try downloading PNG then converting to PDF.'); console.error(err); }
-          downloadPdfBtn.disabled=false; downloadPdfBtn.textContent='📄 Download PDF';
+          downloadPdfBtn.disabled=false; downloadPdfBtn.textContent='📄 Download PDF (HD)';
         });
       }
 
-      printBtn.addEventListener('click', ()=>{
-        const proceed = confirm('Printing may produce grayscale output depending on printer settings. For best color preservation, use the "📄 Download PDF" button. Proceed to print?');
+      // Make Print button open the generated PDF in new tab for accurate printing
+      printBtn.addEventListener('click', async ()=>{
+        const proceed = confirm('Printing from the browser may remove background graphics. For accurate color prints, we will create a PDF and open it for printing. Proceed?');
         if (!proceed) return;
-        window.print();
+        printBtn.disabled = true; printBtn.textContent = 'Preparing...';
+        try {
+          await generateHDPDF({dpi:300, openInNewTab:true});
+        } catch(err) { alert('Could not prepare printable PDF. Try "Download PDF (HD)".'); console.error(err); }
+        printBtn.disabled = false; printBtn.textContent = '🖨 Print';
       });
 
       // Reset
