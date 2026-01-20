@@ -214,7 +214,10 @@
       <div style="margin-top:12px">
         <div style="display:flex;gap:8px;flex-direction:column">
           <button id="ai-btn" class="btn primary">✨ AI Language Assist</button>
-          <div style="display:flex;gap:8px;margin-top:8px"><button id="download-btn" class="btn">⬇️ Download PNG</button><button id="print-btn" class="btn">🖨 Print PDF</button></div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button id="download-btn" class="btn">⬇️ Download PNG</button>
+            <button id="download-pdf-btn" class="btn primary">📄 Download PDF</button>
+          </div>
           <button id="reset-btn" class="btn" style="margin-top:8px">↺ Reset Workspace</button>
         </div>
       </div>
@@ -305,7 +308,7 @@
       const photoThumb = document.getElementById('photo-thumb');
       const photoArea = document.getElementById('photo-area');
       const downloadBtn = document.getElementById('download-btn');
-      const printBtn = document.getElementById('print-btn');
+      const downloadPdfBtn = document.getElementById('download-pdf-btn');
       const aiBtn = document.getElementById('ai-btn');
       const resetBtn = document.getElementById('reset-btn');
       const commendEl = document.getElementById('commendation');
@@ -335,6 +338,60 @@
         const suffix = (regInput.value || '').toUpperCase().trim();
         certReg.textContent = suffix ? 'DDKA-2026-' + suffix : 'DDKA-2026-____';
         certDate.textContent = dateInput.value || 'DATE';
+      }
+
+      // Auto-fill from query parameters when opened from admin panel
+      function applyQueryParams(){
+        try {
+          if (!window.location.search) {
+            updateFields();
+            return;
+          }
+
+          const params = new URLSearchParams(window.location.search);
+          const qpName = params.get('name');
+          const qpFather = params.get('father');
+          const qpReg = params.get('regSuffix') || params.get('reg');
+          const qpDate = params.get('date');
+          const qpGrade = params.get('grade');
+          const qpPhoto = params.get('photoUrl');
+
+          if (qpName) nameInput.value = qpName;
+          if (qpFather) fatherInput.value = qpFather;
+          if (qpReg) {
+            regInput.value = qpReg.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,4);
+          }
+          if (qpDate) {
+            dateInput.value = qpDate;
+          }
+
+          // Apply photo from a URL if provided
+          if (qpPhoto) {
+            const imgThumb = document.createElement('img');
+            imgThumb.src = qpPhoto;
+            imgThumb.style.width='100%';
+            imgThumb.style.height='100%';
+            imgThumb.style.objectFit='cover';
+            photoThumb.innerHTML = '';
+            photoThumb.appendChild(imgThumb);
+
+            const imgMain = document.createElement('img');
+            imgMain.src = qpPhoto;
+            imgMain.style.width='100%';
+            imgMain.style.height='100%';
+            imgMain.style.objectFit='cover';
+            photoArea.innerHTML = '';
+            photoArea.appendChild(imgMain);
+          }
+
+          // Grade is applied after grade helpers are wired up
+          window.__ddkaInitialGrade = qpGrade ? qpGrade.toUpperCase() : '';
+
+          updateFields();
+        } catch (e) {
+          console.error('Failed to apply query params to certificate:', e);
+          updateFields();
+        }
       }
 
       // Input bindings
@@ -400,30 +457,30 @@
         downloadBtn.disabled=false; downloadBtn.textContent='⬇️ Download PNG';
       });
 
-      // Download high-resolution PDF (preserves colors)
-      const downloadPdfBtn = document.getElementById('download-pdf-btn');
+      // Download high-resolution PDF directly (no print preview)
       if (downloadPdfBtn) {
         downloadPdfBtn.addEventListener('click', async ()=>{
           downloadPdfBtn.disabled = true; downloadPdfBtn.textContent = 'Rendering PDF...';
           try{
-            // increase pixelRatio for higher resolution (4 or 6 if you need bigger file)
-            const dataUrl = await window.htmlToImage.toPng(cert, {cacheBust:true, pixelRatio:4, backgroundColor:'#ffffff'});
+            // Generate high-res image for A4 landscape
+            const rect = cert.getBoundingClientRect();
+            const targetWidthPx = 1920; // aim for ~Full HD width
+            const pixelRatio = Math.max(1, Math.ceil(targetWidthPx / rect.width));
+            const dataUrl = await window.htmlToImage.toPng(cert, {cacheBust:true, pixelRatio, backgroundColor:'#ffffff'});
+
+            const img = new Image();
+            img.src = dataUrl;
+            await img.decode();
+
             const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF('landscape','pt','a4');
-            const pageWidth = pdf.internal.pageSize.getWidth();
-            const pageHeight = pdf.internal.pageSize.getHeight();
-            pdf.addImage(dataUrl, 'PNG', 0, 0, pageWidth, pageHeight);
+            // Fit to exact image size so the PDF has no extra margins
+            const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [img.width, img.height] });
+            pdf.addImage(img, 'PNG', 0, 0, img.width, img.height);
             pdf.save('DDKA-Certificate-'+(nameInput.value||'candidate').replace(/\s+/g,'-')+'.pdf');
           }catch(err){ alert('Could not create PDF. Try downloading PNG then converting to PDF.'); console.error(err); }
           downloadPdfBtn.disabled=false; downloadPdfBtn.textContent='📄 Download PDF';
         });
       }
-
-      printBtn.addEventListener('click', ()=>{
-        const proceed = confirm('Printing may produce grayscale output depending on printer settings. For best color preservation, use the "📄 Download PDF" button. Proceed to print?');
-        if (!proceed) return;
-        window.print();
-      });
 
       // Reset
       resetBtn.addEventListener('click', ()=>{
@@ -481,8 +538,14 @@
         else { setGrade(''); }
       });
 
-      // Init
-      updateFields();
+      // Init: apply URL data (name, reg, photo, grade)
+      applyQueryParams();
+
+      // If an initial grade was provided via query, apply it now
+      if (window.__ddkaInitialGrade && ['A','B','C'].includes(window.__ddkaInitialGrade)){
+        gradeSelect.value = window.__ddkaInitialGrade;
+        setGrade(window.__ddkaInitialGrade);
+      }
     })();
   </script>
 </body>

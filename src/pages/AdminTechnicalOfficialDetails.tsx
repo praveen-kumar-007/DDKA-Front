@@ -23,7 +23,12 @@ interface TechnicalOfficial {
   photoUrl: string;
   status: 'Pending' | 'Approved' | 'Rejected';
   remarks?: string;
+  grade?: 'A' | 'B' | 'C' | '';
   createdAt: string;
+}
+
+interface AdminPermissions {
+  canDelete?: boolean;
 }
 
 const AdminTechnicalOfficialDetails: React.FC = () => {
@@ -32,10 +37,27 @@ const AdminTechnicalOfficialDetails: React.FC = () => {
   const [official, setOfficial] = useState<TechnicalOfficial | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [grade, setGrade] = useState<string>('');
+  const [savingGrade, setSavingGrade] = useState<boolean>(false);
+   const [adminRole, setAdminRole] = useState<string | null>(null);
+   const [adminPermissions, setAdminPermissions] = useState<AdminPermissions | null>(null);
+   const [deleting, setDeleting] = useState<boolean>(false);
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   useEffect(() => {
+    // Load admin role & permissions for delete access control
+    const storedRole = localStorage.getItem('adminRole');
+    const permsRaw = localStorage.getItem('adminPermissions');
+    setAdminRole(storedRole);
+    if (permsRaw) {
+      try {
+        setAdminPermissions(JSON.parse(permsRaw));
+      } catch (e) {
+        console.error('Failed to parse adminPermissions', e);
+      }
+    }
+
     const fetchOfficial = async () => {
       if (!id) return;
       setLoading(true);
@@ -54,6 +76,7 @@ const AdminTechnicalOfficialDetails: React.FC = () => {
         }
 
         setOfficial(data.data);
+        setGrade(data.data.grade || '');
       } catch (err: any) {
         console.error('Error fetching technical official details:', err);
         setError(err.message || 'Failed to fetch technical official details');
@@ -64,6 +87,8 @@ const AdminTechnicalOfficialDetails: React.FC = () => {
 
     fetchOfficial();
   }, [API_URL, id]);
+
+  const canDelete = adminRole === 'superadmin' && !!adminPermissions?.canDelete;
 
   const badgeColor = (status: TechnicalOfficial['status']) => {
     if (status === 'Approved') return 'bg-green-100 text-green-800';
@@ -122,9 +147,11 @@ const AdminTechnicalOfficialDetails: React.FC = () => {
               <p className="text-xs text-blue-100">Review complete profile and application info</p>
             </div>
           </div>
-          <span className={`inline-flex px-3 py-1 rounded-full text-xs font-bold ${badgeColor(official.status)}`}>
-            {official.status}
-          </span>
+          <div className="flex items-center gap-3">
+            <span className={`inline-flex px-3 py-1 rounded-full text-xs font-bold ${badgeColor(official.status)}`}>
+              {official.status}
+            </span>
+          </div>
         </div>
 
         <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -240,9 +267,139 @@ const AdminTechnicalOfficialDetails: React.FC = () => {
               </div>
             </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+              <div>
+                <p className="text-xs font-semibold text-slate-500 uppercase">Registration Number</p>
+                <p className="text-sm text-slate-900 font-mono">
+                  {official._id && official.grade
+                    ? `DDKA-2026-${official._id.slice(-4).toUpperCase()}`
+                    : 'DDKA-2026-____'}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-slate-500 uppercase mb-1">Grade (Admin)</p>
+                <div className="flex items-center gap-3">
+                  <select
+                    value={grade}
+                    onChange={(e) => setGrade(e.target.value)}
+                    className="px-3 py-2 border border-slate-200 rounded-lg text-sm"
+                  >
+                    <option value="">Select grade</option>
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                    <option value="C">C</option>
+                  </select>
+                  <button
+                    type="button"
+                    disabled={savingGrade || !official._id}
+                    onClick={async () => {
+                      if (!official?._id) return;
+                      setSavingGrade(true);
+                      try {
+                        const response = await fetch(`${API_URL}/api/technical-officials/${official._id}`, {
+                          method: 'PUT',
+                          headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+                          },
+                          body: JSON.stringify({ grade: grade || null })
+                        });
+                        const data = await response.json();
+                        if (!response.ok || !data.success) {
+                          throw new Error(data.message || 'Failed to update grade');
+                        }
+                        setOfficial(data.data);
+                        setGrade(data.data.grade || '');
+                        alert('Grade updated successfully.');
+                      } catch (err: any) {
+                        console.error('Error updating grade:', err);
+                        alert(err.message || 'Failed to update grade');
+                      } finally {
+                        setSavingGrade(false);
+                      }
+                    }}
+                    className="px-3 py-2 rounded-lg bg-blue-900 text-white text-xs font-semibold hover:bg-blue-800 disabled:opacity-60"
+                  >
+                    {savingGrade ? 'Saving...' : 'Save Grade'}
+                  </button>
+                </div>
+                <p className="text-[11px] text-slate-500 mt-1">Grade will appear on the Technical Official certificate.</p>
+              </div>
+            </div>
+
             <div>
               <p className="text-xs font-semibold text-slate-500 uppercase">Admin Remarks</p>
               <p className="text-sm text-slate-900 min-h-[2.5rem]">{official.remarks || 'No remarks added yet.'}</p>
+            </div>
+
+            <div className="mt-4 flex items-center justify-between">
+              {canDelete && (
+                <button
+                  type="button"
+                  disabled={deleting}
+                  onClick={async () => {
+                    if (!official?._id) return;
+                    const confirmed = window.confirm('Delete certificate details (grade & registration number) for this Technical Official? The application record will remain.');
+                    if (!confirmed) return;
+                    setDeleting(true);
+                    try {
+                      const response = await fetch(`${API_URL}/api/technical-officials/${official._id}`, {
+                        method: 'PUT',
+                        headers: {
+                          'Content-Type': 'application/json',
+                          'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+                        },
+                        body: JSON.stringify({ grade: null })
+                      });
+                      const data = await response.json();
+                      if (!response.ok || !data.success) {
+                        throw new Error(data.message || 'Failed to delete certificate details');
+                      }
+                      setOfficial(data.data);
+                      setGrade('');
+                      alert('Certificate details deleted. You can set grade again later if needed.');
+                    } catch (err: any) {
+                      console.error('Error deleting certificate details:', err);
+                      alert(err.message || 'Failed to delete certificate details');
+                    } finally {
+                      setDeleting(false);
+                    }
+                  }}
+                  className="px-4 py-2 rounded-full bg-red-100 text-red-700 text-xs font-bold uppercase tracking-widest hover:bg-red-200 disabled:opacity-60"
+                  title="Delete only certificate details (grade & registration) for this Technical Official"
+                >
+                  {deleting ? 'Deleting...' : 'Delete Certificate'}
+                </button>
+              )}
+              <button
+                type="button"
+                disabled={official.status !== 'Approved' || !official.grade}
+                onClick={() => {
+                  if (!official) return;
+                  if (!official.grade) return;
+                  const suffix = (official._id || '').slice(-4).toUpperCase();
+                  const params = new URLSearchParams();
+                  params.set('name', official.candidateName);
+                  params.set('father', official.parentName);
+                  if (suffix && official.grade) params.set('regSuffix', suffix);
+                  const createdDate = official.createdAt ? new Date(official.createdAt) : null;
+                  if (createdDate && !Number.isNaN(createdDate.getTime())) {
+                    params.set('date', createdDate.toISOString().slice(0, 10));
+                  }
+                  if (official.grade) params.set('grade', official.grade);
+                  if (official.photoUrl) params.set('photoUrl', official.photoUrl);
+                  const url = `/important-docs/official-certificate.html?${params.toString()}`;
+                  window.open(url, '_blank', 'noopener,noreferrer');
+                }}
+                className="px-4 py-2 rounded-full bg-emerald-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-emerald-700 disabled:bg-slate-300 disabled:text-slate-600"
+                title={official.status !== 'Approved'
+                  ? 'Certificate available only after approval'
+                  : !official.grade
+                    ? 'Set a grade to generate certificate'
+                    : 'Open Technical Official certificate'}
+              >
+                View / Download Certificate
+              </button>
             </div>
           </div>
         </div>

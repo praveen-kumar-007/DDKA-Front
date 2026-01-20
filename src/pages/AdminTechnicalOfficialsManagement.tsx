@@ -23,6 +23,7 @@ interface TechnicalOfficial {
   photoUrl: string;
   status: 'Pending' | 'Approved' | 'Rejected';
   remarks?: string;
+  grade?: 'A' | 'B' | 'C' | '';
   createdAt: string;
 }
 
