@@ -89,15 +89,13 @@ export const About: React.FC<AboutProps> = ({ lang }) => {
         hi: [
           'पद: मीडिया प्रभारी, धनबाद जिला कबड्डी एसोसिएशन',
           'शिक्षा: बी.टेक (CSE, AI/ML स्पेशलाइज़ेशन)',
-          'परिचय: समर्पित विद्यार्थी एवं कबड्डी प्रेमी',
-          'उपलब्धि: राज्य स्तर के कबड्डी खिलाड़ी',
+          'परिचय: समर्पित विद्यार्थी, कबड्डी प्रेमी एवं राज्य स्तर के खिलाड़ी',
           'यह वेबसाइट प्रवीण कुमार द्वारा निर्मित और अनुरक्षित है।'
         ],
         en: [
           'Designation: Media Incharge, Dhanbad District Kabaddi Association',
           'Education: B.Tech (CSE, AI/ML Specialisation)',
-          'Profile: Dedicated student and passionate Kabaddi promoter',
-          'Achievement: State-level Kabaddi player',
+          'Profile: Dedicated student and passionate Kabaddi promoter & State-level Kabaddi player',
           'Website: Made and maintained by Praveen Kumar'
         ]
       }
