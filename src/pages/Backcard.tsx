@@ -89,13 +89,13 @@ export const IDCardBack: React.FC<Props> = ({ data }) => {
       {/* Main Content */}
       <div
         style={{
-          padding: '8px 10px',
+          padding: '6px 8px',
           flexGrow: 1,
           display: 'flex',
           flexDirection: 'column',
-          fontSize: '8.5px',
+          fontSize: '8px',
           color: '#333',
-          lineHeight: 1.25,
+          lineHeight: 1.2,
         }}
       >
         <h4
@@ -137,25 +137,25 @@ export const IDCardBack: React.FC<Props> = ({ data }) => {
         <div
           style={{
             textAlign: 'center',
-            margin: '4px 0',
+            margin: '2px 0',
           }}
         >
           <img
             src={qrUrl}
             alt="QR Code"
             style={{
-              width: '65px',
-              height: '65px',
-              border: '1.5px solid #004A99',
+              width: '60px',
+              height: '60px',
+              border: '1.2px solid #004A99',
               borderRadius: '2.5px',
-              margin: '0 auto 3.5px auto',
+              margin: '0 auto 2px auto',
               display: 'block',
               backgroundColor: '#fff',
             }}
           />
           <p
             style={{
-              fontSize: '8px',
+              fontSize: '7.2px',
               fontWeight: 500,
               color: '#003366',
               margin: 0,
@@ -168,87 +168,96 @@ export const IDCardBack: React.FC<Props> = ({ data }) => {
         {/* Issuing Info */}
         <div
           style={{
-            fontSize: '8px',
+            fontSize: '6.2px',
             textAlign: 'center',
-            margin: '4px 0 2px 0',
-            paddingTop: '5px',
+            margin: '2px 0 0 0',
+            paddingTop: '3px',
             borderTop: '1px dashed #004A99',
             color: '#444',
+            lineHeight: 1.05,
           }}
         >
-          <p style={{ margin: 0 }}>
+          <p title={'+91 9123163206'} style={{ margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>
             <strong style={{ color: '#003366' }}>Phone:</strong> +91 9123163206
           </p>
-          <p style={{ margin: 0 }}>
+          <p title={'dhanbaddistrictkabaddi@gmail.com'} style={{ margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>
             <strong style={{ color: '#003366' }}>Email:</strong> dhanbaddistrictkabaddi@gmail.com
           </p>
         </div>
 
         <div
           style={{
-            fontSize: '8px',
+            fontSize: '6.2px',
             textAlign: 'center',
             margin: '2px 0 4px 0',
             color: '#444',
-            wordWrap: 'break-word',
-            lineHeight: 1.2,
+            lineHeight: 1.05,
           }}
         >
-          <p style={{ margin: 0 }}>
+          <p title={'Retired Rly Colony, Gomoh, Dhanbad, Jharkhand 828401'} style={{ margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>
               <strong style={{ color: '#003366' }}>Address:</strong> Retired Rly Colony, Gomoh, Dhanbad, Jharkhand 828401
             </p>
         </div>
 
-        {/* Secretary Signature */}
+        {/* Signatures: Secretary & Coach */}
         <div
           style={{
             marginTop: '10px',
             marginBottom: '2px',
-            textAlign: 'left',
-            fontSize: '7.4px',
-            color: '#444',
-            minHeight: '18px',
+            display: 'flex',
+            gap: '10px',
+            justifyContent: 'space-between',
+            alignItems: 'flex-end',
           }}
         >
-          <div
-            style={{
-              borderTop: '0.6px solid #999',
-              width: '70%',
-              margin: '0 auto 2px auto',
-            }}
-          />
-          <p
-            style={{
-              margin: 0,
-              textAlign: 'center',
-              fontWeight: 500,
-              letterSpacing: '0.2px',
-            }}
-          >
-            Secretary Signature
-          </p>
+          <div style={{ width: '48%', textAlign: 'center', fontSize: '7.4px', color: '#444' }}>
+            <img
+              src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1768749991/Mintoo_Thakur_Sign_cg8gxm.png"
+              alt="Secretary Signature"
+              style={{ width: '80%', maxHeight: '26px', objectFit: 'contain', display: 'block', margin: '0 auto 6px auto' }}
+            />
+            <div style={{ borderTop: '0.6px solid #999', width: '70%', margin: '0 auto 4px auto' }} />
+            <p style={{ margin: 0, fontWeight: 500, letterSpacing: '0.2px' }}>
+              Mintoo Thakur
+              <br />
+              <span style={{ fontSize: '6px', fontWeight: 400 }}>Secretary</span>
+            </p>
+          </div>
+
+          <div style={{ width: '48%', textAlign: 'center', fontSize: '7.4px', color: '#444' }}>
+            <img
+              src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1768749926/Pappu_Kumar_Yadav_Sign_bj2xlm.png"
+              alt="Coach Signature"
+              style={{ width: '80%', maxHeight: '26px', objectFit: 'contain', display: 'block', margin: '0 auto 6px auto' }}
+            />
+            <div style={{ borderTop: '0.6px solid #999', width: '70%', margin: '0 auto 4px auto' }} />
+            <p style={{ margin: 0, fontWeight: 500, letterSpacing: '0.2px' }}>
+              Pappu Kumar Yadav
+              <br />
+              <span style={{ fontSize: '6px', fontWeight: 400 }}>Coach</span>
+            </p>
+          </div>
         </div>
 
         {/* Membership & Contact Info - right below signature (orange line) */}
         <div
           style={{
-            fontSize: '7.4px',
+            fontSize: '6.4px',
             textAlign: 'center',
             color: '#555',
             marginTop: '4px',
             paddingTop: '2px',
             borderTop: '1px solid #FF8F00',
-            lineHeight: 1.2,
-            wordWrap: 'break-word',
+            lineHeight: 1.02,
           }}
         >
-          <p style={{ margin: 0 }}>
+          <p title={data.name} style={{ margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>
             <strong style={{ color: '#003366' }}>Member Name:</strong> {data.name}
           </p>
-          <p style={{ margin: 0 }}>
+          <p title={data.idNo} style={{ margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>
             <strong style={{ color: '#003366' }}>ID No:</strong> {data.idNo}
           </p>
-          <p style={{ margin: 0 }}>If found, please return to DDKA office.</p>
+          <p style={{ margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>If found, please return to DDKA office.</p>
         </div>
       </div>
 

@@ -172,50 +172,11 @@ export const IDCardFront: React.FC<Props> = ({ data }) => {
           <span style={{ fontWeight: 600, color: '#333', fontSize: '8px' }}>Phone:</span>
           <span style={{ fontWeight: 500, color: '#111', fontSize: '8.5px' }}>{data.phone}</span>
 
-          <span
-            style={{
-              gridColumn: '1 / -1',
-              fontWeight: 600,
-              color: '#333',
-              fontSize: '8px',
-              marginTop: '2.5px',
-            }}
-          >
-            Address:
-          </span>
-          <span
-            style={{
-              gridColumn: '1 / -1',
-              fontWeight: 500,
-              color: '#111',
-              fontSize: '8px',
-              lineHeight: 1.2,
-            }}
-          >
-            {data.address}
-          </span>
+          <span style={{ fontWeight: 600, color: '#333', fontSize: '8px', marginTop: '2.5px' }}>Address:</span>
+          <span style={{ fontWeight: 500, color: '#111', fontSize: '8px', lineHeight: 1.2 }}>{data.address}</span>
 
-          <span
-            style={{
-              gridColumn: '1 / -1',
-              fontWeight: 600,
-              color: '#333',
-              fontSize: '8px',
-              marginTop: '2.5px',
-            }}
-          >
-            Father:
-          </span>
-          <span
-            style={{
-              gridColumn: '1 / -1',
-              fontWeight: 500,
-              color: '#111',
-              fontSize: '8px',
-            }}
-          >
-            {data.fathersName}
-          </span>
+          <span style={{ fontWeight: 600, color: '#333', fontSize: '8px', marginTop: '2.5px' }}>Father:</span>
+          <span style={{ fontWeight: 500, color: '#111', fontSize: '8px' }}>{data.fathersName}</span>
         </div>
       </div>
 
