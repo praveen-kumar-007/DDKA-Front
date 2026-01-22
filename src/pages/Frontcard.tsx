@@ -35,6 +35,23 @@ export const IDCardFront: React.FC<Props> = ({ data }) => {
         fontFamily: "'Poppins', sans-serif",
       }}
     >
+      {/* Watermark (larger, still subtle) */}
+      <img
+        src="https://res.cloudinary.com/dmmll82la/image/upload/v1766683651/ddka-logo_ywnhyh.png"
+        alt="DDKA Watermark"
+        style={{
+          position: 'absolute',
+          left: '50%',
+          top: '50%',
+          transform: 'translate(-50%, 10%)', // slightly lower
+          width: '140px',                 // larger footprint
+          height: 'auto',
+          opacity: 0.07,                  // subtle but noticeable
+          zIndex: 0,
+          pointerEvents: 'none',
+        }}
+      />
+
       {/* Top Header - Deep Blue with DDKA Logo */}
       <div
         style={{
@@ -85,7 +102,7 @@ export const IDCardFront: React.FC<Props> = ({ data }) => {
         </div>
       </div>
 
-      {/* Photo - Centered Circular Image */}
+      {/* Photo - Centered Circular Image with decorative circle behind */}
       <div
         style={{
           marginTop: '0px',
@@ -96,6 +113,7 @@ export const IDCardFront: React.FC<Props> = ({ data }) => {
           zIndex: 2,
         }}
       >
+  
         <img
           src={data.photoUrl}
           alt={data.name}
@@ -107,6 +125,8 @@ export const IDCardFront: React.FC<Props> = ({ data }) => {
             borderRadius: '50%',
             boxShadow: '0 3px 9px rgba(0, 0, 0, 0.12)',
             backgroundColor: '#e0e0e0',
+            position: 'relative',
+            zIndex: 2,
           }}
         />
       </div>
@@ -114,7 +134,8 @@ export const IDCardFront: React.FC<Props> = ({ data }) => {
       {/* Details Section */}
       <div
         style={{
-          padding: '7px 11px 9px 11px',
+          padding: '6px 11px 80px 11px', // extra bottom padding so bottom bar is visible and content is nudged up
+          boxSizing: 'border-box',
           textAlign: 'center',
           flexGrow: 1,
           display: 'flex',
@@ -127,7 +148,7 @@ export const IDCardFront: React.FC<Props> = ({ data }) => {
             fontWeight: 700,
             color: '#003366',
             marginBottom: '1px',
-            marginTop: '2px',
+            marginTop: '0px',
           }}
         >
           {data.name}
@@ -137,7 +158,7 @@ export const IDCardFront: React.FC<Props> = ({ data }) => {
             fontSize: '8.5px',
             fontWeight: 600,
             color: '#FF6F00',
-            marginBottom: '8px',
+            marginBottom: '4px',
             textTransform: 'uppercase',
             letterSpacing: '0.35px',
           }}
@@ -145,20 +166,23 @@ export const IDCardFront: React.FC<Props> = ({ data }) => {
           {data.memberRole ? data.memberRole : 'DDKA MEMBER'}
         </p>
 
+        {/* ID - emphasized and doubled size */}
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '0px', marginBottom: '2px' }}>
+          <div style={{ color: '#003366', fontWeight: 600, fontSize: '10px', letterSpacing: '0.6px' }}>{data.idNo}</div>
+        </div>
+
         {/* Detail Grid - aligned labels and values */}
         <div
           style={{
             display: 'grid',
             gridTemplateColumns: '58px 1fr',
-            gap: '3.5px 5px',
+            gap: '4px 6px',
             textAlign: 'left',
             fontSize: '8.5px',
-            marginTop: 'auto',
+            marginTop: '2px',
             lineHeight: 1.25,
           }}
         >
-          <span style={{ fontWeight: 600, color: '#333', fontSize: '8px' }}>ID:</span>
-          <span style={{ fontWeight: 600, color: '#003366', fontSize: '8.5px' }}>{data.idNo}</span>
 
           <span style={{ fontWeight: 600, color: '#333', fontSize: '8px' }}>DOB:</span>
           <span style={{ fontWeight: 500, color: '#111', fontSize: '8.5px' }}>{formatDOB(data.dob)}</span>
@@ -180,14 +204,26 @@ export const IDCardFront: React.FC<Props> = ({ data }) => {
         </div>
       </div>
 
-      {/* Bottom Bar - Orange Accent */}
+      {/* Bottom Bar - Blue Accent with centered slogan */}
       <div
         style={{
-          height: '5px',
-          background: 'linear-gradient(135deg, #FF8F00, #FF6F00)',
-          marginTop: 'auto',
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: '22px',
+          background: 'linear-gradient(135deg, #003366, #00579B)',
+          borderBottomLeftRadius: '16px',
+          borderBottomRightRadius: '16px',
+          zIndex: 20,
+          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
         }}
-      />
+      >
+        <div style={{ color: '#ffffff', fontSize: '10px', fontWeight: 600, pointerEvents: 'none' }}>मिट्टी का खेल, देश का खेल, कबड्डी अपना खेल</div>
+      </div>
     </div>
   );
 };

@@ -16,8 +16,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onPageChange, lang, onLang
   const t = translations[lang];
 
   const navItems = [
-    { name: t.nav.home, id: 'home' },
-    { 
+    { name: t.nav.home, id: 'home' },    { name: lang === 'hi' ? 'लॉगिन' : 'Login', id: 'login' },    { 
       name: t.nav.about, 
       id: 'about', 
       dropdown: [

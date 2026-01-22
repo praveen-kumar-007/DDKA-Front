@@ -26,6 +26,23 @@ export const IDCardBack: React.FC<Props> = ({ data }) => {
         fontFamily: "'Poppins', sans-serif",
       }}
     >
+      {/* Watermark (larger, still subtle) */}
+      <img
+        src="https://res.cloudinary.com/dmmll82la/image/upload/v1766683651/ddka-logo_ywnhyh.png"
+        alt="DDKA Watermark"
+        style={{
+          position: 'absolute',
+          left: '50%',
+          top: '50%',
+          transform: 'translate(-50%, 10%)',
+          width: '140px',
+          height: 'auto',
+          opacity: 0.07,
+          zIndex: 0,
+          pointerEvents: 'none',
+        }}
+      />
+
       {/* Top Header - Deep Blue with Logos and Text */}
       <div
         style={{
@@ -36,6 +53,8 @@ export const IDCardBack: React.FC<Props> = ({ data }) => {
           alignItems: 'center',
           justifyContent: 'space-between',
           gap: '6px',
+          position: 'relative',
+          zIndex: 2,
         }}
       >
         <img
@@ -89,7 +108,8 @@ export const IDCardBack: React.FC<Props> = ({ data }) => {
       {/* Main Content */}
       <div
         style={{
-          padding: '6px 8px',
+          padding: '6px 8px 96px 8px', // increased bottom padding to move content higher further
+          boxSizing: 'border-box',
           flexGrow: 1,
           display: 'flex',
           flexDirection: 'column',
@@ -103,7 +123,7 @@ export const IDCardBack: React.FC<Props> = ({ data }) => {
             fontSize: '9.5px',
             fontWeight: 600,
             color: '#003366',
-            marginBottom: '3.5px',
+            marginBottom: '1px',
             textAlign: 'center',
           }}
         >
@@ -112,7 +132,7 @@ export const IDCardBack: React.FC<Props> = ({ data }) => {
         <p
           style={{
             textAlign: 'center',
-            marginBottom: '5px',
+            marginBottom: '2px',
             fontSize: '8px',
             lineHeight: 1.2,
             color: '#444',
@@ -137,7 +157,7 @@ export const IDCardBack: React.FC<Props> = ({ data }) => {
         <div
           style={{
             textAlign: 'center',
-            margin: '2px 0',
+            margin: '0 0 4px 0',
           }}
         >
           <img
@@ -148,7 +168,7 @@ export const IDCardBack: React.FC<Props> = ({ data }) => {
               height: '60px',
               border: '1.2px solid #004A99',
               borderRadius: '2.5px',
-              margin: '0 auto 2px auto',
+              margin: '0 auto 6px auto',
               display: 'block',
               backgroundColor: '#fff',
             }}
@@ -245,7 +265,7 @@ export const IDCardBack: React.FC<Props> = ({ data }) => {
             fontSize: '6.4px',
             textAlign: 'center',
             color: '#555',
-            marginTop: '4px',
+            marginTop: '2px',
             paddingTop: '2px',
             borderTop: '1px solid #FF8F00',
             lineHeight: 1.02,
@@ -254,20 +274,33 @@ export const IDCardBack: React.FC<Props> = ({ data }) => {
           <p title={data.name} style={{ margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>
             <strong style={{ color: '#003366' }}>Member Name:</strong> {data.name}
           </p>
-          <p title={data.idNo} style={{ margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>
-            <strong style={{ color: '#003366' }}>ID No:</strong> {data.idNo}
-          </p>
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 6 }}>
+            <div style={{ color: '#003366', fontWeight: 500, fontSize: '4.5px' }}>{data.idNo}</div>
+          </div>
           <p style={{ margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>If found, please return to DDKA office.</p>
         </div>
       </div>
 
-      {/* Bottom Bar - Orange Accent */}
+      {/* Bottom Bar - Blue Accent with centered slogan */}
       <div
         style={{
-          height: '4.5px',
-          background: 'linear-gradient(135deg, #FF8F00, #FF6F00)',
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: '22px',
+          background: 'linear-gradient(135deg, #003366, #00579B)',
+          borderBottomLeftRadius: '16px',
+          borderBottomRightRadius: '16px',
+          zIndex: 20,
+          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
         }}
-      />
+      >
+        <div style={{ color: '#ffffff', fontSize: '10px', fontWeight: 600, pointerEvents: 'none' }}>मिट्टी का खेल, देश का खेल, कबड्डी अपना खेल</div>
+      </div>
     </div>
   );
 };

@@ -21,6 +21,8 @@ import AdminDashboard from './pages/AdminDashboard';
 import AdminInstitutionDetails from './pages/AdminInstitutionDetails';
 import AdminLogin from './pages/AdminLogin';
 import AdminSignup from './pages/AdminSignup';
+import PublicLogin from './pages/PublicLogin';
+import Account from './pages/Account';
 import AdminRegistrationDetails from './pages/AdminRegistrationDetails';
 import PlayerIDCardPage from './pages/PlayerIDCardPage';
 import AdminGalleryUpload from './pages/AdminGalleryUpload';
@@ -135,6 +137,10 @@ const App: React.FC = () => {
             )
           } />
           <Route path="/admin-secure-setup-dkka2024" element={<AdminSignup />} />
+
+          {/* Public Member Login */}
+          <Route path="/login" element={<PublicLogin />} />
+          <Route path="/account" element={<Account />} />
           
           <Route path="/register" element={
             <>
