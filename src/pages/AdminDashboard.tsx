@@ -182,7 +182,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
         body: JSON.stringify({ id, status: newStatus }),
       });
       if (response.ok) {
+        const resJson = await response.json();
         fetchData();
+        if (resJson.emailSent) {
+          alert('Approval email sent to the player');
+        }
       } else {
         const errData = await response.json();
         alert(errData.message || "Error updating status");
