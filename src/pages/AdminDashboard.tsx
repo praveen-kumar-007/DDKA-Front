@@ -167,7 +167,75 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
     };
 
     fetchMe();
+
+
   }, [API_URL]);
+
+  // Toggle component: fetch & update settings (superadmin only)
+  const ToggleShowIDs: React.FC = () => {
+    const [loadingSetting, setLoadingSetting] = useState(false);
+    const [showIds, setShowIds] = useState<boolean | null>(null);
+
+    useEffect(() => {
+      const load = async () => {
+        setLoadingSetting(true);
+        try {
+          const token = localStorage.getItem('token');
+          const res = await fetch(`${API_URL}/api/settings`, { headers: { Authorization: `Bearer ${token}` } });
+          const json = await res.json();
+          if (json && json.success && typeof json.data?.showIdsToUsers === 'boolean') {
+            setShowIds(json.data.showIdsToUsers);
+          } else {
+            setShowIds(true);
+          }
+        } catch (err) {
+          console.error('Failed to load setting', err);
+          setShowIds(true);
+        } finally {
+          setLoadingSetting(false);
+        }
+      };
+      load();
+    }, []);
+
+    const toggle = async () => {
+      if (showIds === null) return;
+      try {
+        setLoadingSetting(true);
+        const token = localStorage.getItem('token');
+        const res = await fetch(`${API_URL}/api/settings`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ showIdsToUsers: !showIds })
+        });
+        if (!res.ok) {
+          const err = await res.json();
+          alert(err.message || 'Failed to update setting');
+          return;
+        }
+        setShowIds(!showIds);
+        alert('Updated setting successfully');
+      } catch (err) {
+        console.error(err);
+        alert('Failed to update setting');
+      } finally {
+        setLoadingSetting(false);
+      }
+    };
+
+    return (
+      <div className="flex items-center gap-3" title={showIds ? 'ID numbers/cards are visible to users' : 'ID numbers/cards are hidden from users'}>
+        <div className="text-xs font-semibold">IDs:</div>
+        <button
+          onClick={toggle}
+          disabled={loadingSetting}
+          className={`px-3 py-1 rounded-full text-sm font-semibold ${showIds ? 'bg-green-600 text-white shadow' : 'bg-slate-100 text-slate-700 border'}`}
+        >
+          {loadingSetting ? '...' : (showIds ? 'ON' : 'OFF')}
+        </button>
+      </div>
+    );
+  };
 
   const updateStatus = async (id: string, newStatus: 'Pending' | 'Approved' | 'Rejected') => {
     try {
@@ -266,11 +334,15 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
               <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
               Admin Portal • Team DDKA (Build with Passion ❤️)
             </p>
-            {adminRole && (
-              <p className="mt-1 text-xs font-bold uppercase tracking-widest text-blue-700">
-                Admin Type: {adminRole === 'superadmin' ? 'SUPERADMIN' : 'ADMIN'}
-              </p>
-            )}
+            <div className="flex items-center gap-4">
+              {adminRole && (
+                <p className="mt-1 text-xs font-bold uppercase tracking-widest text-blue-700">
+                  Admin: {adminRole === 'superadmin' ? 'SUPERADMIN' : 'ADMIN'}
+                </p>
+              )}
+              {/* compact toggle placed next to admin info (superadmin only) */}
+              {adminRole === 'superadmin' && <ToggleShowIDs />}
+            </div>
           </div>
           <button 
             onClick={handleLogout}
@@ -416,6 +488,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
             />
             <span className="font-bold text-xs">Referee Board</span>
           </button>
+
+
 
           {/* Technical Officials - requires canAccessTechnicalOfficials */}
           <button

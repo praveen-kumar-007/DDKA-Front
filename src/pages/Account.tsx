@@ -3,11 +3,26 @@ import { IDCardFront } from './Frontcard';
 import { IDCardBack } from './Backcard';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-
 const Account: React.FC = () => {
   const [profile, setProfile] = useState<any>(null);
   const [role, setRole] = useState<string | null>(null);
   const [error, setError] = useState('');
+  const [showIdsToUsers, setShowIdsToUsers] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/settings/public`);
+        const json = await res.json();
+        if (json && json.success && typeof json.data?.showIdsToUsers === 'boolean') {
+          setShowIdsToUsers(json.data.showIdsToUsers);
+        }
+      } catch (e) {
+        console.error('Failed to fetch public settings', e);
+      }
+    };
+    fetchSettings();
+  }, [API_URL]);
 
   useEffect(() => {
     const token = localStorage.getItem('userToken');
@@ -190,9 +205,15 @@ const Account: React.FC = () => {
                       <div><strong>Name:</strong> {profile.fullName || profile.candidateName || profile.instName || '—'}</div>
                       <div><strong>Email:</strong> {profile.email || '—'}</div>
                       <div><strong>Status:</strong> {profile.status || '—'}</div>
-                      {profile.idNo && (
+                      {profile.idNo && showIdsToUsers && (
                         <div className="flex items-center gap-3">
                           <div><strong>Player ID:</strong> <span className="text-slate-700">{profile.idNo}</span></div>
+                        </div>
+                      )}
+
+                      {!showIdsToUsers && profile.idNo && (
+                        <div className="flex items-center gap-3">
+                          <div className="text-sm text-yellow-700">ID is currently hidden by the association.</div>
                         </div>
                       )}
                       {profile.regNo && <div><strong>Reg. No:</strong> {profile.regNo}</div>}
@@ -262,7 +283,7 @@ const Account: React.FC = () => {
               </div>
 
               {/* ID Card card */}
-              {profile.idNo && (
+{profile.idNo && showIdsToUsers && (
                 <div className="bg-white rounded-2xl shadow-md border border-slate-100 p-6">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold">Your ID Card</h3>
@@ -301,6 +322,12 @@ const Account: React.FC = () => {
                       }} />
                     </div>
                   </div>
+                </div>
+              )}
+
+              {!showIdsToUsers && profile.idNo && (
+                <div className="bg-yellow-50 rounded-2xl border border-yellow-200 p-4 text-sm text-yellow-800">
+                  ID visibility is currently disabled by the association. Your profile details are retained but the ID number and ID card are hidden from users.
                 </div>
               )}
 
