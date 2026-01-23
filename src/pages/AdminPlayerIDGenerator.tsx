@@ -5,6 +5,9 @@ import { IDCardFront } from './Frontcard';
 import { IDCardBack } from './Backcard';
 import type { IDCardData } from '../types';
 
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
+
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 interface PlayerData {
@@ -93,22 +96,7 @@ const AdminPlayerIDGenerator = () => {
     const element = document.getElementById(`card-${player._id}`);
     if (!element) return;
 
-    const canvas = document.createElement('canvas');
-    canvas.width = 240;
-    canvas.height = 760; // Front + Back
-    const ctx = canvas.getContext('2d');
-    
-    if (!ctx) return;
-
-    // White background
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // For demo, we'll use html2canvas or similar library
-    // For now, alert user about browser download
-    alert(`ID Card for ${player.fullName} is ready to download.\n\nPlease use Print to PDF feature for high-quality output.`);
-    
-    // Trigger print dialog
+    // Current fallback: open print dialog for quick PDF
     const printWindow = window.open('', '', 'height=600,width=800');
     if (printWindow) {
       const cardHTML = element.innerHTML;
@@ -132,6 +120,105 @@ const AdminPlayerIDGenerator = () => {
         </html>
       `);
       printWindow.document.close();
+    }
+  };
+
+  const downloadIDCardPDF = async (player: PlayerData) => {
+    try {
+      // Capture the preview wrapper which contains both front & back
+      const wrapper = document.getElementById(`card-both-${player._id}`);
+      if (!wrapper) return alert('Could not find ID card elements to export.');
+
+      // Prefer capturing only the actual card elements (front & back) to avoid extra headings/spacing
+      const frontEl = document.getElementById(`card-front-${player._id}`);
+      const backEl = document.getElementById(`card-back-${player._id}`);
+      if (!frontEl || !backEl) return alert('Could not find ID card elements to export.');
+
+      const container = document.createElement('div');
+      container.style.display = 'flex';
+      container.style.gap = '12px';
+      container.style.background = '#ffffff';
+      container.style.padding = '0';
+      container.style.margin = '0';
+      container.style.alignItems = 'center';
+      container.style.justifyContent = 'center';
+      // exact pixel sizing: two cards side-by-side
+      const cardW = 210;
+      const cardH = 330;
+      container.style.width = `${cardW * 2 + 12}px`;
+      container.style.height = `${cardH}px`;
+
+      const frontClone = frontEl.cloneNode(true) as HTMLElement;
+      const backClone = backEl.cloneNode(true) as HTMLElement;
+      frontClone.style.margin = '0';
+      backClone.style.margin = '0';
+      container.appendChild(frontClone);
+      container.appendChild(backClone);
+
+      document.body.appendChild(container);
+
+      const canvas = await html2canvas(container, { scale: 3, useCORS: true, backgroundColor: '#ffffff' });
+      const imgData = canvas.toDataURL('image/png');
+
+      const pdf = new jsPDF({ unit: 'px', format: [canvas.width, canvas.height] });
+      pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+
+      const filename = `${player.fullName.replace(/\s+/g, '_')}_ID_${(player.idNo || ('DDKA-' + player.transactionId.slice(-6).toUpperCase()))}.pdf`;
+      pdf.save(filename);
+
+      document.body.removeChild(container);
+    } catch (err) {
+      console.error(err);
+      alert('Failed to generate PDF. Please try again.');
+    }
+  };
+
+  const downloadIDCardImage = async (player: PlayerData) => {
+    try {
+      const wrapper = document.getElementById(`card-both-${player._id}`);
+      if (!wrapper) return alert('Could not find ID card elements to export.');
+
+      const frontEl = document.getElementById(`card-front-${player._id}`);
+      const backEl = document.getElementById(`card-back-${player._id}`);
+      if (!frontEl || !backEl) return alert('Could not find ID card elements to export.');
+
+      const container = document.createElement('div');
+      container.style.display = 'flex';
+      container.style.gap = '12px';
+      container.style.background = '#ffffff';
+      container.style.padding = '0';
+      container.style.margin = '0';
+      container.style.alignItems = 'center';
+      container.style.justifyContent = 'center';
+      const cardW = 210;
+      const cardH = 330;
+      container.style.width = `${cardW * 2 + 12}px`;
+      container.style.height = `${cardH}px`;
+
+      const frontClone = frontEl.cloneNode(true) as HTMLElement;
+      const backClone = backEl.cloneNode(true) as HTMLElement;
+      frontClone.style.margin = '0';
+      backClone.style.margin = '0';
+      container.appendChild(frontClone);
+      container.appendChild(backClone);
+
+      document.body.appendChild(container);
+
+      const canvas = await html2canvas(container, { scale: 3, useCORS: true, backgroundColor: '#ffffff' });
+      const dataUrl = canvas.toDataURL('image/png');
+
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      const filename = `${player.fullName.replace(/\s+/g, '_')}_ID_${(player.idNo || ('DDKA-' + player.transactionId.slice(-6).toUpperCase()))}.png`;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      document.body.removeChild(container);
+    } catch (err) {
+      console.error(err);
+      alert('Failed to download image. Please try again.');
     }
   };
 
@@ -240,7 +327,9 @@ const AdminPlayerIDGenerator = () => {
                   <Eye size={16} /> Preview
                 </button>
                 <button
-                  onClick={() => downloadIDCard(player)}
+                  onClick={async () => {
+                    await downloadIDCardImage(player);
+                  }}
                   className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded transition text-sm"
                 >
                   <Download size={16} /> Download
@@ -274,14 +363,18 @@ const AdminPlayerIDGenerator = () => {
               </button>
             </div>
 
-            <div className="p-8 flex gap-8 justify-center flex-wrap">
+            <div id={`card-both-${selectedPlayer._id}`} className="p-8 flex gap-8 justify-center flex-wrap" style={{ background: '#ffffff' }}>
               <div id={`card-${selectedPlayer._id}`}>
                 <h3 className="text-center font-bold text-slate-700 mb-4">Front</h3>
-                <IDCardFront data={convertToIDCardData(selectedPlayer)} />
+                <div id={`card-front-${selectedPlayer._id}`} style={{ width: '210px', height: '330px' }}>
+                  <IDCardFront data={convertToIDCardData(selectedPlayer)} />
+                </div>
               </div>
-              <div>
+              <div id={`card-back-wrapper-${selectedPlayer._id}`}>
                 <h3 className="text-center font-bold text-slate-700 mb-4">Back</h3>
-                <IDCardBack data={convertToIDCardData(selectedPlayer)} />
+                <div id={`card-back-${selectedPlayer._id}`} style={{ width: '210px', height: '330px' }}>
+                  <IDCardBack data={convertToIDCardData(selectedPlayer)} />
+                </div>
               </div>
             </div>
 
@@ -300,6 +393,26 @@ const AdminPlayerIDGenerator = () => {
                 className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded transition flex items-center gap-2"
               >
                 <Download size={18} /> Download ID Card
+              </button>
+
+              <button
+                onClick={async () => {
+                  await downloadIDCardPDF(selectedPlayer);
+                  setShowPreview(false);
+                }}
+                className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded transition flex items-center gap-2"
+              >
+                <Download size={18} /> Download PDF (Front & Back)
+              </button>
+
+              <button
+                onClick={async () => {
+                  await downloadIDCardImage(selectedPlayer);
+                  setShowPreview(false);
+                }}
+                className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded transition flex items-center gap-2"
+              >
+                <Download size={18} /> Download PNG (Direct)
               </button>
             </div>
           </div>

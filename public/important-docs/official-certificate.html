@@ -30,6 +30,11 @@
     /* Preview */
     .preview-wrap{flex:1;display:flex;justify-content:center;align-items:center;padding-top:12px;padding-bottom:12px}
 
+    /* Certificate frame that scales certificate proportionally to fit viewport while preserving layout */
+    .certificate-frame{width:1100px;height:780px;display:flex;align-items:flex-start;justify-content:center;overflow:hidden}
+    .certificate{transform-origin:top center;transform:scale(var(--scale,1));transition:transform .12s ease}
+    @media print{.certificate{transform:none !important}}
+
     /* Certificate styling: use column layout so signatures are part of flow */
     /* Responsive sizing: fit to viewport on small screens while keeping a consistent aspect ratio */
     .certificate{display:flex;flex-direction:column;width:min(1100px,96vw);max-width:1100px;height:auto;aspect-ratio:1100/780;background:#fff;color:#111;border-radius:14px;padding:32px;box-sizing:border-box;position:relative;overflow:hidden;border:10px solid #fff;box-shadow:0 40px 90px rgba(10,25,40,0.6)}
@@ -48,7 +53,7 @@
     .certificate .bottom-bar{position:absolute;bottom:0;left:0;width:100%;height:8px;background:linear-gradient(90deg,#0062FF,var(--accent3),var(--accent))}
 
     /* Main content wrapper: keep centered but do not overlap signatures */
-    .content{flex:1;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:10;padding-bottom:12px}
+    .content{flex:1;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:10;padding-bottom:4px}
     .content .center{margin-bottom:0}
 
     /* Soft color slashes */
@@ -85,9 +90,9 @@
     /* Smaller watermark on narrow screens */
     @media (max-width:780px){.photo::after{width:32px;height:32px;right:6px;bottom:6px;opacity:0.14} .photo::before{left:-28px;bottom:-6px;width:88px;height:88px;opacity:0.08}}
 
-    .center{text-align:center;margin-top:22px}
-    .name-row{display:flex;flex-direction:column;align-items:center;gap:10px}
-    h1.name{font-size:48px;margin:12px 0;color:#111}
+    .center{text-align:center;margin-top:12px}
+    .name-row{display:flex;flex-direction:column;align-items:center;gap:6px}
+    h1.name{font-size:48px;margin:6px 0;color:#111}
 
     /* Grade badge shown on certificate */
     .grade-wrap{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:2px}
@@ -130,10 +135,10 @@
       .info{flex-direction:column;gap:10px}
       .chip{min-width:100%;min-height:80px}
 
-      /* Signature area adjustments */
-      .signatures{height:140px;margin-top:-10px}
-      .signatures .sig img{max-height:88px}
-      .signatures .sig:nth-child(1) img{max-height:120px}
+      /* Signature area adjustments (mobile) */
+      .signatures{height:160px;margin-top:-6px}
+      .signatures .sig img{max-height:82px}
+      .signatures .sig:nth-child(1) img{max-height:110px}
     }
 
     /* Short info (Affiliation / Registration / Recognition) - concise */
@@ -143,18 +148,19 @@
     .short-info strong{display:block;font-weight:800;color:#0f1724;font-size:12px;letter-spacing:0.06em}
     .short-info .muted{color:#475569;font-size:12px;font-weight:700;margin-top:0}
 
-    .signatures{height:110px;display:flex;z-index:12;border-bottom-left-radius:10px;border-bottom-right-radius:10px;overflow:hidden}
-    .sig{flex:1;padding:12px 16px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end}
-    .sig .who{font-weight:800;text-transform:uppercase}
+    .signatures{height:120px;display:flex;z-index:12;border-bottom-left-radius:10px;border-bottom-right-radius:10px;overflow:visible}
+    .sig{flex:1;padding:8px 12px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end}
+    .sig .who{font-weight:800;text-transform:uppercase;margin-top:4px;font-size:13px}
 
     /* Per-signature gradient accents */
     .signatures .sig:nth-child(1){background:linear-gradient(180deg,#0062FF,#00D1C7)}
     .signatures .sig:nth-child(2){background:linear-gradient(180deg,#00D1C7,#00D15E)}
     .signatures .sig:nth-child(3){background:linear-gradient(180deg,#00D15E,#B6D13A)}
-    /* Larger, more visible signatures */
-    .signatures .sig img{max-height:72px;max-width:90%;transition:transform .18s ease, opacity .18s ease}
-    /* Make the first signature slightly larger (≈1.3×) and nudge it up so it sits above the name */
-    .signatures .sig:nth-child(1) img{max-height:96px;max-width:92%;transform:translateY(-8px);margin-bottom:8px;z-index:8}     
+    /* Reduced signature sizes so names & designations are visible */
+    .signatures .sig img{max-height:68px;max-width:92%;transition:transform .18s ease, opacity .18s ease;display:block;margin-bottom:2px}
+    .signatures .sig:nth-child(1) img{max-height:86px;max-width:94%;transform:translateY(-4px);margin-bottom:2px;z-index:8}
+    .signatures .sig:nth-child(2) img{max-height:72px;margin-bottom:2px}
+    .signatures .sig:nth-child(3) img{max-height:72px;margin-bottom:2px}
 
     .commend{margin-top:12px;padding:12px;border-left:4px solid rgba(0,209,94,0.2);background:rgba(0,209,94,0.05);border-radius:6px}
 
@@ -224,71 +230,72 @@
     </aside>
 
     <div class="preview-wrap">
-      <div id="certificate" class="certificate">
-        <div class="top-bar"></div>
-        <div class="bottom-bar"></div>
-        <div class="logo-watermark" aria-hidden="true"></div>
-        <div class="logo-watermark-large" aria-hidden="true"></div>
-        <div class="color-slash slash-1"></div>
-        <div class="color-slash slash-2"></div>
-        <div class="content">
-        <div class="header">
-          <div class="logo">
-            <div class="badge"><img id="logo-img" src="https://res.cloudinary.com/dmmll82la/image/upload/v1766683651/ddka-logo_ywnhyh.png" alt="DDKA" style="width:100%;height:100%;object-fit:contain" /></div>
-            <div>
-              <div class="hindi-line">मिट्टी का खेल, देश का खेल, कबड्डी अपना खेल</div>
-              <div class="title">Dhanbad District Kabaddi Association</div>
-              <div class="header-meta">
-                <div class="meta-line">Affiliated To - JHARKHAND STATE KABADDI ASSOCIATION <span class="sep">|</span> Registered with 1860 Govt. of Jharkhand</div>
-                <div class="meta-line">Recognition - Affiliated for - A.K.F.I. &amp; Jharkhand Olympic Association</div>
-              </div>
-              <div style="display:flex;gap:8px;margin-top:8px;justify-content:center;align-items:center">
-                <img src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1767429051/WhatsApp_Image_2026-01-03_at_1.57.17_PM_qg7rs3.jpg" alt="JSKA" style="height:60px;object-fit:contain;border-radius:6px" />
-                <img src="https://res.cloudinary.com/dmmll82la/image/upload/v1766683651/akfi-logo_sydpx7.png" alt="AKFI" style="height:65px;object-fit:contain;border-radius:6px" />
+      <div class="certificate-frame">
+        <div id="certificate" class="certificate">
+          <div class="top-bar"></div>
+          <div class="bottom-bar"></div>
+          <div class="logo-watermark" aria-hidden="true"></div>
+          <div class="logo-watermark-large" aria-hidden="true"></div>
+          <div class="color-slash slash-1"></div>
+          <div class="color-slash slash-2"></div>
+          <div class="content">
+          <div class="header">
+            <div class="logo">
+              <div class="badge"><img id="logo-img" src="https://res.cloudinary.com/dmmll82la/image/upload/v1766683651/ddka-logo_ywnhyh.png" alt="DDKA" style="width:100%;height:100%;object-fit:contain" /></div>
+              <div>
+                <div class="hindi-line">मिट्टी का खेल, देश का खेल, कबड्डी अपना खेल</div>
+                <div class="title">Dhanbad District Kabaddi Association</div>
+                <div class="header-meta">
+                  <div class="meta-line">Affiliated To - JHARKHAND STATE KABADDI ASSOCIATION <span class="sep">|</span> Registered with 1860 Govt. of Jharkhand</div>
+                  <div class="meta-line">Recognition - Affiliated for - A.K.F.I. &amp; Jharkhand Olympic Association</div>
+                </div>
+                <div style="display:flex;gap:8px;margin-top:8px;justify-content:center;align-items:center">
+                  <img src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1767429051/WhatsApp_Image_2026-01-03_at_1.57.17_PM_qg7rs3.jpg" alt="JSKA" style="height:60px;object-fit:contain;border-radius:6px" />
+                  <img src="https://res.cloudinary.com/dmmll82la/image/upload/v1766683651/akfi-logo_sydpx7.png" alt="AKFI" style="height:65px;object-fit:contain;border-radius:6px" />
+                </div>
               </div>
             </div>
-          </div>
-          <div id="photo-area" class="photo">Referee Photo</div>
-        </div>
-
-        <div class="center">
-          <div style="display:inline-block;padding:12px 40px;background:#111;color:#fff;border-radius:999px;transform:skewX(-12deg);margin-top:18px"><span style="display:inline-block;transform:skewX(12deg);font-weight:900;font-size:24px;letter-spacing:2px">District Referee Certificate 2026</span></div>
-
-          <div style="margin-top:18px;color:#6b7280;font-weight:800;letter-spacing:2px">This document verifies the qualification of</div>
-          <div class="name-row">
-            <div class="name-box"><h1 id="cert-name" class="name">John Doe</h1></div>
+            <div id="photo-area" class="photo">Referee Photo</div>
           </div>
 
-          <div class="info">
-            <div class="chip">
-              <div style="font-size:10px;color:#7b7f86;font-weight:800;letter-spacing:2px">Parent Identity</div>
-              <div style="font-weight:700" id="cert-father">Parent Name</div>
+          <div class="center">
+            <div style="display:inline-block;padding:12px 40px;background:#111;color:#fff;border-radius:999px;transform:skewX(-12deg);margin-top:18px"><span style="display:inline-block;transform:skewX(12deg);font-weight:900;font-size:24px;letter-spacing:2px">District Referee Certificate 2026</span></div>
+
+            <div style="margin-top:18px;color:#6b7280;font-weight:800;letter-spacing:2px">This document verifies the qualification of</div>
+            <div class="name-row">
+              <div class="name-box"><h1 id="cert-name" class="name">John Doe</h1></div>
             </div>
-            <div class="chip">
-              <div style="font-size:10px;color:#7b7f86;font-weight:800;letter-spacing:2px">Grade</div>
-              <div id="chip-grade"><span id="chip-grade-badge" class="grade-badge" style="display:none"></span><span id="chip-grade-label" class="grade-label" style="display:none"></span></div>
-            </div>
-            <div class="chip">
-              <div style="font-size:10px;color:#7b7f86;font-weight:800;letter-spacing:2px">Official ID</div>
-              <div style="font-weight:700;font-family:monospace" id="cert-reg">REG-0001</div>
-            </div>
-          </div> 
 
-          <div id="cert-body" style="color:#4b5563;max-width:780px;margin:0 auto">who has qualified the <strong style="color:var(--accent2)">District Kabaddi Referee Examination 2026</strong>. Held on <span id="cert-date">2026-01-18</span> at SP Kabaddi Group Dhanbad, authorized by the Governing Body of Dhanbad District Kabaddi Association.</div>
+            <div class="info">
+              <div class="chip">
+                <div style="font-size:10px;color:#7b7f86;font-weight:800;letter-spacing:2px">Parent Identity</div>
+                <div style="font-weight:700" id="cert-father">Parent Name</div>
+              </div>
+              <div class="chip">
+                <div style="font-size:10px;color:#7b7f86;font-weight:800;letter-spacing:2px">Grade</div>
+                <div id="chip-grade"><span id="chip-grade-badge" class="grade-badge" style="display:none"></span><span id="chip-grade-label" class="grade-label" style="display:none"></span></div>
+              </div>
+              <div class="chip">
+                <div style="font-size:10px;color:#7b7f86;font-weight:800;letter-spacing:2px">Official ID</div>
+                <div style="font-weight:700;font-family:monospace" id="cert-reg">REG-0001</div>
+              </div>
+            </div> 
+
+            <div id="cert-body" style="color:#4b5563;max-width:780px;margin:0 auto">who has qualified the <strong style="color:var(--accent2)">District Kabaddi Referee Examination 2026</strong>. Held on <span id="cert-date">2026-01-18</span> at SP Kabaddi Group Dhanbad, authorized by the Governing Body of Dhanbad District Kabaddi Association.</div>
 
 
 
-          <div id="commendation" class="commend" style="display:none;margin-top:12px"></div>
-        </div>
-        </div>
+            <div id="commendation" class="commend" style="display:none;margin-top:12px"></div>
+          </div>
+          </div>
 
-        <div class="signatures">
-          <div class="sig"><div style="min-height:45px" id="sig-img-0"><img src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1768747850/Tilak_Ram_Sahu_srluua.png" alt="Tilak sign" style="max-height:96px;max-width:92%;object-fit:contain;"/></div><div class="who">Tilak Ram Sahu</div><div style="font-size:12px;color:#6b7280">Chief Examiner (Referee Board JSKA)</div></div>
-          <div class="sig"><div style="min-height:45px" id="sig-img-1"><img src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1768747850/Mintoo_Thakur_Sign_cg8gxm.png" alt="Mintoo sign" style="max-height:72px;max-width:90%;object-fit:contain;"/></div><div class="who">Mintoo Thakur (NIS)</div><div style="font-size:12px;color:#6b7280">Association Secretary(DDKA)</div></div>
-          <div class="sig"><div style="min-height:45px" id="sig-img-2"><img src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1768747850/Pappu_Kumar_Yadav_Sign_bj2xlm.png" alt="Pappu sign" style="max-height:72px;max-width:90%;object-fit:contain;"/></div><div class="who">Pappu Kumar Yadav</div><div style="font-size:12px;color:#6b7280">Chairman Refree Board(DDKA)</div></div>
+          <div class="signatures">
+            <div class="sig"><div style="min-height:45px" id="sig-img-0"><img src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1768747850/Tilak_Ram_Sahu_srluua.png" alt="Tilak sign" style="max-height:96px;max-width:92%;object-fit:contain;"/></div><div class="who">Tilak Ram Sahu</div><div style="font-size:12px;color:#6b7280">Chief Examiner (Referee Board JSKA)</div></div>
+            <div class="sig"><div style="min-height:45px" id="sig-img-1"><img src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1768747850/Mintoo_Thakur_Sign_cg8gxm.png" alt="Mintoo sign" style="max-height:72px;max-width:90%;object-fit:contain;"/></div><div class="who">Mintoo Thakur (NIS)</div><div style="font-size:12px;color:#6b7280">Association Secretary(DDKA)</div></div>
+            <div class="sig"><div style="min-height:45px" id="sig-img-2"><img src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1768747850/Pappu_Kumar_Yadav_Sign_bj2xlm.png" alt="Pappu sign" style="max-height:72px;max-width:90%;object-fit:contain;"/></div><div class="who">Pappu Kumar Yadav</div><div style="font-size:12px;color:#6b7280">Chairman Refree Board(DDKA)</div></div>
+          </div>
         </div>
       </div>
-    </div>
   </div>
 
   <script src="https://unpkg.com/html-to-image@1.11.11/dist/html-to-image.js"></script>
@@ -313,6 +320,24 @@
       const resetBtn = document.getElementById('reset-btn');
       const commendEl = document.getElementById('commendation');
       const cert = document.getElementById('certificate');
+      const certFrame = document.querySelector('.certificate-frame');
+
+      function fitCertificate(){
+        try{
+          const padding = 24; // keep small page margin
+          const maxW = Math.max(320, window.innerWidth - padding);
+          const maxH = Math.max(320, window.innerHeight - padding - 80);
+          const scale = Math.min(maxW / 1100, maxH / 780, 1);
+          certFrame.style.setProperty('--scale', scale);
+          // set the frame size to match the scaled certificate so it occupies available width on small screens
+          certFrame.style.width = `${1100 * scale}px`;
+          certFrame.style.height = `${780 * scale}px`;
+        }catch(e){console.error('fitCertificate failed', e)}
+      }
+
+      window.addEventListener('resize', fitCertificate);
+      // call later after DOM updates
+      setTimeout(fitCertificate, 60);
 
       const sigInputs = Array.from(document.querySelectorAll('.sig-input'));
       const sigRemoves = Array.from(document.querySelectorAll('.small-btn'));
@@ -451,8 +476,16 @@
       downloadBtn.addEventListener('click', async ()=>{
         downloadBtn.disabled = true; downloadBtn.textContent = 'Rendering...';
         try{
+          // temporarily disable scaling for export to get full-resolution original
+          const prevScale = getComputedStyle(certFrame).getPropertyValue('--scale') || '1';
+          certFrame.style.setProperty('--scale', '1');
+          await new Promise(r => setTimeout(r, 80));
+
           const dataUrl = await window.htmlToImage.toPng(cert, {cacheBust:true, pixelRatio:3, backgroundColor:'#ffffff'});
           const a=document.createElement('a'); a.href=dataUrl; a.download = 'DDKA-Certificate-'+(nameInput.value||'candidate').replace(/\s+/g,'-')+'.png'; a.click();
+
+          // restore scale
+          certFrame.style.setProperty('--scale', prevScale);
         }catch(err){ alert('Could not generate PNG. Try Print.'); console.error(err); }
         downloadBtn.disabled=false; downloadBtn.textContent='⬇️ Download PNG';
       });
@@ -462,7 +495,12 @@
         downloadPdfBtn.addEventListener('click', async ()=>{
           downloadPdfBtn.disabled = true; downloadPdfBtn.textContent = 'Rendering PDF...';
           try{
-            // Generate high-res image for A4 landscape
+            // temporarily disable scaling to capture full original resolution
+            const prevScale = getComputedStyle(certFrame).getPropertyValue('--scale') || '1';
+            certFrame.style.setProperty('--scale', '1');
+            await new Promise(r => setTimeout(r, 80));
+
+            // Generate high-res image for PDF using html-to-image
             const rect = cert.getBoundingClientRect();
             const targetWidthPx = 1920; // aim for ~Full HD width
             const pixelRatio = Math.max(1, Math.ceil(targetWidthPx / rect.width));
@@ -477,6 +515,9 @@
             const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [img.width, img.height] });
             pdf.addImage(img, 'PNG', 0, 0, img.width, img.height);
             pdf.save('DDKA-Certificate-'+(nameInput.value||'candidate').replace(/\s+/g,'-')+'.pdf');
+
+            // restore scale
+            certFrame.style.setProperty('--scale', prevScale);
           }catch(err){ alert('Could not create PDF. Try downloading PNG then converting to PDF.'); console.error(err); }
           downloadPdfBtn.disabled=false; downloadPdfBtn.textContent='📄 Download PDF';
         });

@@ -219,42 +219,28 @@ export const IDCardBack: React.FC<Props> = ({ data }) => {
             </p>
         </div>
 
-        {/* Signatures: Secretary & Coach */}
+        {/* Signature: Secretary (slightly raised) */}
         <div
           style={{
-            marginTop: '10px',
+            marginTop: '6px',
             marginBottom: '2px',
             display: 'flex',
-            gap: '10px',
-            justifyContent: 'space-between',
+            justifyContent: 'center',
             alignItems: 'flex-end',
+            transform: 'translateY(-4px)',
           }}
         >
-          <div style={{ width: '48%', textAlign: 'center', fontSize: '7.4px', color: '#444' }}>
+          <div style={{ width: '70%', textAlign: 'center', fontSize: '7.4px', color: '#444' }}>
             <img
               src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1768749991/Mintoo_Thakur_Sign_cg8gxm.png"
               alt="Secretary Signature"
-              style={{ width: '80%', maxHeight: '26px', objectFit: 'contain', display: 'block', margin: '0 auto 6px auto' }}
+              style={{ width: '70%', maxHeight: '30px', objectFit: 'contain', display: 'block', margin: '0 auto 4px auto' }}
             />
-            <div style={{ borderTop: '0.6px solid #999', width: '70%', margin: '0 auto 4px auto' }} />
+            <div style={{ borderTop: '0.6px solid #999', width: '50%', margin: '0 auto 4px auto' }} />
             <p style={{ margin: 0, fontWeight: 500, letterSpacing: '0.2px' }}>
               Mintoo Thakur
               <br />
               <span style={{ fontSize: '6px', fontWeight: 400 }}>Secretary</span>
-            </p>
-          </div>
-
-          <div style={{ width: '48%', textAlign: 'center', fontSize: '7.4px', color: '#444' }}>
-            <img
-              src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1768749926/Pappu_Kumar_Yadav_Sign_bj2xlm.png"
-              alt="Coach Signature"
-              style={{ width: '80%', maxHeight: '26px', objectFit: 'contain', display: 'block', margin: '0 auto 6px auto' }}
-            />
-            <div style={{ borderTop: '0.6px solid #999', width: '70%', margin: '0 auto 4px auto' }} />
-            <p style={{ margin: 0, fontWeight: 500, letterSpacing: '0.2px' }}>
-              Pappu Kumar Yadav
-              <br />
-              <span style={{ fontSize: '6px', fontWeight: 400 }}>Coach</span>
             </p>
           </div>
         </div>
@@ -274,8 +260,8 @@ export const IDCardBack: React.FC<Props> = ({ data }) => {
           <p title={data.name} style={{ margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>
             <strong style={{ color: '#003366' }}>Member Name:</strong> {data.name}
           </p>
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 6 }}>
-            <div style={{ color: '#003366', fontWeight: 500, fontSize: '4.5px' }}>{data.idNo}</div>
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 2 }}>
+            <div style={{ color: '#003366', fontWeight: 700, fontSize: '8px', letterSpacing: '0.6px' }}>{data.idNo}</div>
           </div>
           <p style={{ margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>If found, please return to DDKA office.</p>
         </div>
