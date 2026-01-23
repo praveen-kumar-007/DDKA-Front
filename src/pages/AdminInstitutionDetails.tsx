@@ -113,8 +113,8 @@ const AdminInstitutionDetails = () => {
 
         {/* RIGHT COLUMN: Main Info */}
         <div className="flex flex-col gap-6 w-full">
-          {/* Back + Dashboard */}
-          <div className="mb-4 flex items-center justify-between">
+          {/* Back + Dashboard (sticky) */}
+          <div className="sticky top-6 z-30 bg-white/90 backdrop-blur-sm border border-slate-200 rounded-lg p-3 mb-4 flex items-center justify-between">
             <button
               onClick={() => navigate(-1)}
               className="flex items-center gap-2 text-blue-900 font-bold hover:underline w-fit"

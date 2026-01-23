@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { IDCardFront } from './Frontcard';
 import { IDCardBack } from './Backcard';
+import { formatDateMDY } from '../utils/date';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const Account: React.FC = () => {
@@ -76,9 +78,7 @@ const Account: React.FC = () => {
 
 
   const formatDate = (d: any) => {
-    if (!d) return '—';
-    const date = new Date(d);
-    return date.toLocaleDateString();
+    return formatDateMDY(d);
   };
 
   // Show institution logo in the profile slot when no photo is uploaded
@@ -86,10 +86,15 @@ const Account: React.FC = () => {
 
   return (
     <div className="py-12">
-      <div className="max-w-4xl mx-auto p-6 bg-white rounded-2xl shadow">
+      <div className="max-w-6xl mx-auto p-6 bg-white rounded-2xl shadow">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold">My Account</h2>
-          <button onClick={logout} className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">Logout</button>
+
+          <div className="flex items-center gap-3">
+            <a href="/admin" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm">GO TO DASHBOARD</a>
+
+            <button onClick={logout} className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">Logout</button>
+          </div>
         </div>
 
         {profile ? (
@@ -116,36 +121,38 @@ const Account: React.FC = () => {
               {role !== 'institution' && (
                 <div className="bg-white rounded-2xl shadow-md border border-slate-100 p-4">
                   <div className="flex items-center justify-between mb-3">
-                    <div className="text-sm font-semibold text-slate-700">Documents</div>
+                    <div className="text-sm font-semibold text-slate-700">Aadhar Card Documents</div>
                     <div className="text-xs text-slate-400">Click to view</div>
                   </div>
 
-                  <div className="space-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {role === 'player' && (
                       <>
                         {profile.aadharFrontUrl && (
-                          <div className="bg-white rounded-lg border p-4 flex items-center gap-4">
-                            <div className="flex-shrink-0 w-full max-w-[224px]">
-                              <a href={profile.aadharFrontUrl} target="_blank" rel="noreferrer" className="inline-block">
-                                <div className="h-40 w-full bg-slate-50 rounded border overflow-hidden flex items-center justify-center hover:shadow-md transition-shadow">
-                                  <img src={profile.aadharFrontUrl} alt="Aadhar Front" className="h-full w-full object-contain" />
-                                </div>
+                          <div className="bg-white rounded-lg border p-4">
+                            <div className="text-sm font-semibold mb-2">Aadhar Front</div>
+                            <div className="w-full max-w-[360px] mx-auto bg-slate-50 rounded border overflow-hidden flex items-center justify-center p-4 hover:shadow-md transition-shadow">
+                              <a href={profile.aadharFrontUrl} target="_blank" rel="noreferrer" className="inline-block w-full">
+                                <img src={profile.aadharFrontUrl} alt="Aadhar Front" className="mx-auto max-h-[360px] w-auto object-contain" />
                               </a>
                             </div>
-                            <div className="flex-1 text-sm text-slate-700"></div>
+                            <div className="mt-3 text-center">
+                              <a href={profile.aadharFrontUrl} download className="inline-flex items-center gap-2 text-sm bg-blue-50 text-blue-700 px-3 py-2 rounded">Download Front</a>
+                            </div>
                           </div>
                         )}
 
                         {profile.aadharBackUrl && (
-                          <div className="bg-white rounded-lg border p-4 flex items-center gap-4">
-                            <div className="flex-shrink-0 w-full max-w-[224px]">
-                              <a href={profile.aadharBackUrl} target="_blank" rel="noreferrer" className="inline-block">
-                                <div className="h-40 w-full bg-slate-50 rounded border overflow-hidden flex items-center justify-center hover:shadow-md transition-shadow">
-                                  <img src={profile.aadharBackUrl} alt="Aadhar Back" className="h-full w-full object-contain" />
-                                </div>
+                          <div className="bg-white rounded-lg border p-4">
+                            <div className="text-sm font-semibold mb-2">Aadhar Back</div>
+                            <div className="w-full max-w-[360px] mx-auto bg-slate-50 rounded border overflow-hidden flex items-center justify-center p-4 hover:shadow-md transition-shadow">
+                              <a href={profile.aadharBackUrl} target="_blank" rel="noreferrer" className="inline-block w-full">
+                                <img src={profile.aadharBackUrl} alt="Aadhar Back" className="mx-auto max-h-[360px] w-auto object-contain" />
                               </a>
                             </div>
-                            <div className="flex-1 text-sm text-slate-700"></div>
+                            <div className="mt-3 text-center">
+                              <a href={profile.aadharBackUrl} download className="inline-flex items-center gap-2 text-sm bg-purple-50 text-purple-700 px-3 py-2 rounded">Download Back Side</a>
+                            </div>
                           </div>
                         )}
                       </>
@@ -187,20 +194,30 @@ const Account: React.FC = () => {
 
             {/* RIGHT: Details Card */}
             <div className="md:col-span-2 flex flex-col gap-6">
+
               <div className="bg-white rounded-2xl shadow-md border border-slate-100 p-6">
                 <div className="flex items-start justify-between">
                   <div>
                     <h3 className="text-2xl font-bold mb-1">Profile Details</h3>
                     <div className="text-sm text-slate-500">All your account information and documents.</div>
+                    <div className="mt-3 text-xs text-slate-500">
+                      By using this account you agree to our{' '}
+                      <Link to="/terms-conditions" className="text-blue-600 underline">Terms &amp; Conditions</Link>{' '}
+                      and{' '}
+                      <Link to="/privacy-policy" className="text-blue-600 underline">Privacy Policy</Link>.
+                    </div>
                   </div>
                   <div className="text-right">
                     <div className="text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-semibold">{role}</div>
                   </div>
-                </div>
+                </div> 
 
                 <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <h4 className="text-lg font-semibold mb-2">Basic Info</h4>
+                    <h4 className="text-lg font-semibold mb-2 flex items-center gap-2 text-orange-600">
+                      <span className="inline-block w-2 h-2 bg-orange-500 rounded-full"></span>
+                      PERSONAL INFORMATION
+                    </h4>
                     <div className="space-y-2 text-sm text-slate-700">
                       <div><strong>Name:</strong> {profile.fullName || profile.candidateName || profile.instName || '—'}</div>
                       <div><strong>Email:</strong> {profile.email || '—'}</div>
@@ -221,7 +238,10 @@ const Account: React.FC = () => {
                   </div>
 
                   <div>
-                    <h4 className="text-lg font-semibold mb-2">Contact</h4>
+                    <h4 className="text-lg font-semibold mb-2 flex items-center gap-2 text-blue-600">
+                      <span className="inline-block w-2 h-2 bg-blue-500 rounded-full"></span>
+                      CONTACT & IDENTITY
+                    </h4>
                     <div className="space-y-2 text-sm text-slate-700">
                       {profile.phone && <div><strong>Phone:</strong> {profile.phone}</div>}
                       {profile.officePhone && <div><strong>Office Phone:</strong> {profile.officePhone}</div>}

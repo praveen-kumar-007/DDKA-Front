@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Download, User, Phone, Info, Building2, Wallet } from "lucide-react";
+import { formatDateMDY } from '../utils/date';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -207,6 +208,52 @@ const AdminRegistrationDetails = () => {
   // --- Layout: Two columns on desktop, stacked on mobile ---
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-100 to-blue-50 p-4 md:p-8">
+      <div className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-sm border-b border-slate-200">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+          <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-blue-900 font-bold hover:underline">
+            <ArrowLeft size={22} /> Back
+          </button>
+
+          <div className="flex gap-2">
+            {type === 'player' && data?.status === 'Approved' && (
+              <>
+                {data?.idNo ? (
+                  <button
+                    onClick={handleViewIdCard}
+                    className="px-4 py-2 rounded-full bg-green-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-green-700 transition-all flex items-center gap-2"
+                  >
+                    <Wallet size={16} /> View ID Card
+                  </button>
+                ) : (
+                  <button
+                    onClick={generateIdNo}
+                    className="px-4 py-2 rounded-full bg-green-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-green-700 transition-all flex items-center gap-2"
+                  >
+                    <Wallet size={16} /> Generate ID
+                  </button>
+                )}
+
+                {data?.idNo && adminRole === 'superadmin' && (
+                  <button
+                    onClick={handleDeleteId}
+                    className="px-4 py-2 rounded-full bg-red-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-red-700 transition-all"
+                  >
+                    Delete ID
+                  </button>
+                )}
+              </>
+            )}
+
+            <button
+              onClick={() => navigate('/admin-portal-access')}
+              className="px-4 py-2 rounded-full bg-blue-900 text-white text-xs font-bold uppercase tracking-widest hover:bg-blue-700 transition-all"
+            >
+              Go to Dashboard
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-12 items-start">
         {/* LEFT COLUMN: Photo & Documents */}
         <div className="flex flex-col gap-8 min-w-[320px]">
@@ -255,49 +302,7 @@ const AdminRegistrationDetails = () => {
 
         {/* RIGHT COLUMN: Main Info */}
         <div className="flex flex-col gap-6 w-full">
-          {/* Back & Dashboard Buttons */}
-          <div className="mb-2 flex items-center justify-between gap-2">
-            <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-blue-900 font-bold hover:underline">
-              <ArrowLeft size={22} /> Back
-            </button>
-            <div className="flex gap-2">
-              {type === 'player' && data?.status === 'Approved' && (
-                <>
-                  {data?.idNo ? (
-                    <button
-                      onClick={handleViewIdCard}
-                      className="px-4 py-2 rounded-full bg-green-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-green-700 transition-all flex items-center gap-2"
-                    >
-                      <Wallet size={16} /> View ID Card
-                    </button>
-                  ) : (
-                    <button
-                      onClick={generateIdNo}
-                      className="px-4 py-2 rounded-full bg-green-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-green-700 transition-all flex items-center gap-2"
-                    >
-                      <Wallet size={16} /> Generate ID
-                    </button>
-                  )}
-                  {data?.idNo && (
-                    adminRole === 'superadmin' && (
-                      <button
-                        onClick={handleDeleteId}
-                        className="px-4 py-2 rounded-full bg-red-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-red-700 transition-all"
-                      >
-                        Delete ID
-                      </button>
-                    )
-                  )}
-                </>
-              )}
-              <button
-                onClick={() => navigate('/admin-portal-access')}
-                className="px-4 py-2 rounded-full bg-blue-900 text-white text-xs font-bold uppercase tracking-widest hover:bg-blue-700 transition-all"
-              >
-                Go to Dashboard
-              </button>
-            </div>
-          </div>
+
 
           {/* Member Role & Custom ID controls for ID card */}
           {type === 'player' && data?.status === 'Approved' && showIdOptions && (
@@ -366,7 +371,7 @@ const AdminRegistrationDetails = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
                   <div><span className="font-semibold">Full Name:</span> {data.fullName}</div>
                   <div><span className="font-semibold">Father's Name:</span> {data.fathersName}</div>
-                  <div><span className="font-semibold">Date of Birth:</span> {new Date(data.dob).toLocaleDateString()}</div>
+                  <div><span className="font-semibold">Date of Birth:</span> {formatDateMDY(data.dob)}</div>
                   <div><span className="font-semibold">Gender:</span> {data.gender}</div>
                   <div><span className="font-semibold">Blood Group:</span> {data.bloodGroup}</div>
                   <div><span className="font-semibold">Aadhar Number:</span> {data.aadharNumber}</div>

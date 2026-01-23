@@ -224,16 +224,18 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
     };
 
     return (
-      <div className="flex items-center gap-3" title={showIds ? 'ID numbers/cards are visible to users' : 'ID numbers/cards are hidden from users'}>
-        <div className="text-xs font-semibold">IDs:</div>
-        <button
-          onClick={toggle}
-          disabled={loadingSetting}
-          className={`px-3 py-1 rounded-full text-sm font-semibold ${showIds ? 'bg-green-600 text-white shadow' : 'bg-slate-100 text-slate-700 border'}`}
-        >
-          {loadingSetting ? '...' : (showIds ? 'ON' : 'OFF')}
-        </button>
-      </div>
+      <button
+        onClick={toggle}
+        disabled={loadingSetting}
+        title={showIds ? 'ID numbers/cards are visible to users' : 'ID numbers/cards are hidden from users'}
+        aria-pressed={showIds === true}
+        className={`flex items-center gap-3 px-6 py-3 rounded-xl font-black shadow-sm border-2 transition-all active:scale-95 ${
+          loadingSetting ? 'opacity-60 cursor-not-allowed' : ''
+        } ${showIds ? 'bg-white text-green-600 border-green-50 hover:bg-green-600 hover:text-white' : 'bg-white text-slate-700 border-slate-50 hover:bg-slate-700 hover:text-white'}`}
+      >
+        {showIds ? <CheckCircle size={18} /> : <XCircle size={18} />}
+        <span>{loadingSetting ? '...' : `IDs: ${showIds ? 'ON' : 'OFF'}`}</span>
+      </button>
     );
   };
 
@@ -340,16 +342,18 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
                   Admin: {adminRole === 'superadmin' ? 'SUPERADMIN' : 'ADMIN'}
                 </p>
               )}
-              {/* compact toggle placed next to admin info (superadmin only) */}
-              {adminRole === 'superadmin' && <ToggleShowIDs />}
             </div>
           </div>
-          <button 
-            onClick={handleLogout}
-            className="flex items-center gap-2 bg-white text-red-600 px-6 py-3 rounded-xl font-black shadow-sm border-2 border-red-50 hover:bg-red-600 hover:text-white transition-all active:scale-95"
-          >
-            <LogOut size={18} /> LOGOUT
-          </button>
+          <div className="flex items-center gap-3">
+            {adminRole === 'superadmin' && <ToggleShowIDs />}
+
+            <button 
+              onClick={handleLogout}
+              className="flex items-center gap-2 bg-white text-red-600 px-6 py-3 rounded-xl font-black shadow-sm border-2 border-red-50 hover:bg-red-600 hover:text-white transition-all active:scale-95"
+            >
+              <LogOut size={18} /> LOGOUT
+            </button>
+          </div>
         </div>
 
         {/* Admin Management Panel */}

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, UserCheck } from 'lucide-react';
+import { formatDateMDY } from '../utils/date';
 
 interface TechnicalOfficial {
   _id: string;
@@ -124,7 +125,7 @@ const AdminTechnicalOfficialDetails: React.FC = () => {
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
-      <div className="flex items-center justify-between mb-4">
+      <div className="sticky top-6 z-30 bg-white/90 backdrop-blur-sm border border-slate-200 rounded-lg p-3 mb-4 flex items-center justify-between">
         <button
           onClick={() => navigate(-1)}
           className="inline-flex items-center gap-2 text-sm text-slate-700 hover:text-blue-900"
@@ -201,7 +202,7 @@ const AdminTechnicalOfficialDetails: React.FC = () => {
               </div>
               <div>
                 <p className="text-xs font-semibold text-slate-500 uppercase">Date of Birth</p>
-                <p className="text-sm text-slate-900">{official.dob ? new Date(official.dob).toLocaleDateString() : '-'}</p>
+                <p className="text-sm text-slate-900">{official.dob ? formatDateMDY(official.dob) : '-'}</p>
               </div>
               <div>
                 <p className="text-xs font-semibold text-slate-500 uppercase">Aadhar Number</p>
