@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Lock, User, ShieldCheck, ArrowRight, AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -110,15 +111,25 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
   }
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center bg-slate-50 px-4">
-      <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in zoom-in duration-500">
-        <div className="bg-blue-900 p-8 text-center text-white">
-          <a href="/" className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg rotate-3">
-            <img src="/logo.svg" alt="DDKA Logo" className="w-12 h-12 object-contain" />
-          </a>
-          <h2 className="text-3xl font-oswald font-bold uppercase tracking-tight">Admin Portal</h2>
-          <p className="text-blue-200 text-sm mt-1 uppercase tracking-widest font-bold">Secure Access</p>
-        </div>
+    <>
+      <Helmet>
+        <title>Admin Login | Dhanbad District Kabaddi Association (DDKA)</title>
+        <meta name="description" content="Admin login for DDKA portal. Authorized admins can sign in to manage registrations, news and gallery content." />
+        <meta name="robots" content="noindex, nofollow" />
+        <link rel="canonical" href="https://dhanbadkabaddiassociation.tech/admin-portal-access" />
+        <meta property="og:title" content="Admin Login | DDKA" />
+        <meta property="og:description" content="Secure admin access to manage DDKA registrations and content." />
+      </Helmet>
+
+      <div className="min-h-[80vh] flex items-center justify-center bg-slate-50 px-4">
+        <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in zoom-in duration-500">
+          <div className="bg-blue-900 p-8 text-center text-white">
+            <a href="/" className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg rotate-3">
+              <img src="/logo.svg" alt="DDKA Logo" className="w-12 h-12 object-contain" />
+            </a>
+            <h2 className="text-3xl font-oswald font-bold uppercase tracking-tight">Admin Portal</h2>
+            <p className="text-blue-200 text-sm mt-1 uppercase tracking-widest font-bold">Secure Access</p>
+          </div>
 
         <form onSubmit={handleLogin} className="p-8 space-y-6">
           {error && (
@@ -184,6 +195,7 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { User, Key, ArrowRight, AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -62,13 +63,26 @@ const PublicLogin: React.FC = () => {
 
 
   return (
-    <div className="min-h-[70vh] flex items-center justify-center bg-slate-50 px-4 py-12">
-      <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden">
-        <div className="bg-[#003366] p-6 text-center text-white">
-          <img src="https://res.cloudinary.com/dmmll82la/image/upload/v1766683651/ddka-logo_ywnhyh.png" alt="DDKA Logo" className="mx-auto mb-2 h-10 w-10 rounded-full bg-white p-1" />
-          <h2 className="text-2xl font-bold uppercase tracking-tight">Member Login</h2>
-          <p className="text-sm mt-1">Only approved candidates may login</p>
-        </div>
+    <>
+      <Helmet>
+        <title>Member Login | Dhanbad District Kabaddi Association (DDKA)</title>
+        <meta name="description" content="Member login for Dhanbad District Kabaddi Association (DDKA). Approved players, technical officials and institutions can log in using their registered email and mobile number." />
+        <meta name="keywords" content="DDKA login, kabaddi login, player login, institution login, kabaddi dhanbad login" />
+        <link rel="canonical" href="https://dhanbadkabaddiassociation.tech/login" />
+        <meta property="og:title" content="Member Login | Dhanbad District Kabaddi Association (DDKA)" />
+        <meta property="og:description" content="Login to access your DDKA account. Use registered email and mobile number to sign in." />
+        <meta property="og:url" content="https://dhanbadkabaddiassociation.tech/login" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary" />
+      </Helmet>
+
+      <div className="min-h-[70vh] flex items-center justify-center bg-slate-50 px-4 py-12">
+        <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden">
+          <div className="bg-[#003366] p-6 text-center text-white">
+            <img src="https://res.cloudinary.com/dmmll82la/image/upload/v1766683651/ddka-logo_ywnhyh.png" alt="DDKA Logo" className="mx-auto mb-2 h-10 w-10 rounded-full bg-white p-1" />
+            <h2 className="text-2xl font-bold uppercase tracking-tight">Member Login</h2>
+            <p className="text-sm mt-1">Only approved candidates may login</p>
+          </div>
 
         <form onSubmit={handleLogin} className="p-8 space-y-6">
           {error && (
@@ -141,6 +155,7 @@ const PublicLogin: React.FC = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
