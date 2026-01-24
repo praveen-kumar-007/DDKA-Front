@@ -176,9 +176,6 @@ const Donate: React.FC<{ lang?: 'en' | 'hi' }> = ({ lang = 'en' }) => {
 
               <div className="text-sm text-slate-600">
                 <p className="font-semibold">{lang === 'hi' ? 'UPI आईडी' : 'UPI ID'}: <span className="font-mono">9504904499@upi</span></p>
-                <p className="mt-1">{lang === 'hi' ? 'बैंक विवरण' : 'Bank Details'}:</p>
-                <p className="text-[13px] mt-1">Account: Dhanbad District Kabaddi Association</p>
-                <p className="text-[13px]">A/C No: 1234567890 | IFSC: ABCD0123456 | Bank: Example Bank</p>
               </div>
             </form>
           </div>
