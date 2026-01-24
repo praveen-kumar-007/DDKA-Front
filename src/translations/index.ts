@@ -2,7 +2,8 @@ export type Language = 'en' | 'hi';
 
 export const translations = {
   en: {
-    nav: { home: 'Home', about: 'About', gallery: 'Gallery', news: 'News', register: 'Registration', institution: 'Institution', affiliated: 'Affiliated', affiliatedInstitutions: 'Affiliated Institutions' },
+    nav: { home: 'Home', about: 'About', gallery: 'Gallery', news: 'News', register: 'Registration', institution: 'Institution', donate: 'Donate', affiliated: 'Affiliated', affiliatedInstitutions: 'Affiliated Institutions' },
+    donate: { title: 'Support DDKA', subtitle: 'Help us build grassroots kabaddi', upiId: '9504904499@upi', bankDetails: 'Account: DDKA | A/C No: 1234567890 | IFSC: ABCD0123456' },
     hero: { 
       badge: 'District League 2026', slogan: 'Sport of the Soil, Sport of the Nation, Kabaddi Our Sport', title: 'Le Panga,', subtitle: 'Dhanbad District!', 
       description: 'Promoting excellence in Kabaddi across Dhanbad district.',
@@ -51,7 +52,8 @@ export const translations = {
     }
   },
   hi: {
-    nav: { home: 'होम', about: 'हमारे बारे में', gallery: 'गैलरी', news: 'खबरें', register: 'पंजीकरण', institution: 'संस्थान', affiliated: 'संबद्ध', affiliatedInstitutions: 'संबद्ध संस्थान' },
+    nav: { home: 'होम', about: 'हमारे बारे में', gallery: 'गैलरी', news: 'खबरें', register: 'पंजीकरण', institution: 'संस्थान', donate: 'दान करें', affiliated: 'संबद्ध', affiliatedInstitutions: 'संबद्ध संस्थान' },
+    donate: { title: 'DDKA का समर्थन करें', subtitle: 'स्थानीय कबड्डी के विकास में मदद करें', upiId: '9504904499@upi', bankDetails: 'खाता: DDKA | A/C No: 1234567890 | IFSC: ABCD0123456' },
     hero: { 
       badge: 'जिला लीग 2026', slogan: 'मिट्टी का खेल, देश का खेल, कबड्डी अपना खेल', title: 'ले पंगा,', subtitle: 'धनबाद जिला!', 
       description: 'धनबाद जिले में कबड्डी में उत्कृष्टता को बढ़ावा देना।',

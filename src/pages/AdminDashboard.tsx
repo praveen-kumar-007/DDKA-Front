@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   CheckCircle, XCircle, Trash2, 
   Users, Building, RefreshCcw, Search, Eye,
-  LogOut, Newspaper, Image as ImageIcon, Mail, UserCheck
+  LogOut, Newspaper, Image as ImageIcon, Mail, UserCheck, Heart
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { Language } from '../translations';
@@ -20,6 +20,7 @@ interface AdminPermissions {
   canAccessTechnicalOfficials?: boolean;
   canAccessPlayerDetails?: boolean;
   canAccessInstitutionDetails?: boolean;
+  canAccessDonations?: boolean;
   canDelete?: boolean;
 }
 
@@ -493,7 +494,32 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
             <span className="font-bold text-xs">Referee Board</span>
           </button>
 
-
+          {/* Donations - requires canAccessDonations */}
+          <button
+            type="button"
+            onClick={() => {
+              if (adminRole === 'superadmin' || adminPermissions?.canAccessDonations) {
+                window.location.href = '/admin/donations';
+              } else {
+                alert('You do not have permission to manage donations. Please contact the superadmin.');
+              }
+            }}
+            className={`flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-[92px] ${
+              adminRole === 'superadmin' || adminPermissions?.canAccessDonations
+                ? 'bg-white hover:bg-slate-50 cursor-pointer'
+                : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+            }`}
+          >
+            <Heart
+              size={28}
+              className={`${
+                adminRole === 'superadmin' || adminPermissions?.canAccessDonations
+                  ? 'text-rose-700 mb-2'
+                  : 'text-slate-400 mb-2'
+              }`}
+            />
+            <span className="font-bold text-xs">Donations</span>
+          </button>
 
           {/* Technical Officials - requires canAccessTechnicalOfficials */}
           <button

@@ -29,8 +29,11 @@ import AdminGalleryUpload from './pages/AdminGalleryUpload';
 import AdminContact from './pages/AdminContact';
 import Contact from './pages/Contact';
 import OurGems from './pages/OurGems';
+import Donate from './pages/Donate';
 import AdminPlayersManagement from './pages/AdminPlayersManagement';
 import AdminRefereesManagement from './pages/AdminRefereesManagement';
+import AdminDonations from './pages/AdminDonations';
+import DonationReceipt from './pages/DonationReceipt';
 import AdminTechnicalOfficialsManagement from './pages/AdminTechnicalOfficialsManagement';
 import AdminTechnicalOfficialDetails from './pages/AdminTechnicalOfficialDetails';
 import AdminManageAdmins from './pages/AdminManageAdmins';
@@ -91,6 +94,8 @@ const App: React.FC = () => {
           <Route path="/gallery" element={<Gallery lang={lang} />} />
           <Route path="/news" element={<News />} />
           <Route path="/news/:id" element={<NewsArticle />} />
+          <Route path="/donate" element={<Donate lang={lang} />} />
+          <Route path="/donation/:id" element={<DonationReceipt />} />
           <Route path="/terms-conditions" element={<TermsConditions lang={lang} />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy lang={lang} />} />
           <Route path="/kabaddi-rules" element={<KabaddiRules lang={lang} />} />
@@ -110,6 +115,10 @@ const App: React.FC = () => {
           {/* Admin Referees Management (protected) */}
           <Route path="/admin/referees" element={
             isAuthenticated ? <AdminRefereesManagement /> : <AdminLogin onLoginSuccess={() => setIsAuthenticated(true)} />
+          } />
+          {/* Admin Donations Management (protected) */}
+          <Route path="/admin/donations" element={
+            isAuthenticated ? <AdminDonations /> : <AdminLogin onLoginSuccess={() => setIsAuthenticated(true)} />
           } />
           {/* Admin Technical Officials Management (protected) */}
           <Route path="/admin/technical-officials" element={
