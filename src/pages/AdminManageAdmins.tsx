@@ -12,6 +12,8 @@ interface AdminPermissions {
   canAccessTechnicalOfficials: boolean;   // Technical Officials tab
   canAccessPlayerDetails: boolean;        // Player Details tab
   canAccessInstitutionDetails: boolean;   // Institution Details tab
+  canAccessDonations: boolean;            // Donations tab
+  canAccessImportantDocs: boolean;        // Important Docs dropdown
   canDelete: boolean;                     // Delete actions
 }
 
@@ -30,6 +32,11 @@ const AdminManageAdmins: React.FC = () => {
 
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
   const role = typeof window !== 'undefined' ? localStorage.getItem('adminRole') : null;
+
+  // Module visibility state (for toggles)
+  const [moduleVisibility, setModuleVisibility] = useState<{ allowGallery?: boolean; allowNews?: boolean; allowContacts?: boolean; allowDonations?: boolean; allowImportantDocs?: boolean; }>({});
+  const [loadingModules, setLoadingModules] = useState(false);
+  const [showModuleModal, setShowModuleModal] = useState(false);
 
   useEffect(() => {
     if (role !== 'superadmin') {
@@ -59,7 +66,30 @@ const AdminManageAdmins: React.FC = () => {
       }
     };
 
+    // Also fetch module visibility settings for toggles
+    const fetchModules = async () => {
+      try {
+        setLoadingModules(true);
+        const res = await fetch(`${API_URL}/api/settings`, { headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) } });
+        const json = await res.json();
+        if (json && json.success && json.data) {
+          setModuleVisibility({
+            allowGallery: typeof json.data.allowGallery === 'boolean' ? json.data.allowGallery : true,
+            allowNews: typeof json.data.allowNews === 'boolean' ? json.data.allowNews : true,
+            allowContacts: typeof json.data.allowContacts === 'boolean' ? json.data.allowContacts : true,
+            allowDonations: typeof json.data.allowDonations === 'boolean' ? json.data.allowDonations : true,
+            allowImportantDocs: typeof json.data.allowImportantDocs === 'boolean' ? json.data.allowImportantDocs : true,
+          });
+        }
+      } catch (err) {
+        console.error('Failed to load module visibility', err);
+      } finally {
+        setLoadingModules(false);
+      }
+    };
+
     fetchAdmins();
+    fetchModules();
   }, [role, token]);
 
   const updateAdmin = async (id: string, update: Partial<Pick<AdminItem, 'role' | 'permissions'>>) => {
@@ -100,15 +130,49 @@ const AdminManageAdmins: React.FC = () => {
       canAccessTechnicalOfficials: value,
       canAccessPlayerDetails: value,
       canAccessInstitutionDetails: value,
+      canAccessDonations: value,
+      canAccessImportantDocs: value,
       canDelete: value,
     };
+
+    // Apply updated permissions
     updateAdmin(admin._id, { permissions: newPermissions });
   };
 
-  const changeRole = (admin: AdminItem, newRole: 'superadmin' | 'admin') => {
-    if (admin.role === newRole) return;
-    if (!window.confirm(`Change role of ${admin.username} to ${newRole.toUpperCase()}?`)) return;
-    updateAdmin(admin._id, { role: newRole });
+  // Toggle a module visibility as superadmin
+  const toggleModuleVisibility = async (key: keyof typeof moduleVisibility) => {
+    try {
+      setLoadingModules(true);
+      const token = localStorage.getItem('token');
+      const payload: any = {};
+      payload[key] = !moduleVisibility[key];
+      const res = await fetch(`${API_URL}/api/settings`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        body: JSON.stringify(payload),
+      });
+      const json = await res.json();
+      if (res.ok && json.success && json.data) {
+        setModuleVisibility(prev => ({ ...prev, [key]: json.data[key] }));
+        alert('Updated setting successfully');
+      } else {
+        alert(json.message || 'Failed to update setting');
+      }
+    } catch (err) {
+      console.error('toggleModuleVisibility error', err);
+      alert('Failed to update setting');
+    } finally {
+      setLoadingModules(false);
+    }
+  };
+
+  const ModuleToggles: React.FC = () => {
+    if (role !== 'superadmin') return null;
+    return (
+      <div className="text-sm text-slate-500">
+        Module toggles have been removed from this page to reduce clutter. Manage modules from the dedicated Settings page or contact another SUPERADMIN if you need changes.
+      </div>
+    );
   };
 
   if (loading) {
@@ -146,13 +210,53 @@ const AdminManageAdmins: React.FC = () => {
               <p className="text-slate-500 text-sm">Superadmin can control roles and module access for each admin.</p>
             </div>
           </div>
+
+          {/* Module management (superadmin only) */}
+          <div className="hidden md:flex items-center gap-3">
+            <button
+              onClick={() => setShowModuleModal(true)}
+              className="px-3 py-2 rounded-full bg-white text-blue-700 text-xs font-bold border border-blue-200 hover:shadow-sm transition-all"
+            >
+              Manage Modules
+            </button>
+            <button
+              onClick={() => (window.location.href = '/admin-portal-access')}
+              className="px-4 py-2 rounded-full bg-blue-900 text-white text-xs font-bold uppercase tracking-widest hover:bg-blue-700 transition-all"
+            >
+              Back to Dashboard
+            </button>
+          </div>
+
+          {/* Mobile fallback: small Manage Modules button */}
+        </div>
+
+        <div className="md:hidden mb-4">
           <button
-            onClick={() => (window.location.href = '/admin-portal-access')}
-            className="px-4 py-2 rounded-full bg-blue-900 text-white text-xs font-bold uppercase tracking-widest hover:bg-blue-700 transition-all"
+            onClick={() => setShowModuleModal(true)}
+            className="w-full px-3 py-2 rounded-full bg-white text-blue-700 text-sm font-semibold border border-slate-200"
           >
-            Back to Dashboard
+            Manage Modules
           </button>
         </div>
+
+        {/* Manage Modules Modal */}
+        {showModuleModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div className="fixed inset-0 bg-black/50" onClick={() => setShowModuleModal(false)} />
+            <div className="bg-white rounded-xl shadow p-6 z-60 w-full max-w-lg mx-4">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-bold">Manage Modules</h2>
+                <button
+                  onClick={() => setShowModuleModal(false)}
+                  className="text-slate-500 text-sm font-semibold"
+                >
+                  Close
+                </button>
+              </div>
+              <ModuleToggles />
+            </div>
+          </div>
+        )}
 
         {/* Mobile-friendly vertical cards instead of a wide table */}
         <div className="space-y-4">
@@ -176,6 +280,8 @@ const AdminManageAdmins: React.FC = () => {
               { key: 'canAccessTechnicalOfficials', label: 'Technical Officials' },
               { key: 'canAccessPlayerDetails', label: 'Player Details' },
               { key: 'canAccessInstitutionDetails', label: 'Institution Details' },
+              { key: 'canAccessDonations', label: 'Donations' },
+              { key: 'canAccessImportantDocs', label: 'Important Docs' },
               { key: 'canDelete', label: 'Delete' },
             ];
 
@@ -267,13 +373,13 @@ const AdminManageAdmins: React.FC = () => {
 
         <div className="mt-4 space-y-1 text-xs text-slate-400">
           <p className="flex items-center gap-1">
-            <Trash2 size={12} /> Only admins with <span className="font-semibold">Delete</span> permission can see delete buttons in the portal; backend also enforces superadmin-only deletes.
+            <Trash2 size={12} /> Only admins with <span className="font-semibold">Delete</span> permission can see delete buttons in the portal; backend enforces delete permission (superadmin always allowed).
           </p>
           <p>
             <span className="font-semibold">Players &amp; Officials</span> controls access to Player Details, Institution Details, Our Champions, Referee Board, and Technical Officials tabs on the dashboard.
           </p>
           <p>
-            <span className="font-semibold">Contact Forms</span> controls the Contact Forms tab; <span className="font-semibold">News</span> and <span className="font-semibold">Gallery</span> match those tabs.
+            <span className="font-semibold">Contact Forms</span> controls the Contact Forms tab; <span className="font-semibold">News</span>, <span className="font-semibold">Gallery</span>, <span className="font-semibold">Donations</span> and <span className="font-semibold">Important Docs</span> match those respective admin sections.
           </p>
         </div>
       </div>

@@ -89,7 +89,7 @@ const AdminTechnicalOfficialDetails: React.FC = () => {
     fetchOfficial();
   }, [API_URL, id]);
 
-  const canDelete = adminRole === 'superadmin' && !!adminPermissions?.canDelete;
+  const canDelete = adminRole === 'superadmin' || !!adminPermissions?.canDelete;
 
   const badgeColor = (status: TechnicalOfficial['status']) => {
     if (status === 'Approved') return 'bg-green-100 text-green-800';

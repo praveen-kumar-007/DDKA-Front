@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   CheckCircle, XCircle, Trash2, 
   Users, Building, RefreshCcw, Search, Eye,
-  LogOut, Newspaper, Image as ImageIcon, Mail, UserCheck, Heart
+  LogOut, Newspaper, Image as ImageIcon, Mail, UserCheck, Heart,
+  Trophy, Gavel, UserCog, FileText, Award
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { Language } from '../translations';
@@ -21,6 +22,7 @@ interface AdminPermissions {
   canAccessPlayerDetails?: boolean;
   canAccessInstitutionDetails?: boolean;
   canAccessDonations?: boolean;
+  canAccessImportantDocs?: boolean;
   canDelete?: boolean;
 }
 
@@ -36,6 +38,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
   const [adminPermissions, setAdminPermissions] = useState<AdminPermissions | null>(null);
   const [showDocs, setShowDocs] = useState(false);
   const docsRef = useRef<HTMLDivElement | null>(null);
+
+  // Public/feature visibility settings (controlled by superadmin)
+  const [publicSettings, setPublicSettings] = useState<{ allowGallery?: boolean; allowNews?: boolean; allowContacts?: boolean; allowDonations?: boolean; allowImportantDocs?: boolean; }>({});
+
+
+
+  // Public settings that can affect admin UI (loaded for all admins)
+
 
   // Close docs dropdown on outside click or Escape
   useEffect(() => {
@@ -66,6 +76,30 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
   }, []);
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+  // Load public settings (which control module visibility)
+  useEffect(() => {
+    const loadPublicSettings = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/settings/public`);
+        const json = await res.json();
+        if (json && json.success && json.data) {
+          setPublicSettings({
+            allowGallery: typeof json.data.allowGallery === 'boolean' ? json.data.allowGallery : true,
+            allowNews: typeof json.data.allowNews === 'boolean' ? json.data.allowNews : true,
+            allowContacts: typeof json.data.allowContacts === 'boolean' ? json.data.allowContacts : true,
+            allowDonations: typeof json.data.allowDonations === 'boolean' ? json.data.allowDonations : true,
+            allowImportantDocs: typeof json.data.allowImportantDocs === 'boolean' ? json.data.allowImportantDocs : true,
+          });
+        }
+      } catch (e) {
+        console.error('Failed to fetch public settings', e);
+      }
+    };
+    loadPublicSettings();
+  }, [API_URL]);
+
+
 
   const handleLogout = () => {
     // Clear authentication flags and admin JWT
@@ -240,6 +274,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
     );
   };
 
+  // Toggle for allowing admins to manage Donations (superadmin only)
+
+
+
   const updateStatus = async (id: string, newStatus: 'Pending' | 'Approved' | 'Rejected') => {
     try {
       const endpoint = activeTab === 'players' ? '/api/players/status' : '/api/institutions/status';
@@ -348,6 +386,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
           <div className="flex items-center gap-3">
             {adminRole === 'superadmin' && <ToggleShowIDs />}
 
+
             <button 
               onClick={handleLogout}
               className="flex items-center gap-2 bg-white text-red-600 px-6 py-3 rounded-xl font-black shadow-sm border-2 border-red-50 hover:bg-red-600 hover:text-white transition-all active:scale-95"
@@ -359,215 +398,236 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
 
         {/* Admin Management Panel */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-10">
-          {/* Gallery - requires canAccessGallery */}
-          <button
-            type="button"
-            onClick={() => {
-              if (adminRole === 'superadmin' || adminPermissions?.canAccessGallery) {
-                window.location.href = '/admin/gallery';
-              } else {
-                alert('You do not have permission to manage gallery. Please contact the superadmin.');
-              }
-            }}
-            className={`flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-[92px] ${
-              adminRole === 'superadmin' || adminPermissions?.canAccessGallery
-                ? 'bg-white hover:bg-blue-50 cursor-pointer'
-                : 'bg-slate-100 text-slate-400 cursor-not-allowed'
-            }`}
-          >
-            <ImageIcon
-              size={32}
-              className={`${
+          {/* Gallery - requires canAccessGallery and not globally disabled */}
+          {(adminRole === 'superadmin' || (publicSettings.allowGallery && adminPermissions?.canAccessGallery)) && (
+            <button
+              type="button"
+              onClick={() => {
+                if (adminRole === 'superadmin' || adminPermissions?.canAccessGallery) {
+                  window.location.href = '/admin/gallery';
+                } else {
+                  alert('You do not have permission to manage gallery. Please contact the superadmin.');
+                }
+              }}
+              className={`flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-[92px] ${
                 adminRole === 'superadmin' || adminPermissions?.canAccessGallery
-                  ? 'text-blue-700 mb-2'
-                  : 'text-slate-400 mb-2'
+                  ? 'bg-white hover:bg-blue-50 cursor-pointer'
+                  : 'bg-slate-100 text-slate-400 cursor-not-allowed'
               }`}
-            />
-            <span className="font-bold text-xs">Manage Gallery</span>
-          </button>
-
-          {/* News - requires canAccessNews */}
-          <button
-            type="button"
-            onClick={() => {
-              if (adminRole === 'superadmin' || adminPermissions?.canAccessNews) {
-                window.location.href = '/admin-news-upload';
-              } else {
-                alert('You do not have permission to manage news. Please contact the superadmin.');
-              }
-            }}
-            className={`flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-[92px] ${
-              adminRole === 'superadmin' || adminPermissions?.canAccessNews
-                ? 'bg-white hover:bg-blue-50 cursor-pointer'
-                : 'bg-slate-100 text-slate-400 cursor-not-allowed'
-            }`}
-          >
-            <Newspaper
-              size={32}
-              className={`${
-                adminRole === 'superadmin' || adminPermissions?.canAccessNews
-                  ? 'text-blue-700 mb-2'
-                  : 'text-slate-400 mb-2'
-              }`}
-            />
-            <span className="font-bold text-xs">Manage News</span>
-          </button>
-
-          {/* Contacts - requires canAccessContacts */}
-          <button
-            type="button"
-            onClick={() => {
-              if (adminRole === 'superadmin' || adminPermissions?.canAccessContacts) {
-                window.location.href = '/admin/contact';
-              } else {
-                alert('You do not have permission to manage contact forms. Please contact the superadmin.');
-              }
-            }}
-            className={`flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-[92px] ${
-              adminRole === 'superadmin' || adminPermissions?.canAccessContacts
-                ? 'bg-white hover:bg-blue-50 cursor-pointer'
-                : 'bg-slate-100 text-slate-400 cursor-not-allowed'
-            }`}
-          >
-            <Mail
-              size={28}
-              className={`${
-                adminRole === 'superadmin' || adminPermissions?.canAccessContacts
-                  ? 'text-blue-700 mb-2'
-                  : 'text-slate-400 mb-2'
-              }`}
-            />
-            <span className="font-bold text-xs">Contact Forms</span>
-          </button>
-
-          {/* Our Champions - requires canAccessChampions */}
-          <button
-            type="button"
-            onClick={() => {
-              if (adminRole === 'superadmin' || adminPermissions?.canAccessChampions) {
-                window.location.href = '/admin/players';
-              } else {
-                alert('You do not have permission to manage champions. Please contact the superadmin.');
-              }
-            }}
-            className={`flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-[92px] ${
-              adminRole === 'superadmin' || adminPermissions?.canAccessChampions
-                ? 'bg-white hover:bg-orange-50 cursor-pointer'
-                : 'bg-slate-100 text-slate-400 cursor-not-allowed'
-            }`}
-          >
-            <Users
-              size={28}
-              className={`${
-                adminRole === 'superadmin' || adminPermissions?.canAccessChampions
-                  ? 'text-orange-700 mb-2'
-                  : 'text-slate-400 mb-2'
-              }`}
-            />
-            <span className="font-bold text-xs">Our Champions</span>
-          </button>
-
-          {/* Referee Board - requires canAccessReferees */}
-          <button
-            type="button"
-            onClick={() => {
-              if (adminRole === 'superadmin' || adminPermissions?.canAccessReferees) {
-                window.location.href = '/admin/referees';
-              } else {
-                alert('You do not have permission to manage referees. Please contact the superadmin.');
-              }
-            }}
-            className={`flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-[92px] ${
-              adminRole === 'superadmin' || adminPermissions?.canAccessReferees
-                ? 'bg-white hover:bg-slate-50 cursor-pointer'
-                : 'bg-slate-100 text-slate-400 cursor-not-allowed'
-            }`}
-          >
-            <Users
-              size={28}
-              className={`${
-                adminRole === 'superadmin' || adminPermissions?.canAccessReferees
-                  ? 'text-slate-700 mb-2'
-                  : 'text-slate-400 mb-2'
-              }`}
-            />
-            <span className="font-bold text-xs">Referee Board</span>
-          </button>
-
-          {/* Donations - requires canAccessDonations */}
-          <button
-            type="button"
-            onClick={() => {
-              if (adminRole === 'superadmin' || adminPermissions?.canAccessDonations) {
-                window.location.href = '/admin/donations';
-              } else {
-                alert('You do not have permission to manage donations. Please contact the superadmin.');
-              }
-            }}
-            className={`flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-[92px] ${
-              adminRole === 'superadmin' || adminPermissions?.canAccessDonations
-                ? 'bg-white hover:bg-slate-50 cursor-pointer'
-                : 'bg-slate-100 text-slate-400 cursor-not-allowed'
-            }`}
-          >
-            <Heart
-              size={28}
-              className={`${
-                adminRole === 'superadmin' || adminPermissions?.canAccessDonations
-                  ? 'text-rose-700 mb-2'
-                  : 'text-slate-400 mb-2'
-              }`}
-            />
-            <span className="font-bold text-xs">Donations</span>
-          </button>
-
-          {/* Technical Officials - requires canAccessTechnicalOfficials */}
-          <button
-            type="button"
-            onClick={() => {
-              if (adminRole === 'superadmin' || adminPermissions?.canAccessTechnicalOfficials) {
-                window.location.href = '/admin/technical-officials';
-              } else {
-                alert('You do not have permission to manage technical officials. Please contact the superadmin.');
-              }
-            }}
-            className={`flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-[92px] ${
-              adminRole === 'superadmin' || adminPermissions?.canAccessTechnicalOfficials
-                ? 'bg-white hover:bg-slate-50 cursor-pointer'
-                : 'bg-slate-100 text-slate-400 cursor-not-allowed'
-            }`}
-          >
-            <UserCheck
-              size={28}
-              className={`${
-                adminRole === 'superadmin' || adminPermissions?.canAccessTechnicalOfficials
-                  ? 'text-emerald-700 mb-2'
-                  : 'text-slate-400 mb-2'
-              }`}
-            />
-            <span className="font-bold text-xs">Technical Officials</span>
-          </button>
-          {adminRole === 'superadmin' && (
-            <Link to="/admin/manage-admins" className="flex flex-col items-center justify-center p-4 bg-white rounded-xl shadow border hover:bg-red-50 transition-all w-full min-h-[92px]">
-              <Users size={28} className="text-red-700 mb-2" />
-              <span className="font-bold text-xs text-red-900">Manage Admins</span>
-            </Link>
+            >
+              <ImageIcon
+                size={32}
+                className={`${
+                  adminRole === 'superadmin' || adminPermissions?.canAccessGallery
+                    ? 'text-blue-700 mb-2'
+                    : 'text-slate-400 mb-2'
+                }`}
+              />
+              <span className="font-bold text-xs">Manage Gallery</span>
+            </button>
           )}
 
+          {/* News - requires canAccessNews and not globally disabled */}
+          {(adminRole === 'superadmin' || (publicSettings.allowNews && adminPermissions?.canAccessNews)) && (
+            <button
+              type="button"
+              onClick={() => {
+                if (adminRole === 'superadmin' || adminPermissions?.canAccessNews) {
+                  window.location.href = '/admin-news-upload';
+                } else {
+                  alert('You do not have permission to manage news. Please contact the superadmin.');
+                }
+              }}
+              className={`flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-[92px] ${
+                adminRole === 'superadmin' || adminPermissions?.canAccessNews
+                  ? 'bg-white hover:bg-blue-50 cursor-pointer'
+                  : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+              }`}
+            >
+              <Newspaper
+                size={32}
+                className={`${
+                  adminRole === 'superadmin' || adminPermissions?.canAccessNews
+                    ? 'text-blue-700 mb-2'
+                    : 'text-slate-400 mb-2'
+                }`}
+              />
+              <span className="font-bold text-xs">Manage News</span>
+            </button>
+          )}
+
+          {/* Contacts - requires canAccessContacts and not globally disabled */}
+          {(adminRole === 'superadmin' || (publicSettings.allowContacts && adminPermissions?.canAccessContacts)) && (
+            <button
+              type="button"
+              onClick={() => {
+                if (adminRole === 'superadmin' || adminPermissions?.canAccessContacts) {
+                  window.location.href = '/admin/contact';
+                } else {
+                  alert('You do not have permission to manage contact forms. Please contact the superadmin.');
+                }
+              }}
+              className={`flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-[92px] ${
+                adminRole === 'superadmin' || adminPermissions?.canAccessContacts
+                  ? 'bg-white hover:bg-blue-50 cursor-pointer'
+                  : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+              }`}
+            >
+              <Mail
+                size={28}
+                className={`${
+                  adminRole === 'superadmin' || adminPermissions?.canAccessContacts
+                    ? 'text-blue-700 mb-2'
+                    : 'text-slate-400 mb-2'
+                }`}
+              />
+              <span className="font-bold text-xs">Contact Forms</span>
+            </button>
+          )}
+
+          {/* Our Champions - hidden unless admin has permission (superadmin sees all) */}
+          {(adminRole === 'superadmin' || adminPermissions?.canAccessChampions) && (
+            <button
+              type="button"
+              onClick={() => {
+                if (adminRole === 'superadmin' || adminPermissions?.canAccessChampions) {
+                  window.location.href = '/admin/players';
+                } else {
+                  alert('You do not have permission to manage champions. Please contact the superadmin.');
+                }
+              }}
+              className={`flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-[92px] ${
+                adminRole === 'superadmin' || adminPermissions?.canAccessChampions
+                  ? 'bg-white hover:bg-orange-50 cursor-pointer'
+                  : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+              }`}
+            >
+              <Trophy
+                size={28}
+                className={`${
+                  adminRole === 'superadmin' || adminPermissions?.canAccessChampions
+                    ? 'text-orange-700 mb-2'
+                    : 'text-slate-400 mb-2'
+                }`}
+              />
+              <span className="font-bold text-xs">Our Champions</span>
+            </button>
+          )}
+
+          {/* Referee Board - hidden unless admin has permission (superadmin sees all) */}
+          {(adminRole === 'superadmin' || adminPermissions?.canAccessReferees) && (
+            <button
+              type="button"
+              onClick={() => {
+                if (adminRole === 'superadmin' || adminPermissions?.canAccessReferees) {
+                  window.location.href = '/admin/referees';
+                } else {
+                  alert('You do not have permission to manage referees. Please contact the superadmin.');
+                }
+              }}
+              className={`flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-[92px] ${
+                adminRole === 'superadmin' || adminPermissions?.canAccessReferees
+                  ? 'bg-white hover:bg-slate-50 cursor-pointer'
+                  : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+              }`}
+            >
+              <Gavel
+                size={28}
+                className={`${
+                  adminRole === 'superadmin' || adminPermissions?.canAccessReferees
+                    ? 'text-amber-700 mb-2'
+                    : 'text-slate-400 mb-2'
+                }`}
+              />
+              <span className="font-bold text-xs">Referee Board</span>
+            </button>
+          )}
+
+          {/* Donations - requires canAccessDonations and not globally disabled */}
+          {(adminRole === 'superadmin' || (publicSettings.allowDonations && adminPermissions?.canAccessDonations)) && (
+            <button
+              type="button"
+              onClick={() => {
+                if (adminRole === 'superadmin' || adminPermissions?.canAccessDonations) {
+                  window.location.href = '/admin/donations';
+                } else {
+                  alert('You do not have permission to manage donations. Please contact the superadmin.');
+                }
+              }}
+              className={`flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-[92px] ${
+                adminRole === 'superadmin' || adminPermissions?.canAccessDonations ? 'bg-white hover:bg-slate-50 cursor-pointer' : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+              }`}
+            >
+              <Heart
+                size={28}
+                className={`${
+                  adminRole === 'superadmin' || adminPermissions?.canAccessDonations
+                    ? 'text-rose-700 mb-2'
+                    : 'text-slate-400 mb-2'
+                }`}
+              />
+              <span className="font-bold text-xs">Donations</span>
+            </button>
+          )}
+
+          {/* Technical Officials - hidden unless admin has permission (superadmin sees all) */}
+          {(adminRole === 'superadmin' || adminPermissions?.canAccessTechnicalOfficials) && (
+            <button
+              type="button"
+              onClick={() => {
+                if (adminRole === 'superadmin' || adminPermissions?.canAccessTechnicalOfficials) {
+                  window.location.href = '/admin/technical-officials';
+                } else {
+                  alert('You do not have permission to manage technical officials. Please contact the superadmin.');
+                }
+              }}
+              className={`flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-[92px] ${
+                adminRole === 'superadmin' || adminPermissions?.canAccessTechnicalOfficials
+                  ? 'bg-white hover:bg-slate-50 cursor-pointer'
+                  : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+              }`}
+            >
+              <UserCheck
+                size={28}
+                className={`${
+                  adminRole === 'superadmin' || adminPermissions?.canAccessTechnicalOfficials
+                    ? 'text-emerald-700 mb-2'
+                    : 'text-slate-400 mb-2'
+                }`}
+              />
+              <span className="font-bold text-xs">Technical Officials</span>
+            </button>
+          )}
           {adminRole === 'superadmin' && (
+            <Link to="/admin/manage-admins" className="flex flex-col items-center justify-center p-4 bg-white rounded-xl shadow border hover:bg-red-50 transition-all w-full min-h-[92px]">
+              <UserCog size={28} className="text-red-700 mb-2" />
+              <span className="font-bold text-xs text-red-900">Manage Admins</span>
+            </Link>
+          )} 
+
+          {(adminRole === 'superadmin' || (publicSettings.allowImportantDocs && adminPermissions?.canAccessImportantDocs)) && (
             <div className="relative" ref={docsRef}>
               <button 
                 type="button"
                 aria-expanded={showDocs}
                 aria-controls="important-docs-dropdown"
-                onClick={() => setShowDocs(s => !s)}
-                className="flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all min-h-[92px] bg-white hover:bg-emerald-50 cursor-pointer w-full"
+                onClick={() => {
+                  if (adminRole === 'superadmin' || adminPermissions?.canAccessImportantDocs) setShowDocs(s => !s);
+                  else alert('You do not have permission to access Important Docs.');
+                }}
+                className={`flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all min-h-[92px] ${
+                  (adminRole === 'superadmin' || adminPermissions?.canAccessImportantDocs) ? 'bg-white hover:bg-emerald-50 cursor-pointer w-full' : 'bg-slate-100 text-slate-400 cursor-not-allowed w-full'
+                }`}
               >
-                <ImageIcon size={28} className="text-emerald-700 mb-2" />
+                <FileText size={28} className={`${(adminRole === 'superadmin' || adminPermissions?.canAccessImportantDocs) ? 'text-emerald-700 mb-2' : 'text-slate-400 mb-2'}`} />
                 <span className="font-bold text-xs text-emerald-900">Important Docs</span>
+                {!(adminRole === 'superadmin' || adminPermissions?.canAccessImportantDocs) && (
+                  <div className="mt-1 text-[10px] text-yellow-700 font-semibold">Disabled</div>
+                )}
+
               </button>
 
-              {showDocs && (
+              {showDocs && (adminRole === 'superadmin' || adminPermissions?.canAccessImportantDocs) && (
                 <div id="important-docs-dropdown" role="menu" className="absolute z-50 mt-2 left-1/2 -translate-x-1/2 w-64 sm:w-72 bg-white shadow-lg rounded-lg p-3 border ring-1 ring-slate-100">
                   <div className="flex items-center justify-between mb-2">
                     <strong className="text-sm">Important Docs</strong>
@@ -576,25 +636,25 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
 
                   <nav className="flex flex-col gap-1">
                       <a href="/important-docs/entry-form.html" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 py-2 px-2 rounded hover:bg-slate-50">
-                      <span className="w-6 text-slate-600">📄</span>
+                      <FileText size={18} className="text-slate-600 w-6" />
                       <span className="text-sm">Entry Form</span>
                       <span className="ml-auto text-slate-400">↗</span>
                     </a>
 
                     <a href="/important-docs/technical-id-card.html" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 py-2 px-2 rounded hover:bg-slate-50">
-                      <span className="w-6 text-slate-600">🪪</span>
+                      <UserCheck size={18} className="text-slate-600 w-6" />
                       <span className="text-sm">Technical ID Card</span>
                       <span className="ml-auto text-slate-400">↗</span>
                     </a>
 
                     <a href="/important-docs/official-certificate.html" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 py-2 px-2 rounded hover:bg-slate-50">
-                      <span className="w-6 text-slate-600">📜</span>
+                      <Award size={18} className="text-slate-600 w-6" />
                       <span className="text-sm">Official Certificate</span>
                       <span className="ml-auto text-slate-400">↗</span>
                     </a>
 
                     <a href="/important-docs/certificate-2.html" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 py-2 px-2 rounded hover:bg-slate-50">
-                      <span className="w-6 text-slate-600">🏅</span>
+                      <Trophy size={18} className="text-slate-600 w-6" />
                       <span className="text-sm">Certificate 2</span>
                       <span className="ml-auto text-slate-400">↗</span>
                     </a>
@@ -604,35 +664,37 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
             </div>
           )}
           {/* Player Details tab - requires canAccessPlayerDetails */}
-          <button
-            type="button"
-            onClick={() => {
-              if (adminRole === 'superadmin' || adminPermissions?.canAccessPlayerDetails) {
-                setActiveTab('players');
-              } else {
-                alert('You do not have permission to view player details. Please contact the superadmin.');
-              }
-            }}
-            className={`flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-[92px] ${
-              activeTab === 'players'
-                ? 'bg-blue-900 text-white'
-                : (adminRole === 'superadmin' || adminPermissions?.canAccessPlayerDetails)
-                    ? 'bg-white hover:bg-blue-50 text-blue-900'
-                    : 'bg-slate-100 text-slate-400 cursor-not-allowed'
-            }`}
-          >
-            <Users
-              size={28}
-              className={
+          {(adminRole === 'superadmin' || adminPermissions?.canAccessPlayerDetails) && (
+            <button
+              type="button"
+              onClick={() => {
+                if (adminRole === 'superadmin' || adminPermissions?.canAccessPlayerDetails) {
+                  setActiveTab('players');
+                } else {
+                  alert('You do not have permission to view player details. Please contact the superadmin.');
+                }
+              }}
+              className={`flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-[92px] ${
                 activeTab === 'players'
-                  ? 'text-orange-400'
+                  ? 'bg-blue-900 text-white'
                   : (adminRole === 'superadmin' || adminPermissions?.canAccessPlayerDetails)
-                      ? 'text-blue-900'
-                      : 'text-slate-400'
-              }
-            />
-            <span className="font-bold text-xs">Player Details</span>
-          </button>
+                      ? 'bg-white hover:bg-blue-50 text-blue-900'
+                      : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+              }`}
+            >
+              <Users
+                size={28}
+                className={
+                  activeTab === 'players'
+                    ? 'text-orange-400'
+                    : (adminRole === 'superadmin' || adminPermissions?.canAccessPlayerDetails)
+                        ? 'text-blue-900'
+                        : 'text-slate-400'
+                }
+              />
+              <span className="font-bold text-xs">Player Details</span>
+            </button>
+          )}
 
           {/* Institution Details tab - requires canAccessInstitutionDetails */}
           <button
@@ -818,7 +880,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
                           >
                             <XCircle size={18} />
                           </button>
-                          {adminRole === 'superadmin' && adminPermissions?.canDelete && (
+                          {(adminRole === 'superadmin' || adminPermissions?.canDelete) && (
                             <button 
                               onClick={() => deleteEntry(item._id)} 
                               className="p-2 bg-slate-100 text-slate-400 rounded-2xl hover:bg-slate-950 hover:text-white transition-all active:scale-90"
@@ -877,7 +939,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
                       <a href={activeTab === 'players' ? `/admin/registration/${item._id}` : `/admin/institution/${item._id}`} className="px-3 py-1 bg-blue-600 text-white rounded-full text-xs font-black">View</a>
                       <button onClick={() => updateStatus(item._id, 'Approved')} className="px-3 py-1 bg-green-50 text-green-600 rounded-full text-xs font-black">Approve</button>
                       <button onClick={() => updateStatus(item._id, 'Rejected')} className="px-3 py-1 bg-red-50 text-red-600 rounded-full text-xs font-black">Reject</button>
-                      {adminRole === 'superadmin' && adminPermissions?.canDelete && (
+                      {(adminRole === 'superadmin' || adminPermissions?.canDelete) && (
                         <button onClick={() => deleteEntry(item._id)} className="px-3 py-1 bg-slate-100 text-slate-400 rounded-full text-xs font-black">Delete</button>
                       )}
                     </div>

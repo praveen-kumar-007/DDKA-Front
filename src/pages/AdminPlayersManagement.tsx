@@ -42,7 +42,7 @@ const AdminPlayersManagement: React.FC = () => {
     }
   }, []);
 
-  const canDelete = adminRole === 'superadmin' && !!adminPermissions?.canDelete;
+  const canDelete = adminRole === 'superadmin' || !!adminPermissions?.canDelete;
 
   const fetchPlayers = async () => {
     try {

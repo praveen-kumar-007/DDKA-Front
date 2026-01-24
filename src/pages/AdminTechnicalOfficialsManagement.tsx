@@ -82,7 +82,7 @@ const AdminTechnicalOfficialsManagement: React.FC = () => {
     fetchOfficials();
   }, []);
 
-  const canDelete = adminRole === 'superadmin' && !!adminPermissions?.canDelete;
+  const canDelete = adminRole === 'superadmin' || !!adminPermissions?.canDelete;
 
   const handleStatusChange = async (id: string, status: 'Pending' | 'Approved' | 'Rejected') => {
     if (status === 'Rejected' && !window.confirm('Are you sure you want to reject this application?')) return;

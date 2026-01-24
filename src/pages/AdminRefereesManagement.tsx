@@ -39,7 +39,7 @@ const AdminRefereesManagement: React.FC = () => {
     fetchReferees();
   }, []);
 
-  const canDelete = adminRole === 'superadmin' && !!adminPermissions?.canDelete;
+  const canDelete = adminRole === 'superadmin' || !!adminPermissions?.canDelete;
 
   const fetchReferees = async () => {
     try {

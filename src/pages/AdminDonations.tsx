@@ -390,7 +390,7 @@ const AdminDonations: React.FC = () => {
                     <button onClick={() => openEdit(d)} className="flex-1 px-3 py-2 bg-indigo-600 text-white rounded-md text-sm flex items-center justify-center gap-2 hover:bg-indigo-700 transition-colors"><Edit2 className="w-4 h-4"/>Edit</button>
                     <button onClick={() => updateStatus(d._id, 'confirmed')} className="flex-1 px-3 py-2 bg-emerald-600 text-white rounded-md text-sm flex items-center justify-center gap-2 hover:bg-emerald-700 transition-colors"><Check className="w-4 h-4"/>Confirm</button>
                     <button onClick={() => updateStatus(d._id, 'failed')} className="flex-1 px-3 py-2 bg-red-600 text-white rounded-md text-sm flex items-center justify-center gap-2 hover:bg-red-700 transition-colors"><X className="w-4 h-4"/>Fail</button>
-                    {adminRole === 'superadmin' && adminPermissions?.canDelete && (
+                    {(adminRole === 'superadmin' || adminPermissions?.canDelete) && (
                       <button onClick={async () => {
                         if (!confirm('Are you sure you want to delete this donation?')) return;
                         try {
@@ -463,7 +463,7 @@ const AdminDonations: React.FC = () => {
                                 <span className="hidden sm:inline">Fail</span>
                               </button>
 
-                              {adminRole === 'superadmin' && adminPermissions?.canDelete && (
+                              {(adminRole === 'superadmin' || adminPermissions?.canDelete) && (
                                 <button
                                   title="Delete donation"
                                   onClick={async () => {
