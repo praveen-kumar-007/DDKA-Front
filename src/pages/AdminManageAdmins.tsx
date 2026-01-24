@@ -35,7 +35,6 @@ const AdminManageAdmins: React.FC = () => {
 
   // Module visibility state (for toggles)
   const [moduleVisibility, setModuleVisibility] = useState<{ allowGallery?: boolean; allowNews?: boolean; allowContacts?: boolean; allowDonations?: boolean; allowImportantDocs?: boolean; }>({});
-  const [loadingModules, setLoadingModules] = useState(false);
   const [showModuleModal, setShowModuleModal] = useState(false);
 
   useEffect(() => {
@@ -69,7 +68,6 @@ const AdminManageAdmins: React.FC = () => {
     // Also fetch module visibility settings for toggles
     const fetchModules = async () => {
       try {
-        setLoadingModules(true);
         const res = await fetch(`${API_URL}/api/settings`, { headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) } });
         const json = await res.json();
         if (json && json.success && json.data) {
@@ -83,8 +81,6 @@ const AdminManageAdmins: React.FC = () => {
         }
       } catch (err) {
         console.error('Failed to load module visibility', err);
-      } finally {
-        setLoadingModules(false);
       }
     };
 
@@ -139,32 +135,14 @@ const AdminManageAdmins: React.FC = () => {
     updateAdmin(admin._id, { permissions: newPermissions });
   };
 
-  // Toggle a module visibility as superadmin
-  const toggleModuleVisibility = async (key: keyof typeof moduleVisibility) => {
-    try {
-      setLoadingModules(true);
-      const token = localStorage.getItem('token');
-      const payload: any = {};
-      payload[key] = !moduleVisibility[key];
-      const res = await fetch(`${API_URL}/api/settings`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-        body: JSON.stringify(payload),
-      });
-      const json = await res.json();
-      if (res.ok && json.success && json.data) {
-        setModuleVisibility(prev => ({ ...prev, [key]: json.data[key] }));
-        alert('Updated setting successfully');
-      } else {
-        alert(json.message || 'Failed to update setting');
-      }
-    } catch (err) {
-      console.error('toggleModuleVisibility error', err);
-      alert('Failed to update setting');
-    } finally {
-      setLoadingModules(false);
-    }
+  // Change admin role
+  const changeRole = (admin: AdminItem, newRole: 'superadmin' | 'admin') => {
+    if (admin.role === newRole) return;
+    if (!confirm(`Change role for ${admin.username} to ${newRole.toUpperCase()}?`)) return;
+    updateAdmin(admin._id, { role: newRole });
   };
+
+
 
   const ModuleToggles: React.FC = () => {
     if (role !== 'superadmin') return null;
