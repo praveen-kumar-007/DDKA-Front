@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Download, User, Phone, Info, Building2, Wallet } from "lucide-react";
+import { useParams } from "react-router-dom";
+import { Download, User, Phone, Info, Building2, Wallet } from "lucide-react";
 import { formatDateMDY } from '../utils/date';
 import AdminPageHeader from '../components/admin/AdminPageHeader';
 import StatusMark from '../components/admin/StatusMark';
@@ -11,7 +11,6 @@ const DEFAULT_ROLES = ['Player', 'Coach', 'Referee', 'Official', 'Manager', 'Sup
 
 const AdminRegistrationDetails = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
   const [data, setData] = useState<any>(null);
   const [type, setType] = useState<'player' | 'institution' | null>(null);
   const [loading, setLoading] = useState(true);

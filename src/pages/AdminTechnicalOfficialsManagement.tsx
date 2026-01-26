@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CheckCircle2, XCircle, Edit2, Trash2, UserCheck, Save, X } from 'lucide-react';
+import { CheckCircle2, XCircle, Edit2, Trash2, Save, X } from 'lucide-react';
 import AdminPageHeader from '../components/admin/AdminPageHeader';
 import StatusMark from '../components/admin/StatusMark';
 
@@ -194,11 +194,7 @@ const AdminTechnicalOfficialsManagement: React.FC = () => {
     }
   };
 
-  const badgeColor = (status: TechnicalOfficial['status']) => {
-    if (status === 'Approved') return 'bg-green-100 text-green-800';
-    if (status === 'Rejected') return 'bg-red-100 text-red-800';
-    return 'bg-yellow-100 text-yellow-800';
-  };
+
 
   return (
     <div className="p-6 max-w-7xl mx-auto">

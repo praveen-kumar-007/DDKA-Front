@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Edit2, Eye } from 'lucide-react';
-import { Newspaper, Image as ImageIcon } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { X, Edit2, Eye, Image as ImageIcon } from 'lucide-react';
 import AdminPageHeader from '../components/admin/AdminPageHeader';
 import StatusMark from '../components/admin/StatusMark';
 
@@ -23,7 +21,6 @@ const AdminNewsUpload = () => {
   const [statusFilter, setStatusFilter] = useState<'all'|'published'|'draft'>('all');
   const [editModal, setEditModal] = useState<{open: boolean, news: any|null}>({open: false, news: null});
   const [viewModal, setViewModal] = useState<{open: boolean, news: any|null}>({open: false, news: null});
-  const navigate = useNavigate();
   const [adminRole, setAdminRole] = useState<string | null>(null);
   const [adminPermissions, setAdminPermissions] = useState<AdminPermissions | null>(null);
     // Edit news handler

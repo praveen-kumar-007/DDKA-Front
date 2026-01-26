@@ -93,12 +93,6 @@ const AdminTechnicalOfficialDetails: React.FC = () => {
 
   const canDelete = adminRole === 'superadmin' || !!adminPermissions?.canDelete;
 
-  const badgeColor = (status: TechnicalOfficial['status']) => {
-    if (status === 'Approved') return 'bg-green-100 text-green-800';
-    if (status === 'Rejected') return 'bg-red-100 text-red-800';
-    return 'bg-yellow-100 text-yellow-800';
-  };
-
   if (loading) {
     return (
       <div className="p-6 max-w-5xl mx-auto">
