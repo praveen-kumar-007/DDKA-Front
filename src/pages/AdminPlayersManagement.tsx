@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { UserPlus, Edit2, Trash2, Star, Award, Trophy, Save, X } from 'lucide-react';
+import AdminPageHeader from '../components/admin/AdminPageHeader';
 
 interface Player {
   _id: string;
@@ -40,6 +41,15 @@ const AdminPlayersManagement: React.FC = () => {
         console.error('Failed to parse adminPermissions', e);
       }
     }
+  }, []);
+
+  // Mobile detection for responsive admin views
+  const [isMobile, setIsMobile] = useState<boolean>(false);
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 768);
+    onResize();
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
   }, []);
 
   const canDelete = adminRole === 'superadmin' || !!adminPermissions?.canDelete;
@@ -151,27 +161,17 @@ const AdminPlayersManagement: React.FC = () => {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      <div className="mb-8 flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-oswald font-bold text-blue-900 uppercase">Players Management</h1>
-          <p className="text-slate-600 mt-2">Manage DDKA's champion players</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => { window.location.href = '/admin-portal-access'; }}
-            className="px-4 py-2 rounded-full bg-blue-900 text-white text-xs font-bold uppercase tracking-widest hover:bg-blue-700 transition-all"
-          >
-            Go to Dashboard
-          </button>
-          <button
-            onClick={() => setShowForm(!showForm)}
-            className="px-6 py-3 bg-blue-900 text-white rounded-xl hover:bg-blue-800 transition-colors flex items-center gap-2 font-bold"
-          >
+      {/* Header */}
+      <AdminPageHeader
+        title="Players Management"
+        subtitle="Manage DDKA's champion players"
+        actions={(
+          <button onClick={() => setShowForm(!showForm)} className="w-full sm:w-auto px-6 py-3 bg-blue-900 text-white rounded-xl hover:bg-blue-800 transition-colors flex items-center gap-2 font-bold justify-center">
             {showForm ? <X className="w-5 h-5" /> : <UserPlus className="w-5 h-5" />}
             {showForm ? 'Cancel' : 'Add Player'}
           </button>
-        </div>
-      </div>
+        )}
+      />
 
       {/* Add/Edit Form */}
       {showForm && (
@@ -266,60 +266,90 @@ const AdminPlayersManagement: React.FC = () => {
           <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-900"></div>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-blue-900 text-white">
-                <tr>
-                  <th className="px-6 py-4 text-left font-bold uppercase text-sm">#</th>
-                  <th className="px-6 py-4 text-left font-bold uppercase text-sm">Name</th>
-                  <th className="px-6 py-4 text-left font-bold uppercase text-sm">Category</th>
-                  <th className="px-6 py-4 text-left font-bold uppercase text-sm">Gender</th>
-                  <th className="px-6 py-4 text-left font-bold uppercase text-sm">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200">
-                {players.map((player, index) => (
-                  <tr key={player._id} className="hover:bg-slate-50 transition-colors">
-                    <td className="px-6 py-4 text-slate-700 font-bold">{index + 1}</td>
-                    <td className="px-6 py-4 text-slate-900 font-bold">{player.name}</td>
-                    <td className="px-6 py-4">
-                      <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-bold ${getCategoryColor(player.category)}`}>
+        isMobile ? (
+          <div className="space-y-4">
+            {players.map((player, index) => (
+              <div key={player._id} className="bg-white rounded-xl shadow-sm border p-4">
+                <div className="flex items-start gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm text-slate-500">#{index + 1}</div>
+                    <div className="font-bold text-slate-900 truncate">{player.name}</div>
+                    <div className="mt-1">
+                      <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-bold ${getCategoryColor(player.category)} break-words`}> 
                         {getCategoryIcon(player.category)}
-                        {player.category}
+                        <span className="break-words">{player.category}</span>
                       </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`px-3 py-1 rounded-full text-sm font-bold ${player.gender === 'Female' ? 'bg-pink-100 text-pink-700' : 'bg-blue-100 text-blue-700'}`}>
-                        {player.gender}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleEdit(player)}
-                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                          title="Edit"
-                        >
-                          <Edit2 className="w-5 h-5" />
-                        </button>
-                        {canDelete && (
-                          <button
-                            onClick={() => handleDelete(player._id)}
-                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                            title="Delete"
-                          >
-                            <Trash2 className="w-5 h-5" />
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    </div>
+                    <div className="mt-2">
+                      <span className={`px-3 py-1 rounded-full text-sm font-bold ${player.gender === 'Female' ? 'bg-pink-100 text-pink-700' : 'bg-blue-100 text-blue-700'}`}>{player.gender}</span>
+                    </div>
+                    {player.achievements && <div className="mt-2 text-xs text-slate-700 break-words">{player.achievements}</div>}
+                  </div>
+                </div>
+
+                <div className="mt-3 flex gap-2 flex-wrap">
+                  <button onClick={() => handleEdit(player)} className="px-3 py-2 bg-indigo-600 text-white rounded-md text-sm">Edit</button>
+                  {canDelete && <button onClick={() => handleDelete(player._id)} className="px-3 py-2 bg-red-600 text-white rounded-md text-sm">Delete</button>}
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
+        ) : (
+          <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-blue-900 text-white">
+                  <tr>
+                    <th className="px-6 py-4 text-left font-bold uppercase text-sm">#</th>
+                    <th className="px-6 py-4 text-left font-bold uppercase text-sm">Name</th>
+                    <th className="px-6 py-4 text-left font-bold uppercase text-sm">Category</th>
+                    <th className="px-6 py-4 text-left font-bold uppercase text-sm">Gender</th>
+                    <th className="px-6 py-4 text-left font-bold uppercase text-sm">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200">
+                  {players.map((player, index) => (
+                    <tr key={player._id} className="hover:bg-slate-50 transition-colors">
+                      <td className="px-6 py-4 text-slate-700 font-bold">{index + 1}</td>
+                      <td className="px-6 py-4 text-slate-900 font-bold">{player.name}</td>
+                      <td className="px-6 py-4">
+                        <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-bold ${getCategoryColor(player.category)}`}>
+                          {getCategoryIcon(player.category)}
+                          {player.category}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`px-3 py-1 rounded-full text-sm font-bold ${player.gender === 'Female' ? 'bg-pink-100 text-pink-700' : 'bg-blue-100 text-blue-700'}`}>
+                          {player.gender}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleEdit(player)}
+                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            title="Edit"
+                          >
+                            <Edit2 className="w-5 h-5" />
+                          </button>
+                          {canDelete && (
+                            <button
+                              onClick={() => handleDelete(player._id)}
+                              className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                              title="Delete"
+                            >
+                              <Trash2 className="w-5 h-5" />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )
       )}
     </div>
   );

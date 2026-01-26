@@ -5,6 +5,7 @@ import {
   LogOut, Newspaper, Image as ImageIcon, Mail, UserCheck, Heart,
   Trophy, Gavel, UserCog, FileText, Award
 } from 'lucide-react';
+import StatusMark from '../components/admin/StatusMark';
 import { Link } from 'react-router-dom';
 import type { Language } from '../translations';
 
@@ -856,12 +857,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
                       </td>
 
                       <td className="p-3 md:p-6">
-                        <span className={`inline-block px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm border-2 ${
-                          item.status === 'Approved' ? 'bg-green-50 text-green-700 border-green-100' : 
-                          item.status === 'Rejected' ? 'bg-red-50 text-red-700 border-red-100' : 'bg-amber-50 text-amber-700 border-amber-100'
-                        }`}>
-                          {item.status || 'Pending'}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <StatusMark status={item.status} className="w-6 h-6" title={item.status || 'Pending'} />
+                          <span className="sr-only">{item.status || 'Pending'}</span>
+                        </div>
                       </td>
 
                       <td className="p-3 md:p-6">
@@ -927,12 +926,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
                         <p className="text-sm text-slate-600">{item.email || item.phone || '-'}</p>
                       </div>
                       <div className="text-right">
-                        <div className={`inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                          item.status === 'Approved' ? 'bg-green-50 text-green-700 border-green-100' : 
-                          item.status === 'Rejected' ? 'bg-red-50 text-red-700 border-red-100' : 'bg-amber-50 text-amber-700 border-amber-100'
-                        }`}>
-                          {item.status || 'Pending'}
-                        </div>
+                        <div className="flex items-center gap-2">
+                        <StatusMark status={item.status} className="w-6 h-6" title={item.status || 'Pending'} />
+                        <span className="sr-only">{item.status || 'Pending'}</span>
+                      </div>
                       </div>
                     </div>
                     <div className="mt-3 flex flex-wrap gap-2">

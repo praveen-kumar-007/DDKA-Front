@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { Download, ArrowRight, Printer } from 'lucide-react';
+import StatusMark from '../components/admin/StatusMark';
 import html2canvas from 'html2canvas';
 import { CONTACT_INFO } from '../constants';
 
@@ -120,7 +121,13 @@ const DonationReceipt: React.FC = () => {
           <div><div className="text-xs text-slate-500">Phone</div><div className="font-semibold">{donation.phone || '-'}</div></div>
           <div><div className="text-xs text-slate-500">Amount</div><div className="font-semibold">₹{donation.amount}</div></div>
           <div><div className="text-xs text-slate-500">Date</div><div className="font-semibold">{dateStr}</div></div>
-          <div><div className="text-xs text-slate-500">Status</div><div className="font-semibold">{donation.status || 'pending'}</div></div>
+          <div>
+            <div className="text-xs text-slate-500">Status</div>
+            <div className="font-semibold">
+              <StatusMark status={donation.status} title={donation.status || 'pending'} className="w-6 h-6" />
+              <span className="sr-only">{donation.status || 'pending'}</span>
+            </div>
+          </div>
           <div><div className="text-xs text-slate-500">Txn ID</div><div className="font-semibold">{donation.txId || '-'}</div></div>
           <div className="md:col-span-2"><div className="text-xs text-slate-500">Message</div><div className="font-semibold">{donation.message || '-'}</div></div>
         </div>

@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Mail, Phone, Trash2, CheckCircle, XCircle, RefreshCcw, Eye, ListChecks } from 'lucide-react';
+import AdminPageHeader from '../components/admin/AdminPageHeader';
+import StatusMark from '../components/admin/StatusMark';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -137,47 +139,31 @@ const AdminContact: React.FC = () => {
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-          <h1 className="text-3xl md:text-4xl font-extrabold text-blue-900 flex items-center gap-3">
-            <Mail className="text-orange-500" /> Admin Inbox
-          </h1>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => { window.location.href = '/admin-portal-access'; }}
-              className="px-4 py-2 rounded-full bg-blue-900 text-white text-xs font-bold uppercase tracking-widest hover:bg-blue-700 transition-all"
-            >
-              Go to Dashboard
-            </button>
-            <button
-              onClick={() => {
-                setActiveTab('contacts');
-                fetchContacts();
-              }}
-              className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest border shadow-sm flex items-center gap-2 ${
-                activeTab === 'contacts' ? 'bg-blue-900 text-white border-blue-900' : 'bg-white text-blue-900 hover:bg-blue-50'
-              }`}
-            >
-              <Mail size={14} /> Contacts
-            </button>
-            <button
-              onClick={() => {
-                setActiveTab('newsletter');
-                fetchNewsletters();
-              }}
-              className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest border shadow-sm flex items-center gap-2 ${
-                activeTab === 'newsletter' ? 'bg-blue-900 text-white border-blue-900' : 'bg-white text-blue-900 hover:bg-blue-50'
-              }`}
-            >
-              <ListChecks size={14} /> Newsletter
-            </button>
-            <button
-              onClick={activeTab === 'contacts' ? fetchContacts : fetchNewsletters}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border shadow-sm text-sm font-bold text-blue-900 hover:bg-blue-50"
-            >
-              <RefreshCcw size={16} /> Refresh
-            </button>
-          </div>
-        </div>
+        <AdminPageHeader
+          title="Admin Inbox"
+          subtitle="Manage contact messages and newsletter subscriptions"
+          actions={(
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => { setActiveTab('contacts'); fetchContacts(); }}
+                className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest border shadow-sm flex items-center gap-2 ${activeTab === 'contacts' ? 'bg-blue-900 text-white border-blue-900' : 'bg-white text-blue-900 hover:bg-blue-50'}`}>
+                <Mail size={14} /> Contacts
+              </button>
+
+              <button
+                onClick={() => { setActiveTab('newsletter'); fetchNewsletters(); }}
+                className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest border shadow-sm flex items-center gap-2 ${activeTab === 'newsletter' ? 'bg-blue-900 text-white border-blue-900' : 'bg-white text-blue-900 hover:bg-blue-50'}`}>
+                <ListChecks size={14} /> Newsletter
+              </button>
+
+              <button
+                onClick={activeTab === 'contacts' ? fetchContacts : fetchNewsletters}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border shadow-sm text-sm font-bold text-blue-900 hover:bg-blue-50">
+                <RefreshCcw size={16} /> Refresh
+              </button>
+            </div>
+          )}
+        />
 
         <div className="bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden">
           {loading ? (
@@ -224,17 +210,10 @@ const AdminContact: React.FC = () => {
                         {new Date(item.createdAt).toLocaleString()}
                       </td>
                       <td className="p-4">
-                        <span
-                          className={`inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                            item.status === 'New'
-                              ? 'bg-blue-50 text-blue-700 border border-blue-100'
-                              : item.status === 'Read'
-                              ? 'bg-green-50 text-green-700 border border-green-100'
-                              : 'bg-red-50 text-red-700 border border-red-100'
-                          }`}
-                        >
-                          {item.status}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <StatusMark status={item.status} className="w-6 h-6" title={item.status} />
+                          <span className="sr-only">{item.status}</span>
+                        </div>
                       </td>
                       <td className="p-4">
                         <div className="flex justify-end gap-2">

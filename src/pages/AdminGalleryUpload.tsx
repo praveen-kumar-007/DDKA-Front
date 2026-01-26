@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Image as ImageIcon, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import AdminPageHeader from '../components/admin/AdminPageHeader';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -102,15 +103,12 @@ const AdminGalleryUpload = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white py-12 px-2">
       <div className="max-w-4xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-4xl font-extrabold flex items-center gap-3 text-blue-900 drop-shadow"><ImageIcon size={32}/> Admin Gallery Management</h1>
-          <button
-            onClick={() => navigate('/admin-portal-access')}
-            className="px-4 py-2 rounded-full bg-blue-900 text-white text-xs font-bold uppercase tracking-widest hover:bg-blue-700 transition-all"
-          >
-            Go to Dashboard
-          </button>
-        </div>
+        <AdminPageHeader
+          title="Admin Gallery Management"
+          actions={(
+            <></>
+          )}
+        />
         <form onSubmit={handleSubmit} className="bg-white rounded-3xl shadow-2xl border border-slate-100 p-10 flex flex-col md:flex-row gap-10 mb-16 items-stretch">
           <div className="flex-1 flex flex-col items-center gap-4 justify-center border-l border-slate-100 pl-6">
             <label className="flex flex-col items-center gap-2 cursor-pointer w-full">

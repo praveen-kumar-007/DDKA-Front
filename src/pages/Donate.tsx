@@ -97,12 +97,12 @@ const Donate: React.FC<{ lang?: 'en' | 'hi' }> = ({ lang = 'en' }) => {
       <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white py-8 px-4">
         <div className="max-w-5xl mx-auto">
           <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-100">
-            <div className="flex items-center gap-4">
-              <div className="p-4 rounded-full bg-orange-50 text-orange-600">
+            <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+              <div className="p-4 rounded-full bg-orange-50 text-orange-600 flex-shrink-0">
                 <Heart className="w-6 h-6" />
               </div>
-              <div>
-                <h1 className="text-3xl font-extrabold text-blue-900">{lang === 'hi' ? 'DDKA को दान दें' : 'Support DDKA'}</h1>
+              <div className="min-w-0">
+                <h1 className="text-3xl font-extrabold text-blue-900 truncate">{lang === 'hi' ? 'DDKA को दान दें' : 'Support DDKA'}</h1>
                 <p className="text-slate-600 mt-1">{lang === 'hi' ? 'आपका समर्थन हमारे खेल कार्यक्रमों, प्रशिक्षकों और युवा विकास को आगे बढ़ाता है।' : 'Your support helps fund tournaments, coaching, equipment and youth programs.'}</p>
               </div>
             </div>
@@ -127,7 +127,7 @@ const Donate: React.FC<{ lang?: 'en' | 'hi' }> = ({ lang = 'en' }) => {
                     placeholder={lang === 'hi' ? 'अन्य राशि' : 'Other amount'}
                     value={custom}
                     onChange={(e) => setCustom(e.target.value)}
-                    className="w-36 px-3 py-2 border rounded-lg"
+                    className="w-full sm:w-36 px-3 py-2 border rounded-lg"
                   />
                 </div>
               </div>
@@ -141,12 +141,12 @@ const Donate: React.FC<{ lang?: 'en' | 'hi' }> = ({ lang = 'en' }) => {
               <div>
                 <label className="block text-sm font-semibold text-blue-900 mb-2">{lang === 'hi' ? 'भुगतान विधि' : 'Payment method'}</label>
                 <div className="flex flex-col md:flex-row items-center gap-6">
-                  <div className="w-48 h-48 bg-white rounded-lg p-3 border border-slate-200 flex items-center justify-center shadow-sm">
-                    <img src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1769251199/QR_1769251094_biebtv.png" alt="UPI QR code" className="max-w-full max-h-full" />
+                  <div className="w-full md:w-48 h-auto md:h-48 bg-white rounded-lg p-3 border border-slate-200 flex items-center justify-center shadow-sm">
+                    <img src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1769251199/QR_1769251094_biebtv.png" alt="UPI QR code" className="max-w-full h-auto object-contain" />
                   </div>
-                  <div className="text-sm text-slate-700">
+                  <div className="text-sm text-slate-700 min-w-0 break-words">
                     <p className="font-semibold">{lang === 'hi' ? 'Scan & Pay (UPI)' : 'Scan & Pay (UPI)'}</p>
-                    <p className="mt-2">{lang === 'hi' ? 'UPI आईडी' : 'UPI ID'}: <span className="font-mono">9504904499@upi</span></p>
+                    <p className="mt-2">{lang === 'hi' ? 'UPI आईडी' : 'UPI ID'}: <span className="font-mono break-words inline-block">9504904499@upi</span></p>
                     <p className="text-xs text-slate-500 mt-2">{lang === 'hi' ? 'भुगतान करने के बाद कृपया यहाँ भुगतान का प्रमाण (स्क्रीनशॉट) अपलोड करें।' : 'After paying, please upload your payment proof (screenshot) below.'}</p>
                   </div>
                 </div>
@@ -162,11 +162,11 @@ const Donate: React.FC<{ lang?: 'en' | 'hi' }> = ({ lang = 'en' }) => {
                 <input type="file" accept="image/*" onChange={(e) => setReceipt(e.target.files ? e.target.files[0] : null)} />
               </div>
 
-              <div className="flex items-center gap-3">
-                <button type="submit" className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg font-semibold shadow-sm" disabled={status === 'sending'}>
+              <div className="flex flex-col md:flex-row items-start md:items-center gap-3">
+                <button type="submit" className="w-full md:w-auto inline-flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg font-semibold shadow-sm justify-center" disabled={status === 'sending'}>
                   <Zap className="w-4 h-4" /> {status === 'sending' ? (lang === 'hi' ? 'प्रक्रिया...' : 'Processing...') : (lang === 'hi' ? 'दान करें' : 'Donate now')}
                 </button>
-                <div className="text-sm text-slate-600">{lang === 'hi' ? 'दान सत्यापन के लिए लंबित है। DDKA की स्वीकृति के बाद आप रिसीप्ट प्राप्त करने के लिए /login पर लॉगिन कर सकते हैं (ईमेल आईडी के रूप में ID और पंजीकृत मोबाइल नंबर पासवर्ड के रूप में)।' : 'Donation is pending verification. After approval by DDKA you can get the receipt by logging in at /login using your Email as ID and your registered mobile number as password.'}</div>
+                <div className="text-sm text-slate-600 break-words">{lang === 'hi' ? 'दान सत्यापन के लिए लंबित है। DDKA की स्वीकृति के बाद आप रिसीप्ट प्राप्त करने के लिए /login पर लॉगिन कर सकते हैं (ईमेल आईडी के रूप में ID और पंजीकृत मोबाइल नंबर पासवर्ड के रूप में)।' : 'Donation is pending verification. After approval by DDKA you can get the receipt by logging in at /login using your Email as ID and your registered mobile number as password.'}</div>
               </div>
 
               {status === 'error' && <div className="text-sm text-red-600">{resultMsg}</div>}

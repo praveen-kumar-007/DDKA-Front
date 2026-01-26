@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { UserPlus, Edit2, Trash2, Shield, Save, X } from 'lucide-react';
+import AdminPageHeader from '../components/admin/AdminPageHeader';
 
 interface Referee {
   _id: string;
@@ -37,6 +38,15 @@ const AdminRefereesManagement: React.FC = () => {
     }
 
     fetchReferees();
+  }, []);
+
+  // Mobile detection for responsive admin views
+  const [isMobile, setIsMobile] = useState<boolean>(false);
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 768);
+    onResize();
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
   }, []);
 
   const canDelete = adminRole === 'superadmin' || !!adminPermissions?.canDelete;
@@ -132,27 +142,17 @@ const AdminRefereesManagement: React.FC = () => {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      <div className="mb-8 flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-oswald font-bold text-blue-900 uppercase">Referees Management</h1>
-          <p className="text-slate-600 mt-2">Manage DDKA's referee board</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => { window.location.href = '/admin-portal-access'; }}
-            className="px-4 py-2 rounded-full bg-blue-900 text-white text-xs font-bold uppercase tracking-widest hover:bg-blue-700 transition-all"
-          >
-            Go to Dashboard
-          </button>
-          <button
-            onClick={() => setShowForm(!showForm)}
-            className="px-6 py-3 bg-blue-900 text-white rounded-xl hover:bg-blue-800 transition-colors flex items-center gap-2 font-bold"
-          >
+      {/* Header */}
+      <AdminPageHeader
+        title="Referees Management"
+        subtitle="Manage DDKA's referee board"
+        actions={(
+          <button onClick={() => setShowForm(!showForm)} className="w-full sm:w-auto px-6 py-3 bg-blue-900 text-white rounded-xl hover:bg-blue-800 transition-colors flex items-center gap-2 font-bold justify-center">
             {showForm ? <X className="w-5 h-5" /> : <UserPlus className="w-5 h-5" />}
             {showForm ? 'Cancel' : 'Add Referee'}
           </button>
-        </div>
-      </div>
+        )}
+      />
 
       {/* Add/Edit Form */}
       {showForm && (
@@ -217,58 +217,78 @@ const AdminRefereesManagement: React.FC = () => {
           <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-900"></div>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-blue-900 text-white">
-                <tr>
-                  <th className="px-6 py-4 text-left font-bold uppercase text-sm">#</th>
-                  <th className="px-6 py-4 text-left font-bold uppercase text-sm">Name</th>
-                  <th className="px-6 py-4 text-left font-bold uppercase text-sm">Qualification</th>
-                  <th className="px-6 py-4 text-left font-bold uppercase text-sm">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200">
-                {referees.map((referee, index) => (
-                  <tr key={referee._id} className="hover:bg-slate-50 transition-colors">
-                    <td className="px-6 py-4 text-slate-700 font-bold">{index + 1}</td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <Shield className="w-5 h-5 text-slate-600" />
-                        <span className="text-slate-900 font-bold">{referee.name}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-bold">
-                        {referee.qualification}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleEdit(referee)}
-                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                          title="Edit"
-                        >
-                          <Edit2 className="w-5 h-5" />
-                        </button>
-                        {canDelete && (
-                          <button
-                            onClick={() => handleDelete(referee._id)}
-                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                            title="Delete"
-                          >
-                            <Trash2 className="w-5 h-5" />
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        isMobile ? (
+          <div className="space-y-4">
+            {referees.map((referee, index) => (
+              <div key={referee._id} className="bg-white rounded-xl shadow-sm border p-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm text-slate-500">#{index + 1}</div>
+                    <div className="font-bold text-slate-900 truncate">{referee.name}</div>
+                    <div className="mt-1 text-xs text-slate-600 break-words">{referee.qualification}</div>
+                  </div>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <button onClick={() => handleEdit(referee)} className="px-3 py-2 bg-indigo-600 text-white rounded-md text-xs flex items-center gap-2">Edit</button>
+                    {canDelete && <button onClick={() => handleDelete(referee._id)} className="px-3 py-2 bg-red-600 text-white rounded-md text-xs">Delete</button>}
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
+        ) : (
+          <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-blue-900 text-white">
+                  <tr>
+                    <th className="px-6 py-4 text-left font-bold uppercase text-sm">#</th>
+                    <th className="px-6 py-4 text-left font-bold uppercase text-sm">Name</th>
+                    <th className="px-6 py-4 text-left font-bold uppercase text-sm">Qualification</th>
+                    <th className="px-6 py-4 text-left font-bold uppercase text-sm">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200">
+                  {referees.map((referee, index) => (
+                    <tr key={referee._id} className="hover:bg-slate-50 transition-colors">
+                      <td className="px-6 py-4 text-slate-700 font-bold">{index + 1}</td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <Shield className="w-5 h-5 text-slate-600" />
+                          <span className="text-slate-900 font-bold">{referee.name}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-bold">
+                          {referee.qualification}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleEdit(referee)}
+                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            title="Edit"
+                          >
+                            <Edit2 className="w-5 h-5" />
+                          </button>
+                          {canDelete && (
+                            <button
+                              onClick={() => handleDelete(referee._id)}
+                              className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                              title="Delete"
+                            >
+                              <Trash2 className="w-5 h-5" />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )
       )}
     </div>
   );

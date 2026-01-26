@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Shield, UserCog, Mail, Trash2, ToggleLeft, ToggleRight, ArrowLeft } from 'lucide-react';
+import AdminPageHeader from '../components/admin/AdminPageHeader';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -160,38 +161,31 @@ const AdminManageAdmins: React.FC = () => {
           <div className="flex items-center gap-3">
             <Shield className="text-blue-900" size={32} />
             <div>
-              <h1 className="text-2xl md:text-3xl font-oswald font-bold text-blue-900 uppercase tracking-tight">
-                Admin Management
-              </h1>
-              <p className="text-slate-500 text-sm">Superadmin can control roles and module access for each admin.</p>
+              <AdminPageHeader
+                title="Admin Management"
+                subtitle="Superadmin can control roles and module access for each admin."
+                showManageModules={true}
+                onManageModules={() => setShowModuleModal(true)}
+                actions={null}
+              />
             </div>
-          </div>
-
-          {/* Module management (superadmin only) */}
-          <div className="hidden md:flex items-center gap-3">
-            <button
-              onClick={() => setShowModuleModal(true)}
-              className="px-3 py-2 rounded-full bg-white text-blue-700 text-xs font-bold border border-blue-200 hover:shadow-sm transition-all"
-            >
-              Manage Modules
-            </button>
-            <button
-              onClick={() => (window.location.href = '/admin-portal-access')}
-              className="px-4 py-2 rounded-full bg-blue-900 text-white text-xs font-bold uppercase tracking-widest hover:bg-blue-700 transition-all"
-            >
-              Back to Dashboard
-            </button>
           </div>
 
           {/* Mobile fallback: small Manage Modules button */}
         </div>
 
-        <div className="md:hidden mb-4">
+        <div className="md:hidden mb-4 space-y-2">
           <button
             onClick={() => setShowModuleModal(true)}
             className="w-full px-3 py-2 rounded-full bg-white text-blue-700 text-sm font-semibold border border-slate-200"
           >
             Manage Modules
+          </button>
+          <button
+            onClick={() => (window.location.href = '/admin-portal-access')}
+            className="w-full px-3 py-2 rounded-full bg-blue-900 text-white text-sm font-semibold"
+          >
+            Back to Dashboard
           </button>
         </div>
 
@@ -254,15 +248,15 @@ const AdminManageAdmins: React.FC = () => {
                         <UserCog size={16} />
                       </div>
                     </div>
-                    <div>
+                    <div className="min-w-0">
                       <div className="font-semibold text-slate-900 flex flex-wrap items-center gap-2">
                         {admin.username}
                         <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest bg-slate-100 text-slate-600">
                           {admin.role === 'superadmin' ? 'SUPERADMIN' : 'ADMIN'}
                         </span>
                       </div>
-                      <div className="text-xs text-slate-500 flex items-center gap-1 mt-0.5 break-all">
-                        <Mail size={12} /> {admin.email}
+                      <div className="text-xs text-slate-500 flex items-center gap-1 mt-0.5 break-words">
+                        <Mail size={12} /> <span className="break-words">{admin.email}</span>
                       </div>
                     </div>
                   </div>

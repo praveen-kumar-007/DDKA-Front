@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Download, Check, X, Trash2, Edit2 } from 'lucide-react';
+import StatusMark from '../components/admin/StatusMark';
 
 interface Donation {
   _id: string;
@@ -275,14 +276,13 @@ const AdminDonations: React.FC = () => {
   };
 
   const statusBadge = (s?: string) => {
-    switch (s) {
-      case 'confirmed':
-        return <span className="inline-block px-2 py-1 text-xs rounded-full bg-emerald-100 text-emerald-800 font-semibold">Confirmed</span>;
-      case 'failed':
-        return <span className="inline-block px-2 py-1 text-xs rounded-full bg-red-100 text-red-800 font-semibold">Failed</span>;
-      default:
-        return <span className="inline-block px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-900 font-semibold">Pending</span>;
-    }
+    const title = s ? (s[0].toUpperCase() + s.slice(1)) : 'Pending';
+    return (
+      <div className="flex items-center gap-2">
+        <StatusMark status={s} className="w-6 h-6" title={title} />
+        <span className="sr-only">{title}</span>
+      </div>
+    );
   };
 
   const exportCSV = () => {
@@ -304,16 +304,17 @@ const AdminDonations: React.FC = () => {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      <div className="mb-6 flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-oswald font-bold text-blue-900 uppercase">Donations</h1>
-          <p className="text-slate-600 mt-2">Manage incoming donations and payment proofs</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <button onClick={exportCSV} className="px-4 py-2 rounded-full bg-green-700 text-white text-xs font-bold uppercase tracking-widest hover:bg-green-600 transition-all flex items-center gap-2"><Download className="w-4 h-4"/> Export CSV</button>
-          <button onClick={fetchDonations} className="px-4 py-2 rounded-full bg-blue-900 text-white text-xs font-bold uppercase tracking-widest hover:bg-blue-700 transition-all">Refresh</button>
-        </div>
-      </div>
+      {/* Header */}
+      <AdminPageHeader
+        title="Donations"
+        subtitle="Manage incoming donations and payment proofs"
+        actions={(
+          <div className="flex items-center gap-3">
+            <button onClick={exportCSV} className="px-4 py-2 rounded-full bg-green-700 text-white text-xs font-bold uppercase tracking-widest hover:bg-green-600 transition-all flex items-center justify-center gap-2"><Download className="w-4 h-4"/> Export CSV</button>
+            <button onClick={fetchDonations} className="px-4 py-2 rounded-full bg-blue-900 text-white text-xs font-bold uppercase tracking-widest hover:bg-blue-700 transition-all">Refresh</button>
+          </div>
+        )}
+      />
 
       <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-4 mb-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -340,14 +341,14 @@ const AdminDonations: React.FC = () => {
             {filtered.map((d, i) => (
               <div key={d._id} className="bg-white rounded-xl shadow-sm border p-4">
                 <div className="flex justify-between items-start gap-4">
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
-                      <div>
+                      <div className="min-w-0">
                         <div className="text-sm text-slate-500">#{i + 1}</div>
-                        <div className="font-bold text-slate-900">{d.name}</div>
-                        <div className="text-xs text-slate-600">{d.email}</div>
+                        <div className="font-bold text-slate-900 truncate">{d.name}</div>
+                        <div className="text-xs text-slate-600 break-words">{d.email}</div>
                       </div>
-                      <div className="text-right">
+                      <div className="text-right flex-shrink-0 ml-3">
                         <div className="text-sm font-semibold">₹{d.amount}</div>
                         <div className="text-xs text-slate-500 mt-1">{d.createdAt ? new Date(d.createdAt).toLocaleString() : '-'}</div>
                         <div className="text-xs text-slate-500 mt-1">{d.phone ? `Phone: ${d.phone}` : ''}</div>
@@ -356,7 +357,7 @@ const AdminDonations: React.FC = () => {
                     </div>
 
                     {d.message && (
-                      <div className="mt-3 text-sm text-slate-700">{d.message}</div>
+                      <div className="mt-3 text-sm text-slate-700 break-words">{d.message}</div>
                     )}
 
                     <div className="mt-3 text-sm">
@@ -372,24 +373,24 @@ const AdminDonations: React.FC = () => {
                 {editingId === d._id ? (
                   <div className="mt-4 space-y-3">
                     <div className="flex flex-col sm:flex-row gap-2">
-                      <input value={editTxId} onChange={(e) => setEditTxId(e.target.value)} placeholder="Transaction ID (txId)" className="px-3 py-2 border rounded-lg w-full sm:w-48" />
-                      <input value={editReceiptNumber} onChange={(e) => setEditReceiptNumber(e.target.value)} placeholder="Receipt No." className="px-3 py-2 border rounded-lg w-full sm:w-40" />
+                      <input value={editTxId} onChange={(e) => setEditTxId(e.target.value)} placeholder="Transaction ID (txId)" className="px-3 py-2 border rounded-lg w-full sm:w-48 break-words" />
+                      <input value={editReceiptNumber} onChange={(e) => setEditReceiptNumber(e.target.value)} placeholder="Receipt No." className="px-3 py-2 border rounded-lg w-full sm:w-40 break-words" />
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-wrap">
                       <input type="file" accept="image/*" onChange={(e) => setEditReceiptFile(e.target.files ? e.target.files[0] : null)} />
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-wrap">
                       <button onClick={() => saveEdit(d._id)} disabled={editLoading} className="flex-1 px-3 py-2 bg-blue-900 text-white rounded-md text-sm">{editLoading ? 'Saving...' : 'Save'}</button>
                       <button onClick={cancelEdit} className="flex-1 px-3 py-2 bg-slate-200 rounded-md text-sm">Cancel</button>
                     </div>
                   </div>
                 ) : (
-                  <div className="mt-4 flex gap-2">
-                    <a href={`/donation/${d._id}`} target="_blank" rel="noreferrer" className="flex-1 px-3 py-2 bg-sky-600 text-white rounded-md text-sm flex items-center justify-center gap-2 hover:bg-sky-700 transition-colors">View Receipt</a>
-                    <button disabled={generatingId === d._id} onClick={() => generateReceiptPDF(d)} className="flex-1 px-3 py-2 bg-amber-600 disabled:opacity-60 text-white rounded-md text-sm flex items-center justify-center gap-2 hover:bg-amber-700 transition-colors">{generatingId === d._id ? 'Generating...' : (<><Download className="w-4 h-4"/>Receipt</>)}</button>
-                    <button onClick={() => openEdit(d)} className="flex-1 px-3 py-2 bg-indigo-600 text-white rounded-md text-sm flex items-center justify-center gap-2 hover:bg-indigo-700 transition-colors"><Edit2 className="w-4 h-4"/>Edit</button>
-                    <button onClick={() => updateStatus(d._id, 'confirmed')} className="flex-1 px-3 py-2 bg-emerald-600 text-white rounded-md text-sm flex items-center justify-center gap-2 hover:bg-emerald-700 transition-colors"><Check className="w-4 h-4"/>Confirm</button>
-                    <button onClick={() => updateStatus(d._id, 'failed')} className="flex-1 px-3 py-2 bg-red-600 text-white rounded-md text-sm flex items-center justify-center gap-2 hover:bg-red-700 transition-colors"><X className="w-4 h-4"/>Fail</button>
+                  <div className="mt-4 flex gap-2 flex-wrap">
+                    <a href={`/donation/${d._id}`} target="_blank" rel="noreferrer" className="flex-1 min-w-0 px-3 py-2 bg-sky-600 text-white rounded-md text-sm flex items-center justify-center gap-2 hover:bg-sky-700 transition-colors">View Receipt</a>
+                    <button disabled={generatingId === d._id} onClick={() => generateReceiptPDF(d)} className="flex-1 min-w-0 px-3 py-2 bg-amber-600 disabled:opacity-60 text-white rounded-md text-sm flex items-center justify-center gap-2 hover:bg-amber-700 transition-colors">{generatingId === d._id ? 'Generating...' : (<><Download className="w-4 h-4"/>Receipt</>)}</button>
+                    <button onClick={() => openEdit(d)} className="flex-1 min-w-0 px-3 py-2 bg-indigo-600 text-white rounded-md text-sm flex items-center justify-center gap-2 hover:bg-indigo-700 transition-colors"><Edit2 className="w-4 h-4"/>Edit</button>
+                    <button onClick={() => updateStatus(d._id, 'confirmed')} className="flex-1 min-w-0 px-3 py-2 bg-emerald-600 text-white rounded-md text-sm flex items-center justify-center gap-2 hover:bg-emerald-700 transition-colors"><Check className="w-4 h-4"/>Confirm</button>
+                    <button onClick={() => updateStatus(d._id, 'failed')} className="flex-1 min-w-0 px-3 py-2 bg-red-600 text-white rounded-md text-sm flex items-center justify-center gap-2 hover:bg-red-700 transition-colors"><X className="w-4 h-4"/>Fail</button>
                     {(adminRole === 'superadmin' || adminPermissions?.canDelete) && (
                       <button onClick={async () => {
                         if (!confirm('Are you sure you want to delete this donation?')) return;
@@ -400,7 +401,7 @@ const AdminDonations: React.FC = () => {
                           });
                           if (resp.ok) { alert('Donation deleted'); fetchDonations(); } else { alert('Failed to delete donation'); }
                         } catch (err) { console.error('Delete failed', err); alert('Delete failed'); }
-                      }} className="flex-1 px-3 py-2 bg-slate-500 text-white rounded-md text-sm flex items-center justify-center gap-2 hover:bg-slate-600 transition-colors"><Trash2 className="w-4 h-4"/>Delete</button>
+                      }} className="flex-1 min-w-0 px-3 py-2 bg-slate-500 text-white rounded-md text-sm flex items-center justify-center gap-2 hover:bg-slate-600 transition-colors"><Trash2 className="w-4 h-4"/>Delete</button>
                     )}
                   </div>
                 )}

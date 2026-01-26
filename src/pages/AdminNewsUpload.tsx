@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { X, Edit2, Eye } from 'lucide-react';
 import { Newspaper, Image as ImageIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import AdminPageHeader from '../components/admin/AdminPageHeader';
+import StatusMark from '../components/admin/StatusMark';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -141,15 +143,12 @@ const AdminNewsUpload = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white py-12 px-2">
       <div className="max-w-4xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-4xl font-extrabold flex items-center gap-3 text-blue-900 drop-shadow"><Newspaper size={32}/> Admin News Management</h1>
-          <button
-            onClick={() => navigate('/admin-portal-access')}
-            className="px-4 py-2 rounded-full bg-blue-900 text-white text-xs font-bold uppercase tracking-widest hover:bg-blue-700 transition-all"
-          >
-            Go to Dashboard
-          </button>
-        </div>
+        <AdminPageHeader
+          title="Admin News Management"
+          actions={(
+            <></>
+          )}
+        />
       {/* Upload Form */}
       <form onSubmit={handleSubmit} className="bg-white rounded-3xl shadow-2xl border border-slate-100 p-10 flex flex-col md:flex-row gap-10 mb-16 items-stretch">
         {/* Left: Form Fields */}
@@ -234,7 +233,9 @@ const AdminNewsUpload = () => {
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-xs px-2 py-1 rounded bg-blue-50 text-blue-700 font-bold uppercase">{item.category}</span>
                 {item.isHighlight && <span className="text-xs px-2 py-1 rounded bg-orange-100 text-orange-700 font-bold">Highlight</span>}
-                <span className={`text-xs px-2 py-1 rounded ${item.status === 'published' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>{item.status}</span>
+                <div className="flex items-center gap-2">
+                  <StatusMark status={item.status} className="w-6 h-6" title={item.status} />
+                </div>
               </div>
               <h3 className="text-lg font-bold mb-1 line-clamp-1">{item.title}</h3>
               <div className="text-xs text-slate-400 mb-2">{new Date(item.createdAt).toLocaleDateString()}</div>

@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Download, User, Phone, Info, Building2, Wallet } from "lucide-react";
 import { formatDateMDY } from '../utils/date';
+import AdminPageHeader from '../components/admin/AdminPageHeader';
+import StatusMark from '../components/admin/StatusMark';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -208,50 +210,28 @@ const AdminRegistrationDetails = () => {
   // --- Layout: Two columns on desktop, stacked on mobile ---
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-100 to-blue-50 p-4 md:p-8">
-      <div className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-sm border-b border-slate-200">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-          <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-blue-900 font-bold hover:underline">
-            <ArrowLeft size={22} /> Back
-          </button>
+      <div className="max-w-6xl mx-auto mb-4">
+        <AdminPageHeader
+          title={type === 'player' ? data.fullName : data.instName}
+          subtitle={type === 'player' ? data.email : 'Institution registration'}
+          actions={(
+            <div className="flex items-center gap-2">
+              {type === 'player' && data?.status === 'Approved' && (
+                <>
+                  {data?.idNo ? (
+                    <button onClick={handleViewIdCard} className="px-4 py-2 rounded-full bg-green-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-green-700 transition-all flex items-center gap-2"><Wallet size={16} /> View ID Card</button>
+                  ) : (
+                    <button onClick={generateIdNo} className="px-4 py-2 rounded-full bg-green-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-green-700 transition-all flex items-center gap-2"><Wallet size={16} /> Generate ID</button>
+                  )}
 
-          <div className="flex gap-2">
-            {type === 'player' && data?.status === 'Approved' && (
-              <>
-                {data?.idNo ? (
-                  <button
-                    onClick={handleViewIdCard}
-                    className="px-4 py-2 rounded-full bg-green-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-green-700 transition-all flex items-center gap-2"
-                  >
-                    <Wallet size={16} /> View ID Card
-                  </button>
-                ) : (
-                  <button
-                    onClick={generateIdNo}
-                    className="px-4 py-2 rounded-full bg-green-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-green-700 transition-all flex items-center gap-2"
-                  >
-                    <Wallet size={16} /> Generate ID
-                  </button>
-                )}
-
-                {data?.idNo && adminRole === 'superadmin' && (
-                  <button
-                    onClick={handleDeleteId}
-                    className="px-4 py-2 rounded-full bg-red-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-red-700 transition-all"
-                  >
-                    Delete ID
-                  </button>
-                )}
-              </>
-            )}
-
-            <button
-              onClick={() => navigate('/admin-portal-access')}
-              className="px-4 py-2 rounded-full bg-blue-900 text-white text-xs font-bold uppercase tracking-widest hover:bg-blue-700 transition-all"
-            >
-              Go to Dashboard
-            </button>
-          </div>
-        </div>
+                  {data?.idNo && adminRole === 'superadmin' && (
+                    <button onClick={handleDeleteId} className="px-4 py-2 rounded-full bg-red-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-red-700 transition-all">Delete ID</button>
+                  )}
+                </>
+              )}
+            </div>
+          )}
+        />
       </div>
 
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-12 items-start">
@@ -354,7 +334,7 @@ const AdminRegistrationDetails = () => {
               {type === 'player' && <div className="text-blue-700 text-base font-medium">{data.email}</div>}
             </div>
             <div className="flex flex-row items-center gap-4 md:gap-6">
-              <span className={`px-3 py-1 rounded-full text-xs font-bold h-fit ${data.status === 'Approved' ? 'bg-green-100 text-green-700' : data.status === 'Rejected' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}>{data.status}</span>
+              <StatusMark status={data.status} />
               <span className="text-xs text-gray-500 whitespace-nowrap">Registered: {new Date(data.createdAt).toLocaleDateString()}</span>
             </div>
           </div>
@@ -403,7 +383,7 @@ const AdminRegistrationDetails = () => {
                   {data.reasonForJoining && <div className="md:col-span-2"><span className="font-semibold">Reason for Joining:</span> {data.reasonForJoining}</div>}
                   <div><span className="font-semibold">Transaction ID:</span> {data.transactionId}</div>
                   <div><span className="font-semibold">Registered At:</span> {new Date(data.createdAt).toLocaleString()}</div>
-                  <div><span className="font-semibold">Status:</span> <span className={`px-2 py-1 rounded text-xs font-bold ${data.status === 'Approved' ? 'bg-green-100 text-green-700' : data.status === 'Rejected' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}>{data.status}</span></div>
+                  <div className="flex items-center gap-2"><span className="font-semibold">Status:</span> <StatusMark status={data.status} /></div>
                 </div>
               </div>
             </div>
@@ -440,7 +420,7 @@ const AdminRegistrationDetails = () => {
                   <span className="font-extrabold text-lg text-green-700 tracking-wide">OTHER DETAILS</span>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
-                  <div><span className="font-semibold">Status:</span> <span className={`px-2 py-1 rounded text-xs font-bold ${data.status === 'Approved' ? 'bg-green-100 text-green-700' : data.status === 'Rejected' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}>{data.status}</span></div>
+                  <div className="flex items-center gap-2"><span className="font-semibold">Status:</span> <StatusMark status={data.status} /></div>
                   <div><span className="font-semibold">Transaction ID:</span> {data.transactionId}</div>
                   <div><span className="font-semibold">Registered At:</span> {new Date(data.createdAt).toLocaleString()}</div>
                 </div>

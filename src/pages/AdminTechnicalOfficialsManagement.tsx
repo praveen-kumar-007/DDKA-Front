@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle2, XCircle, Edit2, Trash2, UserCheck, Save, X } from 'lucide-react';
+import AdminPageHeader from '../components/admin/AdminPageHeader';
+import StatusMark from '../components/admin/StatusMark';
 
 interface TechnicalOfficial {
   _id: string;
@@ -80,6 +82,15 @@ const AdminTechnicalOfficialsManagement: React.FC = () => {
     }
 
     fetchOfficials();
+  }, []);
+
+  // Mobile detection for responsive admin views
+  const [isMobile, setIsMobile] = useState<boolean>(false);
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 768);
+    onResize();
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
   }, []);
 
   const canDelete = adminRole === 'superadmin' || !!adminPermissions?.canDelete;
@@ -191,140 +202,168 @@ const AdminTechnicalOfficialsManagement: React.FC = () => {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      <div className="mb-8 flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-oswald font-bold text-blue-900 uppercase flex items-center gap-2">
-            <UserCheck className="w-7 h-7" /> Technical Officials
-          </h1>
-          <p className="text-slate-600 mt-2">Manage DDKA Technical Officials applications</p>
-        </div>
-        <button
-          onClick={() => { window.location.href = '/admin-portal-access'; }}
-          className="px-4 py-2 rounded-full bg-blue-900 text-white text-xs font-bold uppercase tracking-widest hover:bg-blue-700 transition-all"
-        >
-          Go to Dashboard
-        </button>
-      </div>
+      {/* Header */}
+      <AdminPageHeader
+        title="Technical Officials"
+        subtitle="Manage DDKA Technical Officials applications"
+        actions={null}
+      />
 
       {loading ? (
         <div className="flex items-center justify-center py-20">
           <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-900" />
         </div>
       ) : (
-        <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-blue-900 text-white">
-                <tr>
-                  <th className="px-4 py-3 text-left text-xs font-bold uppercase">Photo</th>
-                  <th className="px-4 py-3 text-left text-xs font-bold uppercase">Name</th>
-                  <th className="px-4 py-3 text-left text-xs font-bold uppercase">Contact</th>
-                  <th className="px-4 py-3 text-left text-xs font-bold uppercase">Level</th>
-                  <th className="px-4 py-3 text-left text-xs font-bold uppercase">Payment</th>
-                  <th className="px-4 py-3 text-left text-xs font-bold uppercase">Status</th>
-                  <th className="px-4 py-3 text-left text-xs font-bold uppercase">Remarks</th>
-                  <th className="px-4 py-3 text-right text-xs font-bold uppercase">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {officials.map((off) => (
-                  <tr key={off._id} className="hover:bg-slate-50 transition-colors">
-                    <td className="px-4 py-3">
-                      <div className="flex items-center">
-                        {off.photoUrl ? (
-                          <img
-                            src={off.photoUrl}
-                            alt={off.candidateName}
-                            className="w-10 h-10 rounded-full object-cover border border-slate-200"
-                          />
-                        ) : (
-                          <div className="w-10 h-10 rounded-full bg-slate-200" />
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-sm font-semibold text-slate-900">
-                      <div>{off.candidateName}</div>
-                      <div className="text-xs text-slate-500">Aadhar: {off.aadharNumber}</div>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-slate-700">
-                      <div>{off.email}</div>
-                      <div className="text-xs text-slate-500">+91 {off.mobile}</div>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-slate-700">
-                      <div>{off.playerLevel}</div>
-                      <div className="text-xs text-slate-500">{off.gender}</div>
-                      <div className="text-xs text-slate-500">Blood: {off.bloodGroup || 'NA'}</div>
-                    </td>
-                    <td className="px-4 py-3 text-xs text-slate-700">
-                      <div className="font-semibold">₹{off.examFee || 1000}</div>
-                      <div className="text-[11px] text-slate-500 break-words">
-                        TXN: {off.transactionId || '-'}
-                      </div>
-                      {off.receiptUrl && (
-                        <button
-                          type="button"
-                          onClick={() => window.open(off.receiptUrl, '_blank')}
-                          className="mt-1 inline-flex px-2 py-1 rounded-full bg-blue-50 text-blue-700 text-[11px] font-semibold hover:bg-blue-100"
-                        >
-                          View Receipt
-                        </button>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-sm">
-                      <span className={`inline-flex px-3 py-1 rounded-full text-xs font-bold ${badgeColor(off.status)}`}>
-                        {off.status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-xs text-slate-600 max-w-xs truncate">
-                      {off.remarks || '-'}
-                    </td>
-                    <td className="px-4 py-3 text-right text-xs">
-                      <div className="flex justify-end gap-2">
-                        <button
-                          onClick={() => navigate(`/admin/technical-officials/${off._id}`)}
-                          className="inline-flex items-center justify-center px-3 h-8 rounded-full bg-blue-50 text-blue-700 hover:bg-blue-100 text-xs font-semibold"
-                          title="View more"
-                        >
-                          View
-                        </button>
-                        <button
-                          onClick={() => handleStatusChange(off._id, 'Approved')}
-                          className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
-                          title="Approve"
-                        >
-                          <CheckCircle2 className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleStatusChange(off._id, 'Rejected')}
-                          className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-50 text-red-700 hover:bg-red-100"
-                          title="Reject"
-                        >
-                          <XCircle className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => openEdit(off)}
-                          className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-50 text-slate-700 hover:bg-slate-100"
-                          title="Edit"
-                        >
-                          <Edit2 className="w-4 h-4" />
-                        </button>
-                        {canDelete && (
+        isMobile ? (
+          <div className="space-y-4">
+            {officials.map((off) => (
+              <div key={off._id} className="bg-white rounded-xl shadow-sm border p-4">
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0">
+                    {off.photoUrl ? (
+                      <img src={off.photoUrl} alt={off.candidateName} className="w-12 h-12 rounded-full object-cover border border-slate-200" />
+                    ) : (
+                      <div className="w-12 h-12 rounded-full bg-slate-200" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-bold text-slate-900 truncate">{off.candidateName}</div>
+                    <div className="text-xs text-slate-600 break-words">{off.email} • +91 {off.mobile}</div>
+                    <div className="text-xs text-slate-600 mt-1">{off.playerLevel} • {off.gender}</div>
+                    <div className="text-sm font-semibold mt-2">₹{off.examFee || 1000}</div>
+                    <div className="text-xs text-slate-500 mt-1 break-words">TXN: {off.transactionId || '-'}</div>
+                    <div className="mt-2">{off.receiptUrl ? <a href={off.receiptUrl} target="_blank" rel="noreferrer" className="text-blue-700 underline break-words">View Receipt</a> : <span className="text-slate-400">No receipt</span>}</div>
+                    <div className="mt-2 text-xs break-words">{off.remarks || '-'}</div>
+                  </div>
+                </div>
+
+                <div className="mt-3 flex gap-2 flex-wrap">
+                  <button onClick={() => navigate(`/admin/technical-officials/${off._id}`)} className="flex-1 min-w-0 px-3 py-2 bg-blue-50 text-blue-700 rounded-md text-sm">View</button>
+                  <button onClick={() => handleStatusChange(off._id, 'Approved')} className="px-3 py-2 bg-emerald-50 text-emerald-700 rounded-md text-sm">Approve</button>
+                  <button onClick={() => handleStatusChange(off._id, 'Rejected')} className="px-3 py-2 bg-red-50 text-red-700 rounded-md text-sm">Reject</button>
+                  <button onClick={() => openEdit(off)} className="px-3 py-2 bg-slate-50 text-slate-700 rounded-md text-sm">Edit</button>
+                  {canDelete && <button onClick={() => handleDelete(off._id)} className="px-3 py-2 bg-red-500 text-white rounded-md text-sm">Delete</button>}
+                </div>
+              </div>
+            ))} 
+          </div>
+        ) : (
+          <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-blue-900 text-white">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-bold uppercase">Photo</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold uppercase">Name</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold uppercase">Contact</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold uppercase">Level</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold uppercase">Payment</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold uppercase">Status</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold uppercase">Remarks</th>
+                    <th className="px-4 py-3 text-right text-xs font-bold uppercase">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {officials.map((off) => (
+                    <tr key={off._id} className="hover:bg-slate-50 transition-colors">
+                      <td className="px-4 py-3">
+                        <div className="flex items-center">
+                          {off.photoUrl ? (
+                            <img
+                              src={off.photoUrl}
+                              alt={off.candidateName}
+                              className="w-10 h-10 rounded-full object-cover border border-slate-200"
+                            />
+                          ) : (
+                            <div className="w-10 h-10 rounded-full bg-slate-200" />
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-sm font-semibold text-slate-900">
+                        <div>{off.candidateName}</div>
+                        <div className="text-xs text-slate-500">Aadhar: {off.aadharNumber}</div>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-slate-700">
+                        <div>{off.email}</div>
+                        <div className="text-xs text-slate-500">+91 {off.mobile}</div>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-slate-700">
+                        <div>{off.playerLevel}</div>
+                        <div className="text-xs text-slate-500">{off.gender}</div>
+                        <div className="text-xs text-slate-500">Blood: {off.bloodGroup || 'NA'}</div>
+                      </td>
+                      <td className="px-4 py-3 text-xs text-slate-700">
+                        <div className="font-semibold">₹{off.examFee || 1000}</div>
+                        <div className="text-[11px] text-slate-500 break-words">
+                          TXN: {off.transactionId || '-'}
+                        </div>
+                        {off.receiptUrl && (
                           <button
-                            onClick={() => handleDelete(off._id)}
-                            className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-50 text-red-700 hover:bg-red-100"
-                            title="Delete"
+                            type="button"
+                            onClick={() => window.open(off.receiptUrl, '_blank')}
+                            className="mt-1 inline-flex px-2 py-1 rounded-full bg-blue-50 text-blue-700 text-[11px] font-semibold hover:bg-blue-100"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            View Receipt
                           </button>
                         )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                      </td>
+                      <td className="px-4 py-3 text-sm">
+                        <div className="flex items-center gap-2">
+                          <StatusMark status={off.status} className="w-6 h-6" title={off.status} />
+                          <span className="sr-only">{off.status}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-xs text-slate-600 max-w-xs truncate">
+                        {off.remarks || '-'}
+                      </td>
+                      <td className="px-4 py-3 text-right text-xs">
+                        <div className="flex justify-end gap-2">
+                          <button
+                            onClick={() => navigate(`/admin/technical-officials/${off._id}`)}
+                            className="inline-flex items-center justify-center px-3 h-8 rounded-full bg-blue-50 text-blue-700 hover:bg-blue-100 text-xs font-semibold"
+                            title="View more"
+                          >
+                            View
+                          </button>
+                          <button
+                            onClick={() => handleStatusChange(off._id, 'Approved')}
+                            className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                            title="Approve"
+                          >
+                            <CheckCircle2 className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleStatusChange(off._id, 'Rejected')}
+                            className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-50 text-red-700 hover:bg-red-100"
+                            title="Reject"
+                          >
+                            <XCircle className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => openEdit(off)}
+                            className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-50 text-slate-700 hover:bg-slate-100"
+                            title="Edit"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                          {canDelete && (
+                            <button
+                              onClick={() => handleDelete(off._id)}
+                              className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-50 text-red-700 hover:bg-red-100"
+                              title="Delete"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
+        )
       )}
 
       {editing && (

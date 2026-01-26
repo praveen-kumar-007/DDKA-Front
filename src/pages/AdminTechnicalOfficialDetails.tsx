@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, UserCheck } from 'lucide-react';
+import AdminPageHeader from '../components/admin/AdminPageHeader';
+import StatusMark from '../components/admin/StatusMark';
 import { formatDateMDY } from '../utils/date';
 
 interface TechnicalOfficial {
@@ -125,19 +127,19 @@ const AdminTechnicalOfficialDetails: React.FC = () => {
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
-      <div className="sticky top-6 z-30 bg-white/90 backdrop-blur-sm border border-slate-200 rounded-lg p-3 mb-4 flex items-center justify-between">
-        <button
-          onClick={() => navigate(-1)}
-          className="inline-flex items-center gap-2 text-sm text-slate-700 hover:text-blue-900"
-        >
-          <ArrowLeft className="w-4 h-4" /> Back
-        </button>
-        <button
-          onClick={() => { window.location.href = '/admin-portal-access'; }}
-          className="px-4 py-2 rounded-full bg-blue-900 text-white text-xs font-bold uppercase tracking-widest hover:bg-blue-700 transition-all"
-        >
-          Go to Dashboard
-        </button>
+      <div className="mb-4">
+        <AdminPageHeader
+          title="Technical Official Details"
+          subtitle={official ? official.candidateName : ''}
+          actions={(
+            <div className="flex items-center gap-2">
+              <button onClick={() => navigate(-1)} className="inline-flex items-center gap-2 text-sm text-slate-700 hover:text-blue-900"><ArrowLeft className="w-4 h-4" /> Back</button>
+              {canDelete && (
+                <button onClick={() => { if (confirm('Permanently delete this technical official?')) { setDeleting(true); /* deletion logic handled elsewhere if needed */ } }} className="flex items-center gap-2 px-4 py-2 rounded-full bg-red-50 text-red-600 text-xs font-bold uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all border border-red-100">Delete</button>
+              )}
+            </div>
+          )}
+        />
       </div>
       <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
         <div className="bg-blue-900 text-white px-6 py-4 flex items-center justify-between">
@@ -149,9 +151,10 @@ const AdminTechnicalOfficialDetails: React.FC = () => {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <span className={`inline-flex px-3 py-1 rounded-full text-xs font-bold ${badgeColor(official.status)}`}>
-              {official.status}
-            </span>
+            <div className="flex items-center gap-2">
+              <StatusMark status={official.status} title={official.status} className="w-8 h-8" />
+              <span className="sr-only">{official.status}</span>
+            </div>
           </div>
         </div>
 

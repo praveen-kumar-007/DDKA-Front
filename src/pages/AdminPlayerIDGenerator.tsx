@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Download, Eye, LayoutGrid, List, Search, AlertCircle, Loader } from 'lucide-react';
+import AdminPageHeader from '../components/admin/AdminPageHeader';
+import StatusMark from '../components/admin/StatusMark';
 import { IDCardFront } from './Frontcard';
 import { IDCardBack } from './Backcard';
 import type { IDCardData } from '../types';
@@ -225,18 +227,13 @@ const AdminPlayerIDGenerator = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-4xl font-black text-slate-900">Player ID Generator</h1>
-          <p className="text-slate-600 mt-2">Generate and download official ID cards for approved players</p>
-        </div>
-        <button
-          onClick={() => navigate('/admin-portal-access')}
-          className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition"
-        >
-          ← Back to Dashboard
-        </button>
-      </div>
+      <AdminPageHeader
+        title="Player ID Generator"
+        subtitle="Generate and download official ID cards for approved players"
+        actions={(
+          <></>
+        )}
+      />
 
       {/* Search Bar */}
       <div className="mb-6 flex gap-4 items-center">
@@ -301,8 +298,9 @@ const AdminPlayerIDGenerator = () => {
                   <p className="text-sm text-slate-600">ID: DDKA-{player.transactionId.slice(-6).toUpperCase()}</p>
                   <p className="text-sm text-slate-500 mt-1">{player.phone}</p>
                 </div>
-                <div className="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded">
-                  {player.status}
+                <div className="flex items-center gap-2">
+                  <StatusMark status={player.status} className="w-6 h-6" title={player.status} />
+                  <span className="sr-only">{player.status}</span>
                 </div>
               </div>
 
