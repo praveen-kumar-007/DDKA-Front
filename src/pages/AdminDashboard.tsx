@@ -76,7 +76,51 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
+  // Pending counts for admin attention
+  const [pendingPlayers, setPendingPlayers] = useState<number>(0);
+  const [pendingInstitutions, setPendingInstitutions] = useState<number>(0);
+  const [pendingOfficials, setPendingOfficials] = useState<number>(0);
+  const [pendingDonations, setPendingDonations] = useState<number>(0);
+
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+  const fetchPendingCounts = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
+
+      const [playersRes, instRes, offsRes, donsRes] = await Promise.all([
+        fetch(`${API_URL}/api/players`, { headers }),
+        fetch(`${API_URL}/api/institutions`, { headers }),
+        fetch(`${API_URL}/api/technical-officials`, { headers }),
+        fetch(`${API_URL}/api/donations`, { headers }),
+      ]);
+
+      const [playersJson, instJson, offsJson, donsJson] = await Promise.all([
+        playersRes.ok ? playersRes.json() : null,
+        instRes.ok ? instRes.json() : null,
+        offsRes.ok ? offsRes.json() : null,
+        donsRes.ok ? donsRes.json() : null,
+      ]);
+
+      const pCount = Array.isArray(playersJson) ? playersJson.filter((p: any) => (p.status || '').toLowerCase() === 'pending').length : (playersJson && playersJson.data ? playersJson.data.filter((p: any) => (p.status || '').toLowerCase() === 'pending').length : 0);
+      const iCount = Array.isArray(instJson) ? instJson.filter((i: any) => (i.status || '').toLowerCase() === 'pending').length : (instJson && instJson.data ? instJson.data.filter((i: any) => (i.status || '').toLowerCase() === 'pending').length : 0);
+      const oCount = Array.isArray(offsJson) ? offsJson.filter((o: any) => (o.status || '').toLowerCase() === 'pending').length : (offsJson && offsJson.data ? offsJson.data.filter((o: any) => (o.status || '').toLowerCase() === 'pending').length : 0);
+      const dCount = Array.isArray(donsJson) ? donsJson.filter((d: any) => (d.status || '').toLowerCase() === 'pending').length : (donsJson && donsJson.data ? donsJson.data.filter((d: any) => (d.status || '').toLowerCase() === 'pending').length : 0);
+
+      setPendingPlayers(pCount || 0);
+      setPendingInstitutions(iCount || 0);
+      setPendingOfficials(oCount || 0);
+      setPendingDonations(dCount || 0);
+    } catch (e) {
+      console.error('Failed to fetch pending counts', e);
+    }
+  };
+
+  // Fetch pending counts on mount and when permissions change
+  useEffect(() => {
+    fetchPendingCounts();
+  }, [API_URL, adminRole, adminPermissions]);
 
   // Load public settings (which control module visibility)
   useEffect(() => {
@@ -532,14 +576,19 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
                   : 'bg-slate-100 text-slate-400 cursor-not-allowed'
               }`}
             >
-              <Gavel
-                size={28}
-                className={`${
-                  adminRole === 'superadmin' || adminPermissions?.canAccessReferees
-                    ? 'text-amber-700 mb-2'
-                    : 'text-slate-400 mb-2'
-                }`}
-              />
+              <div className="relative w-full flex items-center justify-center">
+                <Gavel
+                  size={28}
+                  className={`${
+                    adminRole === 'superadmin' || adminPermissions?.canAccessReferees
+                      ? 'text-amber-700 mb-2'
+                      : 'text-slate-400 mb-2'
+                  }`}
+                />
+                {0 > 0 && (adminRole === 'superadmin' || adminPermissions?.canAccessReferees) && (
+                  <div className="absolute -top-1 -right-1 inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-700 text-white text-xs font-bold">0</div>
+                )}
+              </div>
               <span className="font-bold text-xs">Referee Board</span>
             </button>
           )}
@@ -559,14 +608,19 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
                 adminRole === 'superadmin' || adminPermissions?.canAccessDonations ? 'bg-white hover:bg-slate-50 cursor-pointer' : 'bg-slate-100 text-slate-400 cursor-not-allowed'
               }`}
             >
-              <Heart
-                size={28}
-                className={`${
-                  adminRole === 'superadmin' || adminPermissions?.canAccessDonations
-                    ? 'text-rose-700 mb-2'
-                    : 'text-slate-400 mb-2'
-                }`}
-              />
+              <div className="relative w-full flex items-center justify-center">
+                <Heart
+                  size={28}
+                  className={`${
+                    adminRole === 'superadmin' || adminPermissions?.canAccessDonations
+                      ? 'text-rose-700 mb-2'
+                      : 'text-slate-400 mb-2'
+                  }`}
+                />
+                {pendingDonations > 0 && (adminRole === 'superadmin' || adminPermissions?.canAccessDonations) && (
+                  <div className="absolute -top-1 -right-1 inline-flex items-center justify-center w-6 h-6 rounded-full bg-rose-700 text-white text-xs font-bold">{pendingDonations}</div>
+                )}
+              </div>
               <span className="font-bold text-xs">Donations</span>
             </button>
           )}
@@ -588,14 +642,19 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
                   : 'bg-slate-100 text-slate-400 cursor-not-allowed'
               }`}
             >
-              <UserCheck
-                size={28}
-                className={`${
-                  adminRole === 'superadmin' || adminPermissions?.canAccessTechnicalOfficials
-                    ? 'text-emerald-700 mb-2'
-                    : 'text-slate-400 mb-2'
-                }`}
-              />
+              <div className="relative w-full flex items-center justify-center">
+                <UserCheck
+                  size={28}
+                  className={`${
+                    adminRole === 'superadmin' || adminPermissions?.canAccessTechnicalOfficials
+                      ? 'text-emerald-700 mb-2'
+                      : 'text-slate-400 mb-2'
+                  }`}
+                />
+                {pendingOfficials > 0 && (adminRole === 'superadmin' || adminPermissions?.canAccessTechnicalOfficials) && (
+                  <div className="absolute -top-1 -right-1 inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-700 text-white text-xs font-bold">{pendingOfficials}</div>
+                )}
+              </div>
               <span className="font-bold text-xs">Technical Officials</span>
             </button>
           )}
@@ -683,16 +742,21 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
                       : 'bg-slate-100 text-slate-400 cursor-not-allowed'
               }`}
             >
-              <Users
-                size={28}
-                className={
-                  activeTab === 'players'
-                    ? 'text-orange-400'
-                    : (adminRole === 'superadmin' || adminPermissions?.canAccessPlayerDetails)
-                        ? 'text-blue-900'
-                        : 'text-slate-400'
-                }
-              />
+              <div className="relative w-full flex items-center justify-center">
+                <Users
+                  size={28}
+                  className={
+                    activeTab === 'players'
+                      ? 'text-orange-400'
+                      : (adminRole === 'superadmin' || adminPermissions?.canAccessPlayerDetails)
+                          ? 'text-blue-900'
+                          : 'text-slate-400'
+                  }
+                />
+                {pendingPlayers > 0 && (adminRole === 'superadmin' || adminPermissions?.canAccessPlayerDetails) && (
+                  <div className="absolute -top-1 -right-1 inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-600 text-white text-xs font-bold">{pendingPlayers}</div>
+                )}
+              </div>
               <span className="font-bold text-xs">Player Details</span>
             </button>
           )}
@@ -715,16 +779,21 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
                     : 'bg-slate-100 text-slate-400 cursor-not-allowed'
             }`}
           >
-            <Building
-              size={28}
-              className={
-                activeTab === 'institutions'
-                  ? 'text-orange-400'
-                  : (adminRole === 'superadmin' || adminPermissions?.canAccessInstitutionDetails)
-                      ? 'text-blue-900'
-                      : 'text-slate-400'
-              }
-            />
+            <div className="relative w-full flex items-center justify-center">
+              <Building
+                size={28}
+                className={
+                  activeTab === 'institutions'
+                    ? 'text-orange-400'
+                    : (adminRole === 'superadmin' || adminPermissions?.canAccessInstitutionDetails)
+                        ? 'text-blue-900'
+                        : 'text-slate-400'
+                }
+              />
+              {pendingInstitutions > 0 && (adminRole === 'superadmin' || adminPermissions?.canAccessInstitutionDetails) && (
+                <div className="absolute -top-1 -right-1 inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-600 text-white text-xs font-bold">{pendingInstitutions}</div>
+              )}
+            </div>
             <span className="font-bold text-xs">Institution Details</span>
           </button>
         </div>
