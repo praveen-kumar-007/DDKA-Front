@@ -174,9 +174,11 @@ const AffiliatedInstitutions: React.FC<AffiliatedInstitutionsProps> = ({ lang })
             viewMode === 'grid' ? (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                 {filteredInstitutions.map((inst, index) => (
-                  <div 
-                    key={inst._id} 
-                    className="group bg-white rounded-2xl md:rounded-3xl p-4 md:p-6 shadow-sm border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col items-center text-center"
+                  <Link
+                    key={inst._id}
+                    to={`/institution/${inst._id}`}
+                    className="group bg-white rounded-2xl md:rounded-3xl p-4 md:p-6 shadow-sm border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col items-center text-center no-underline"
+                    aria-label={`View ${inst.instName} institution details`}
                   >
                     <div className="relative w-16 h-16 md:w-24 md:h-24 mb-4">
                       <div className="absolute inset-0 bg-blue-50 rounded-xl md:rounded-2xl transform rotate-6 group-hover:rotate-12 transition-transform" />
@@ -195,17 +197,19 @@ const AffiliatedInstitutions: React.FC<AffiliatedInstitutionsProps> = ({ lang })
                     
                     <h3 className="text-xs md:text-lg font-bold text-slate-900 leading-tight group-hover:text-blue-700 transition-colors line-clamp-2">
                       <span className="text-blue-500 mr-1">{index + 1}.</span>
-                      <Link to={`/institution/${inst._id}`} className="hover:underline">{inst.instName}</Link>
+                      <span className="hover:underline">{inst.instName}</span>
                     </h3>
-                  </div>
-                ))}
+                  </Link>
+                ))} 
               </div>
             ) : (
               <div className="space-y-3 md:space-y-4">
                 {filteredInstitutions.map((inst, index) => (
-                  <div 
-                    key={inst._id} 
-                    className="group bg-white rounded-xl md:rounded-2xl p-3 md:p-4 shadow-sm border border-slate-100 hover:shadow-md transition-all flex items-center gap-4 md:gap-6"
+                  <Link
+                    key={inst._id}
+                    to={`/institution/${inst._id}`}
+                    className="group bg-white rounded-xl md:rounded-2xl p-3 md:p-4 shadow-sm border border-slate-100 hover:shadow-md transition-all flex items-center gap-4 md:gap-6 no-underline"
+                    aria-label={`View ${inst.instName} institution details`}
                   >
                     <div className="w-12 h-12 md:w-16 md:h-16 shrink-0">
                       {inst.instLogoUrl ? (
@@ -225,10 +229,10 @@ const AffiliatedInstitutions: React.FC<AffiliatedInstitutionsProps> = ({ lang })
                         {index + 1}
                       </div>
                       <h3 className="text-sm md:text-xl font-bold text-slate-900 group-hover:text-blue-700 transition-colors">
-                        <Link to={`/institution/${inst._id}`} className="hover:underline">{inst.instName}</Link>
+                        <span className="hover:underline">{inst.instName}</span>
                       </h3>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             )
