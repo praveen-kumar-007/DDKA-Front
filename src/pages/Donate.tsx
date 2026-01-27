@@ -13,8 +13,17 @@ const Donate: React.FC<{ lang?: 'en' | 'hi' }> = ({ lang = 'en' }) => {
   const method = 'upi';
   const [message, setMessage] = useState('');
   const [receipt, setReceipt] = useState<File | null>(null);
+  const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
+  const [dragActive, setDragActive] = useState(false);
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
   const [resultMsg, setResultMsg] = useState('');
+
+  // cleanup object URL when component unmounts or preview changes
+  React.useEffect(() => {
+    return () => {
+      if (receiptPreview) URL.revokeObjectURL(receiptPreview);
+    };
+  }, [receiptPreview]);
 
   const presets = [100, 500, 1000, 2000];
 
@@ -76,7 +85,10 @@ const Donate: React.FC<{ lang?: 'en' | 'hi' }> = ({ lang = 'en' }) => {
         setCustom('');
         setAmount(500);
         setMessage('');
+        // clear receipt and preview
+        if (receiptPreview) URL.revokeObjectURL(receiptPreview);
         setReceipt(null);
+        setReceiptPreview(null);
       } else {
         setStatus('error');
         setResultMsg((data && data.message) || 'Failed to submit donation. Please try again.');
@@ -159,7 +171,113 @@ const Donate: React.FC<{ lang?: 'en' | 'hi' }> = ({ lang = 'en' }) => {
 
               <div>
                 <label className="block text-sm font-semibold text-blue-900 mb-2">{lang === 'hi' ? 'भुगतान का प्रमाण (वैकल्पिक)' : 'Payment proof (optional)'}</label>
-                <input type="file" accept="image/*" onChange={(e) => setReceipt(e.target.files ? e.target.files[0] : null)} />
+
+                <div
+                  onDragOver={(e) => { e.preventDefault(); setDragActive(true); }}
+                  onDragLeave={(e) => { e.preventDefault(); setDragActive(false); }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setDragActive(false);
+                    const file = e.dataTransfer?.files && e.dataTransfer.files[0] ? e.dataTransfer.files[0] : null;
+                    if (!file) return;
+                    if (file.size > 5 * 1024 * 1024) {
+                      setStatus('error');
+                      setResultMsg(lang === 'hi' ? 'कृपया 5MB से छोटा फ़ाइल चुनें।' : 'Please select a file smaller than 5MB.');
+                      setReceipt(null);
+                      setReceiptPreview(null);
+                      return;
+                    }
+                    setReceipt(file);
+                    if (receiptPreview) URL.revokeObjectURL(receiptPreview);
+                    const url = URL.createObjectURL(file);
+                    setReceiptPreview(url);
+                    setStatus('idle');
+                    setResultMsg('');
+                    try { (document.querySelector('input[data-receipt]') as HTMLInputElement).value = ''; } catch(e) {}
+                  }}
+                  className={`border rounded-lg p-4 flex items-center gap-4 ${dragActive ? 'border-dashed border-blue-400 bg-blue-50' : 'border-slate-200 bg-white'}`}
+                >
+                  <input
+                    data-receipt
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files ? e.target.files[0] : null;
+                      if (!file) {
+                        setReceipt(null);
+                        if (receiptPreview) URL.revokeObjectURL(receiptPreview);
+                        setReceiptPreview(null);
+                        return;
+                      }
+                      if (file.size > 5 * 1024 * 1024) {
+                        setStatus('error');
+                        setResultMsg(lang === 'hi' ? 'कृपया 5MB से छोटा फ़ाइल चुनें।' : 'Please select a file smaller than 5MB.');
+                        setReceipt(null);
+                        setReceiptPreview(null);
+                        return;
+                      }
+                      setReceipt(file);
+                      if (receiptPreview) URL.revokeObjectURL(receiptPreview);
+                      const url = URL.createObjectURL(file);
+                      setReceiptPreview(url);
+                      setStatus('idle');
+                      setResultMsg('');
+                    }}
+                    className="hidden"
+                  />
+
+                  <div className="flex items-center gap-3 flex-1">
+                    <div className="w-16 h-16 rounded-md overflow-hidden border border-slate-200 bg-white shadow-sm flex items-center justify-center">
+                      {receiptPreview ? (
+                        <img src={receiptPreview} alt="Receipt preview" className="w-full h-full object-cover" />
+                      ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V8m0 0L3 12m4-4l4 4M17 8v8m0 0l4-4m-4 4l-4-4" />
+                        </svg>
+                      )}
+                    </div>
+
+                    <div className="flex-1 text-sm text-slate-700">
+                      <div className="font-medium text-slate-900">{lang === 'hi' ? 'स्लाइड में रखें या क्लिक करके छवि अपलोड करें' : 'Drop or click to upload an image'}</div>
+                      <div className="text-xs text-slate-500 mt-1">{lang === 'hi' ? 'PNG/JPG, अधिकतम 5MB' : 'PNG/JPG, max 5MB'}</div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const input = document.querySelector('input[data-receipt]') as HTMLInputElement | null;
+                        if (input) input.click();
+                      }}
+                      className="px-3 py-1 text-xs bg-blue-50 text-blue-600 rounded"
+                    >
+                      {lang === 'hi' ? 'अपलोड करें' : 'Upload'}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Preview meta / actions */}
+                {receiptPreview && (
+                  <div className="mt-3 flex items-start gap-3">
+                    <div className="w-28 h-28 rounded-md overflow-hidden border border-slate-200 bg-white shadow-sm">
+                      <img src={receiptPreview} alt="Receipt preview" className="w-full h-full object-cover" />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <div className="text-sm text-slate-700">{receipt?.name}</div>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (receiptPreview) URL.revokeObjectURL(receiptPreview);
+                            setReceipt(null);
+                            setReceiptPreview(null);
+                            try { (document.querySelector('input[data-receipt]') as HTMLInputElement).value = ''; } catch(e) {}
+                          }}
+                          className="px-3 py-1 text-xs bg-red-50 text-red-600 rounded"
+                        >{lang === 'hi' ? 'हटाएँ' : 'Remove'}</button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="flex flex-col md:flex-row items-start md:items-center gap-3">
