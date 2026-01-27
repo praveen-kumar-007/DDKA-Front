@@ -1,4 +1,22 @@
 User-agent: *
 Allow: /
 
+# Prevent indexing of admin and auth pages (admin only)
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /admin-login
+Disallow: /login
+
+# Allow public registration and affiliation pages to be indexed (priority pages)
+Allow: /register
+Allow: /institution
+Allow: /technical-official-registration
+# Allow player ID card pages (public profiles)
+Allow: /id-card
+
+# If API endpoints are publicly accessible, avoid indexing them directly
+Disallow: /api/
+# Allow share preview endpoints so social crawlers can read OG tags and Google can discover social preview metadata
+Allow: /api/news/share/
+
 Sitemap: https://dhanbadkabaddiassociation.tech/sitemap.xml

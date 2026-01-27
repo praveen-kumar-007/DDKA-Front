@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { Helmet } from 'react-helmet-async';
 import { IDCardFront } from "./Frontcard";
 import { IDCardBack } from "./Backcard";
 import type { IDCardData } from "../types";
@@ -84,8 +85,30 @@ const PlayerIDCardPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col items-center justify-center p-4">
-      <h1 className="text-xl font-bold text-slate-800 mb-4">DDKA Player ID Card{showIdsToUsers ? ` - ${cardData.idNo}` : ''}</h1>
+    <>
+      <Helmet>
+        <title>{`${cardData.name} — DDKA Player ID ${cardData.idNo || ''}`}</title>
+        <link rel="canonical" href={`${window.location?.origin || 'https://dhanbadkabaddiassociation.tech'}/id-card/${cardData.idNo}`} />
+        <meta name="description" content={`DDKA Player ID Card for ${cardData.name}. Download or print the official membership card.`} />
+        <meta name="robots" content="index,follow" />
+
+        {/* Structured Data for the player */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Person",
+            "name": cardData.name,
+            "jobTitle": cardData.memberRole || 'Player',
+            "image": cardData.photoUrl || `${window.location?.origin || 'https://dhanbadkabaddiassociation.tech'}/logo.png`,
+            "address": cardData.address,
+            "telephone": cardData.phone,
+            "identifier": cardData.idNo
+          })}
+        </script>
+      </Helmet>
+
+      <div className="min-h-screen bg-slate-100 flex flex-col items-center justify-center p-4">
+        <h1 className="text-xl font-bold text-slate-800 mb-4">DDKA Player ID Card{showIdsToUsers ? ` - ${cardData.idNo}` : ''}</h1>
 
       {showIdsToUsers === false ? (
         <div className="bg-yellow-50 rounded-lg p-6 text-yellow-800">ID visibility is currently disabled by the association. You can view profile details but the ID number and ID card are hidden.</div>
@@ -111,6 +134,7 @@ const PlayerIDCardPage = () => {
         </>
       )}
     </div>
+  </>
   );
 };
 

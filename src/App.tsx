@@ -25,6 +25,7 @@ import PublicLogin from './pages/PublicLogin';
 import Account from './pages/Account';
 import AdminRegistrationDetails from './pages/AdminRegistrationDetails';
 import PlayerIDCardPage from './pages/PlayerIDCardPage';
+import InstitutionDetailsPublic from './pages/InstitutionDetailsPublic';
 const AdminGalleryUpload = React.lazy(() => import('./pages/AdminGalleryUpload'));
 const AdminContact = React.lazy(() => import('./pages/AdminContact'));
 import Contact from './pages/Contact';
@@ -160,6 +161,8 @@ const App: React.FC = () => {
                     ? 'खिलाड़ी पंजीकरण | धनबाद जिला कबड्डी संघ (DDKA)'
                     : 'Player Registration | Dhanbad District Kabaddi Association (DDKA)'}
                 </title>
+                {/* Canonical and JSON-LD to help indexing & rich results */}
+                <link rel="canonical" href={`${window.location?.origin || 'https://dhanbadkabaddiassociation.tech'}/register`} />
                 <meta
                   name="description"
                   content={
@@ -172,6 +175,15 @@ const App: React.FC = () => {
                   name="keywords"
                   content="player registration dhanbad kabaddi, DDKA player registration, kabaddi registration dhanbad, kabaddi jharkhand player form, jaan kabaddi registration, jan kabaddi dhanbad"
                 />
+                <script type="application/ld+json">
+                  {JSON.stringify({
+                    "@context": "https://schema.org",
+                    "@type": "WebPage",
+                    "name": lang === 'hi' ? 'खिलाड़ी पंजीकरण' : 'Player Registration',
+                    "url": `${window.location?.origin || 'https://dhanbadkabaddiassociation.tech'}/register`,
+                    "description": lang === 'hi' ? 'धनबाद जिला कबड्डी संघ (DDKA) के लिए ऑनलाइन खिलाड़ी पंजीकरण फ़ॉर्म' : 'Online player registration form for DDKA'
+                  })}
+                </script>
               </Helmet>
               <div className="py-20 bg-slate-50 min-h-screen">
                 <div className="max-w-7xl mx-auto px-4">
@@ -189,6 +201,7 @@ const App: React.FC = () => {
                     ? 'संस्थान एफिलिएशन | धनबाद जिला कबड्डी संघ (DDKA)'
                     : 'Institution Affiliation | Dhanbad District Kabaddi Association (DDKA)'}
                 </title>
+                <link rel="canonical" href={`${window.location?.origin || 'https://dhanbadkabaddiassociation.tech'}/institution`} />
                 <meta
                   name="description"
                   content={
@@ -201,6 +214,18 @@ const App: React.FC = () => {
                   name="keywords"
                   content="institution affiliation dhanbad kabaddi, DDKA institution registration, kabaddi school affiliation dhanbad, kabaddi club registration jharkhand, kabaddi association of jharkhand dhanbad, jaan kabaddi school affiliation"
                 />
+                <script type="application/ld+json">
+                  {JSON.stringify({
+                    "@context": "https://schema.org",
+                    "@type": "Organization",
+                    "name": "Dhanbad District Kabaddi Association",
+                    "url": `${window.location?.origin || 'https://dhanbadkabaddiassociation.tech'}/institution`,
+                    "description": lang === 'hi' ? 'DDKA संस्थान एफिलिएशन पंजीकरण' : 'Institution affiliation registration with DDKA',
+                    "sameAs": [
+                      `${window.location?.origin || 'https://dhanbadkabaddiassociation.tech'}`
+                    ]
+                  })}
+                </script>
               </Helmet>
               <div className="py-20 bg-slate-50 min-h-screen">
                 <div className="max-w-7xl mx-auto px-4">
@@ -244,6 +269,11 @@ const App: React.FC = () => {
           <Route path="*" element={<Home lang={lang} onNavigate={handlePageChange} />} />
           <Route path="/admin/registration/:id" element={<AdminRegistrationDetails />} />
           <Route path="/id-card/:idNo" element={<PlayerIDCardPage />} />
+          {/* Public institution details for SEO */}
+          <Route path="/institution/:id" element={
+            // lazy load to reduce initial bundle size
+            <InstitutionDetailsPublic />
+          } />
           <Route path="/admin/institution/:id" element={<AdminInstitutionDetails />} />
         </Routes>
         </Suspense>

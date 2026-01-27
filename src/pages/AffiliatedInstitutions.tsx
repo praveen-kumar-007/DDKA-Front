@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { ShieldCheck, Search, LayoutGrid, List, Building2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { translations } from '../translations';
 import type { Language } from '../translations';
 
@@ -65,6 +66,24 @@ const AffiliatedInstitutions: React.FC<AffiliatedInstitutionsProps> = ({ lang })
           name="keywords"
           content="DDKA affiliated institutions, kabaddi schools dhanbad, kabaddi clubs dhanbad, Jharkhand kabaddi institutions, kabaddi association of jharkhand dhanbad, jaan kabaddi schools"
         />
+        {/* Structured data: ItemList of institutions for better indexing */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            "name": "Affiliated Institutions - DDKA",
+            "itemListElement": institutions.map((inst, index) => ({
+              "@type": "ListItem",
+              "position": index + 1,
+              "item": {
+                "@type": "Organization",
+                "name": inst.instName,
+                "url": `${window.location?.origin || 'https://dhanbadkabaddiassociation.tech'}/institution/${inst._id}`,
+                "logo": inst.instLogoUrl || undefined
+              }
+            }))
+          })}
+        </script>
       </Helmet>
 
       <div className="min-h-screen bg-slate-50 pb-16">
@@ -176,7 +195,7 @@ const AffiliatedInstitutions: React.FC<AffiliatedInstitutionsProps> = ({ lang })
                     
                     <h3 className="text-xs md:text-lg font-bold text-slate-900 leading-tight group-hover:text-blue-700 transition-colors line-clamp-2">
                       <span className="text-blue-500 mr-1">{index + 1}.</span>
-                      {inst.instName}
+                      <Link to={`/institution/${inst._id}`} className="hover:underline">{inst.instName}</Link>
                     </h3>
                   </div>
                 ))}
@@ -206,7 +225,7 @@ const AffiliatedInstitutions: React.FC<AffiliatedInstitutionsProps> = ({ lang })
                         {index + 1}
                       </div>
                       <h3 className="text-sm md:text-xl font-bold text-slate-900 group-hover:text-blue-700 transition-colors">
-                        {inst.instName}
+                        <Link to={`/institution/${inst._id}`} className="hover:underline">{inst.instName}</Link>
                       </h3>
                     </div>
                   </div>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowLeft } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 
 interface Props {
   title: string;
@@ -13,6 +14,9 @@ interface Props {
 const AdminPageHeader: React.FC<Props> = ({ title, subtitle, showManageModules, onManageModules, actions, showBack = true }) => {
   return (
     <div className="mb-6 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       <div className="min-w-0">
         <h1 className="text-3xl font-oswald font-bold text-blue-900 uppercase truncate">{title}</h1>
         {subtitle && <p className="text-slate-600 mt-2">{subtitle}</p>}

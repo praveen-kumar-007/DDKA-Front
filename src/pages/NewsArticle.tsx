@@ -43,6 +43,8 @@ const NewsArticle = () => {
     <>
       <Helmet>
         <title>{news.title} | DDKA Kabaddi News Dhanbad</title>
+        {/* Canonical so Google attributes the article URL correctly */}
+        {articleUrl && <link rel="canonical" href={articleUrl} />}
         <meta
           name="description"
           content={
@@ -77,6 +79,23 @@ const NewsArticle = () => {
         />
         {news.images && news.images.length > 0 && (
           <meta name="twitter:image" content={news.images[0]} />
+        )}
+
+        {/* Article structured data to improve indexing and rich results */}
+        {articleUrl && (
+          <script type="application/ld+json">
+            {JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "NewsArticle",
+              "headline": news.title,
+              "image": news.images && news.images.length ? news.images : [],
+              "datePublished": news.createdAt,
+              "dateModified": news.updatedAt || news.createdAt,
+              "author": { "@type": "Organization", "name": "Dhanbad District Kabaddi Association" },
+              "publisher": { "@type": "Organization", "name": "DDKA", "logo": { "@type": "ImageObject", "url": `${window.location.origin}/logo.png` } },
+              "description": news.content && news.content.slice(0, 200)
+            })}
+          </script>
         )}
       </Helmet>
       <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white py-12 px-2">
