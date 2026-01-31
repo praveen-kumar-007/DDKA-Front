@@ -352,12 +352,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
         disabled={loadingSetting}
         title={showIds ? 'ID numbers/cards are visible to users' : 'ID numbers/cards are hidden from users'}
         aria-pressed={showIds === true}
-        className={`flex items-center gap-3 px-6 py-3 rounded-xl font-black shadow-sm border-2 transition-all active:scale-95 ${
-          loadingSetting ? 'opacity-60 cursor-not-allowed' : ''
-        } ${showIds ? 'bg-white text-green-600 border-green-50 hover:bg-green-600 hover:text-white' : 'bg-white text-slate-700 border-slate-50 hover:bg-slate-700 hover:text-white'}`}
+        className={`flex items-center gap-2 md:gap-3 px-3 md:px-6 py-2 md:py-3 rounded-full md:rounded-xl font-bold md:font-black shadow-sm transition-all active:scale-95 ${loadingSetting ? 'opacity-60 cursor-not-allowed' : ''} ${showIds ? 'bg-white text-green-600 md:hover:bg-green-600 md:hover:text-white' : 'bg-white text-slate-700 md:hover:bg-slate-700 md:hover:text-white'}`}
       >
-        {showIds ? <CheckCircle size={18} /> : <XCircle size={18} />}
-        <span>{loadingSetting ? '...' : `IDs: ${showIds ? 'ON' : 'OFF'}`}</span>
+        {showIds ? <CheckCircle size={16} /> : <XCircle size={16} />}
+        <span className="font-black text-xs md:text-sm">ID</span>
+        <div className={`${showIds ? 'bg-green-600' : 'bg-slate-400'} w-4 h-4 md:w-6 md:h-6 rounded-md border`} aria-hidden="true" />
+        <span className="sr-only">ID: {showIds ? 'ON' : 'OFF'}</span>
       </button>
     );
   };
@@ -426,15 +426,17 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
         disabled={loadingSetting}
         title={`${label}: ${value ? 'ON' : 'OFF'}`}
         aria-pressed={value === true}
-        className={`flex items-center gap-3 px-6 py-3 rounded-xl font-black shadow-sm border-2 transition-all active:scale-95 ${loadingSetting ? 'opacity-60 cursor-not-allowed' : ''} ${value ? 'bg-white text-green-600 border-green-50 hover:bg-green-600 hover:text-white' : 'bg-white text-slate-700 border-slate-50 hover:bg-slate-700 hover:text-white'}`}
+        className={`flex items-center gap-2 md:gap-3 px-3 md:px-6 py-2 md:py-3 rounded-full md:rounded-xl font-bold md:font-black shadow-sm transition-all active:scale-95 ${loadingSetting ? 'opacity-60 cursor-not-allowed' : ''} ${value ? 'bg-white text-green-600 md:hover:bg-green-600 md:hover:text-white' : 'bg-white text-slate-700 md:hover:bg-slate-700 md:hover:text-white'}`}
       >
-        {value ? <CheckCircle size={18} /> : <XCircle size={18} />}
-        <span>{loadingSetting ? '...' : `${label}: ${value ? 'ON' : 'OFF'}`}</span>
+        {value ? <CheckCircle size={16} /> : <XCircle size={16} />}
+        <span className="font-black text-xs md:text-sm">{label}</span>
+        <div className={`${value ? 'bg-green-600' : 'bg-slate-400'} w-4 h-4 md:w-6 md:h-6 rounded-md border`} aria-hidden="true" />
+        <span className="sr-only">{label}: {value ? 'ON' : 'OFF'}</span>
       </button>
     );
   };
 
-  const ToggleExportAll: React.FC = () => <ToggleSetting label="Export All" settingKey="allowExportAll" />;
+  const ToggleExportAll: React.FC = () => <ToggleSetting label="EXP" settingKey="allowExportAll" />;
 
   // Toggle for allowing admins to manage Donations (superadmin only)
 
@@ -545,20 +547,22 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
               )}
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             {adminRole === 'superadmin' && <ToggleShowIDs />}
 
             {adminRole === 'superadmin' && (
-              <div className="flex gap-2 items-center">
+              <div className="flex gap-2 items-center flex-wrap">
                 <ToggleExportAll />
               </div>
             )}
 
             <button 
               onClick={handleLogout}
-              className="flex items-center gap-2 bg-white text-red-600 px-6 py-3 rounded-xl font-black shadow-sm border-2 border-red-50 hover:bg-red-600 hover:text-white transition-all active:scale-95"
+              className="flex items-center gap-2 bg-white text-red-600 px-4 md:px-6 py-2 md:py-3 rounded-xl font-black shadow-sm border-2 border-red-50 hover:bg-red-600 hover:text-white transition-all active:scale-95"
+              title="Logout"
             >
-              <LogOut size={18} /> LOGOUT
+              <LogOut size={18} />
+              <span className="font-black text-sm">LOGOUT</span>
             </button>
           </div>
         </div>
