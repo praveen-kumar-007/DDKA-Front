@@ -426,9 +426,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
         disabled={loadingSetting}
         title={`${label}: ${value ? 'ON' : 'OFF'}`}
         aria-pressed={value === true}
-        className={`flex items-center gap-2 px-3 py-2 rounded-xl font-bold shadow-sm border transition-all active:scale-95 ${loadingSetting ? 'opacity-60 cursor-not-allowed' : ''} ${value ? 'bg-white text-green-600 border-green-50 hover:bg-green-600 hover:text-white' : 'bg-white text-slate-700 border-slate-50 hover:bg-slate-700 hover:text-white'}`}
+        className={`flex items-center gap-3 px-6 py-3 rounded-xl font-black shadow-sm border-2 transition-all active:scale-95 ${loadingSetting ? 'opacity-60 cursor-not-allowed' : ''} ${value ? 'bg-white text-green-600 border-green-50 hover:bg-green-600 hover:text-white' : 'bg-white text-slate-700 border-slate-50 hover:bg-slate-700 hover:text-white'}`}
       >
-        {value ? <CheckCircle size={16} /> : <XCircle size={16} />}<span className="text-xs">{label}: {value ? 'ON' : 'OFF'}</span>
+        {value ? <CheckCircle size={18} /> : <XCircle size={18} />}
+        <span>{loadingSetting ? '...' : `${label}: ${value ? 'ON' : 'OFF'}`}</span>
       </button>
     );
   };
