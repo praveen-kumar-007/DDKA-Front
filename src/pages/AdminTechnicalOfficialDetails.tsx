@@ -385,10 +385,8 @@ const AdminTechnicalOfficialDetails: React.FC = () => {
                     params.set('name', official.candidateName);
                     params.set('father', official.parentName);
                     if (suffix && official.grade) params.set('regSuffix', suffix);
-                    const createdDate = official.createdAt ? new Date(official.createdAt) : null;
-                    if (createdDate && !Number.isNaN(createdDate.getTime())) {
-                      params.set('date', createdDate.toISOString().slice(0, 10));
-                    }
+                    // Use event date (fixed) for certificate
+                    params.set('date', '2026-01-18');
                     if (official.grade) params.set('grade', official.grade);
                     if (official.photoUrl) params.set('photoUrl', official.photoUrl);
                     if (autoDownload) params.set('download', 'pdf');

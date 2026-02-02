@@ -114,10 +114,8 @@ const Account: React.FC = () => {
     params.set('name', name);
     if (profile.parentName) params.set('father', profile.parentName);
     if (suffix && profile.grade) params.set('regSuffix', suffix);
-    const createdDate = profile.createdAt ? new Date(profile.createdAt) : null;
-    if (createdDate && !Number.isNaN(createdDate.getTime())) {
-      params.set('date', createdDate.toISOString().slice(0, 10));
-    }
+    // Use event date (fixed) for certificates
+    params.set('date', '2026-01-18');
     if (profile.grade) params.set('grade', profile.grade);
     if (profile.photoUrl) params.set('photoUrl', profile.photoUrl);
     if (autoDownload) params.set('download', 'pdf');
