@@ -529,71 +529,6 @@
         }));
       }
 
-      const TRANSPARENT_PIXEL = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
-
-      function isHttpUrl(url){
-        return /^https?:/i.test(url || '');
-      }
-
-      function getOriginProxy(url){
-        return `${window.location.origin}/api/proxy/image?url=${encodeURIComponent(url)}`;
-      }
-
-      async function fetchAsDataUrl(url){
-        try {
-          const res = await fetch(url, { mode: 'cors', cache: 'reload' });
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          const blob = await res.blob();
-          return await new Promise((resolve, reject) => {
-            const r = new FileReader();
-            r.onload = () => resolve(r.result);
-            r.onerror = () => reject(new Error('FileReader failed'));
-            r.readAsDataURL(blob);
-          });
-        } catch (e) {
-          return null;
-        }
-      }
-
-      async function sanitizeImages(rootEl){
-        if (!rootEl) return;
-        const imgs = Array.from(rootEl.querySelectorAll('img'));
-        await Promise.all(imgs.map(async (img) => {
-          try {
-            const rawSrc = img.getAttribute('src') || '';
-            if (!rawSrc || rawSrc.startsWith('data:')) return;
-            img.crossOrigin = 'anonymous';
-            const absSrc = new URL(rawSrc, window.location.href).toString();
-            const candidates = [];
-            const pushUnique = (u) => { if (u && !candidates.includes(u)) candidates.push(u); };
-
-            const proxied = toProxy(absSrc);
-            if (proxied && proxied !== absSrc) pushUnique(proxied);
-            if (isHttpUrl(absSrc)) pushUnique(absSrc);
-            if (!apiPrefix && isHttpUrl(absSrc) && !absSrc.startsWith(window.location.origin)) {
-              pushUnique(getOriginProxy(absSrc));
-            }
-
-            let dataUrl = null;
-            for (const u of candidates) {
-              dataUrl = await fetchAsDataUrl(u);
-              if (dataUrl) break;
-            }
-
-            if (dataUrl) {
-              img.src = dataUrl;
-              if (img.decode) {
-                try { await img.decode(); } catch (e) { /* ignore */ }
-              }
-            } else {
-              img.src = TRANSPARENT_PIXEL;
-            }
-          } catch (e) {
-            img.src = TRANSPARENT_PIXEL;
-          }
-        }));
-      }
-
       async function exportCertificate(format){
         const prevScale = getComputedStyle(certFrame).getPropertyValue('--scale') || '1';
         const prevCertTransform = cert.style.transform;
@@ -659,35 +594,40 @@
           exportHost.appendChild(exportClone);
           document.body.appendChild(exportHost);
 
-          await sanitizeImages(exportClone || cert);
+          const BASE_WIDTH = 1100;
+          const BASE_HEIGHT = 780;
+          const DEFAULT_TARGET_WIDTH = 2200; // ~2x for sharp output but small size
+          const MAX_TARGET_WIDTH = 3840; // cap to keep under ~10MB
+          const JPEG_QUALITY = 0.9;
 
           const renderOptions = {
             cacheBust: true,
-            pixelRatio: 3,
+            pixelRatio: 2,
             backgroundColor: '#ffffff',
             useCORS: true,
-            width: 1100,
-            height: 780,
+            width: BASE_WIDTH,
+            height: BASE_HEIGHT,
             style: {
               transform: 'scale(1)',
               transformOrigin: 'top left',
-              width: '1100px',
-              height: '780px'
+              width: `${BASE_WIDTH}px`,
+              height: `${BASE_HEIGHT}px`
             }
           };
 
           if (format === 'pdf') {
-            // support high-resolution targets via URL param `resolution=8k` (defaults to 1920)
+            // support higher resolution via URL param `resolution=4k|8k` but cap to keep size small
             const resParam = urlParams.get('resolution') || '';
-            const targetWidthPx = resParam === '8k' ? 7680 : 1920;
-            const pixelRatio = Math.max(1, Math.ceil(targetWidthPx / 1100));
-            const dataUrl = await window.htmlToImage.toPng(exportClone || cert, { ...renderOptions, pixelRatio });
+            const requestedWidth = resParam === '8k' ? 7680 : (resParam === '4k' ? 3840 : DEFAULT_TARGET_WIDTH);
+            const targetWidthPx = Math.min(requestedWidth, MAX_TARGET_WIDTH);
+            const pixelRatio = Math.max(1, Math.ceil(targetWidthPx / BASE_WIDTH));
+            const dataUrl = await window.htmlToImage.toJpeg(exportClone || cert, { ...renderOptions, pixelRatio, quality: JPEG_QUALITY });
             const img = new Image();
             img.src = dataUrl;
             await img.decode();
             const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [img.width, img.height] });
-            pdf.addImage(img, 'PNG', 0, 0, img.width, img.height);
+            const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [img.width, img.height], compress: true });
+            pdf.addImage(img, 'JPEG', 0, 0, img.width, img.height, undefined, 'FAST');
             const filenameBase = 'DDKA-Certificate-'+(nameInput.value||'candidate').replace(/\s+/g,'-');
             const pdfBlob = pdf.output('blob');
 
@@ -718,10 +658,12 @@
               pdf.save(`${filenameBase}.pdf`);
             }
           } else {
-            // For PNGs, support high-resolution via resolution param as well
+            // For PNGs, keep size reasonable (default ~2x), allow up to 4k equivalent
             const resParam = urlParams.get('resolution') || '';
-            const highPixelRatio = resParam === '8k' ? 7 : 3;
-            const dataUrl = await window.htmlToImage.toPng(exportClone || cert, { ...renderOptions, pixelRatio: highPixelRatio });
+            const requestedWidth = resParam === '8k' ? 7680 : (resParam === '4k' ? 3840 : DEFAULT_TARGET_WIDTH);
+            const targetWidthPx = Math.min(requestedWidth, MAX_TARGET_WIDTH);
+            const pixelRatio = Math.max(1, Math.ceil(targetWidthPx / BASE_WIDTH));
+            const dataUrl = await window.htmlToImage.toPng(exportClone || cert, { ...renderOptions, pixelRatio });
             const filenameBase = 'DDKA-Certificate-'+(nameInput.value||'candidate').replace(/\s+/g,'-');
             let pngBlob = null;
             try {
