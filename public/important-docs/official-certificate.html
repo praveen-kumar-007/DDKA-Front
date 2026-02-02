@@ -694,9 +694,23 @@
               a.remove();
             }
           }
-        }catch(err){
-          alert('Could not generate file. Try Print.');
-          console.error(err);
+        } catch (err) {
+          console.error('Export failed:', err);
+          try {
+            const errMsg = err && (err.message || err.toString()) || 'Unknown error';
+            let friendly = 'Could not generate file. Try Print.';
+            if (/tainted canvas/i.test(errMsg) || /cross-origin|CORS|tainted/i.test(errMsg)) {
+              friendly += '\n\nLikely cause: cross-origin images (CORS) or external resources blocking export. Use proxied image URLs or enable CORS for external images.';
+            }
+            friendly += '\n\nError: ' + errMsg;
+            if (confirm(friendly + '\n\nOpen print dialog instead?')) {
+              try { window.print(); } catch (e) { /* ignore */ }
+            } else {
+              alert(friendly);
+            }
+          } catch (e2) {
+            alert('Could not generate file. Try Print.');
+          }
         } finally {
           if (exportHost && exportHost.parentNode) exportHost.parentNode.removeChild(exportHost);
           cert.style.transform = prevCertTransform;

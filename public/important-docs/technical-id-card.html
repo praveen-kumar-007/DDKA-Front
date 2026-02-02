@@ -492,7 +492,17 @@
                     a.click();
                     a.remove();
                 } catch (err) {
-                    alert('Failed to export image: ' + (err && err.message));
+                    console.error('Failed to export image:', err);
+                    const errMsg = err && (err.message || err.toString()) || 'Unknown error';
+                    let msg = 'Failed to export image: ' + errMsg;
+                    if (/tainted canvas|cross-origin|CORS|tainted/i.test(errMsg)) {
+                        msg += '\n\nLikely cause: cross-origin images or CORS. Use proxied image URLs or enable CORS for external images.';
+                    }
+                    if (confirm(msg + '\n\nOpen print dialog instead?')) {
+                        try { window.print(); } catch (e) { /* ignore */ }
+                    } else {
+                        alert(msg);
+                    }
                 } finally {
                     document.body.classList.remove('exporting');
                 }
@@ -512,7 +522,17 @@
                     pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
                     pdf.save('ddka-id.pdf');
                 } catch (err) {
-                    alert('Failed to export PDF: ' + (err && err.message));
+                    console.error('Failed to export PDF:', err);
+                    const errMsg = err && (err.message || err.toString()) || 'Unknown error';
+                    let msg = 'Failed to export PDF: ' + errMsg;
+                    if (/tainted canvas|cross-origin|CORS|tainted/i.test(errMsg)) {
+                        msg += '\n\nLikely cause: cross-origin images or CORS. Use proxied image URLs or enable CORS for external images.';
+                    }
+                    if (confirm(msg + '\n\nOpen print dialog instead?')) {
+                        try { window.print(); } catch (e) { /* ignore */ }
+                    } else {
+                        alert(msg);
+                    }
                 } finally {
                     document.body.classList.remove('exporting');
                 }
