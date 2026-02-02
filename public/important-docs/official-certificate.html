@@ -531,10 +531,18 @@
 
       async function exportCertificate(format){
         const prevScale = getComputedStyle(certFrame).getPropertyValue('--scale') || '1';
+        const prevCertTransform = cert.style.transform;
+        const prevCertTransformOrigin = cert.style.transformOrigin;
+        const prevCertWidth = cert.style.width;
+        const prevCertHeight = cert.style.height;
         document.body.classList.add('exporting');
         certFrame.style.setProperty('--scale', '1');
         certFrame.style.width = '1100px';
         certFrame.style.height = '780px';
+        cert.style.transform = 'scale(1)';
+        cert.style.transformOrigin = 'top left';
+        cert.style.width = '1100px';
+        cert.style.height = '780px';
         const removedStylesheets = [];
         const removeExternalStylesheets = () => {
           const links = Array.from(document.querySelectorAll('link[rel="stylesheet"]'));
@@ -566,11 +574,25 @@
           await waitForImages();
           await new Promise(r => setTimeout(r, 120));
 
+          const renderOptions = {
+            cacheBust: true,
+            pixelRatio: 3,
+            backgroundColor: '#ffffff',
+            useCORS: true,
+            width: 1100,
+            height: 780,
+            style: {
+              transform: 'scale(1)',
+              transformOrigin: 'top left',
+              width: '1100px',
+              height: '780px'
+            }
+          };
+
           if (format === 'pdf') {
-            const rect = cert.getBoundingClientRect();
             const targetWidthPx = 1920;
-            const pixelRatio = Math.max(1, Math.ceil(targetWidthPx / rect.width));
-            const dataUrl = await window.htmlToImage.toPng(cert, {cacheBust:true, pixelRatio, backgroundColor:'#ffffff', useCORS:true});
+            const pixelRatio = Math.max(1, Math.ceil(targetWidthPx / 1100));
+            const dataUrl = await window.htmlToImage.toPng(cert, { ...renderOptions, pixelRatio });
             const img = new Image();
             img.src = dataUrl;
             await img.decode();
@@ -579,7 +601,7 @@
             pdf.addImage(img, 'PNG', 0, 0, img.width, img.height);
             pdf.save('DDKA-Certificate-'+(nameInput.value||'candidate').replace(/\s+/g,'-')+'.pdf');
           } else {
-            const dataUrl = await window.htmlToImage.toPng(cert, {cacheBust:true, pixelRatio:3, backgroundColor:'#ffffff', useCORS:true});
+            const dataUrl = await window.htmlToImage.toPng(cert, renderOptions);
             const a=document.createElement('a');
             a.href=dataUrl;
             a.download = 'DDKA-Certificate-'+(nameInput.value||'candidate').replace(/\s+/g,'-')+'.png';
@@ -589,6 +611,10 @@
           alert('Could not generate file. Try Print.');
           console.error(err);
         } finally {
+          cert.style.transform = prevCertTransform;
+          cert.style.transformOrigin = prevCertTransformOrigin;
+          cert.style.width = prevCertWidth;
+          cert.style.height = prevCertHeight;
           restoreExternalStylesheets();
           document.body.classList.remove('exporting');
           certFrame.style.setProperty('--scale', prevScale);

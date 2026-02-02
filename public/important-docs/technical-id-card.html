@@ -303,75 +303,13 @@
             text-transform: uppercase;
         }
 
-        /* Editor panel for live input */
-        .editor-panel {
-            width: var(--card-width);
-            margin-bottom: 12px;
-            background: #fff;
-            border-radius: 8px;
-            padding: 10px;
-            border: 2px dashed #ddd;
-            box-sizing: border-box;
-        }
-        .editor-panel label { display:block; font-weight:700; margin-top:8px; font-size:13px; }
-        .editor-panel input[type="text"], .editor-panel input[type="date"], .editor-panel select {
-            width: calc(100% - 12px);
-            padding:6px;
-            margin-top:4px;
-            border:1px solid #ccc;
-            border-radius:4px;
-            box-sizing:border-box;
-        }
-        .editor-row { display:flex; gap:8px; align-items:center; }
-        .editor-row .col { flex:1; }
-
-        /* Export mode: hide editor panel and lock layout */
+        /* Export mode: lock layout */
         body.exporting { background: #fff; }
-        body.exporting .editor-panel { display: none; }
         body.exporting .id-card { box-shadow: none; }
         body.exporting .id-card::before { background-image: none !important; }
     </style>
 </head>
 <body>
-
-    <div class="editor-panel">
-        <div class="editor-row">
-            <div class="col">
-                <label for="input-sno">S. No</label>
-                <input id="input-sno" type="text" placeholder="Enter S. No.">
-            </div>
-            <div class="col">
-                <label for="input-name">Name</label>
-                <input id="input-name" type="text" placeholder="Enter name">
-            </div>
-        </div>
-        <div class="editor-row">
-            <div class="col">
-                <label for="input-uid">UID No</label>
-                <input id="input-uid" type="text" placeholder="Enter UID">
-            </div>
-            <div class="col">
-                <label for="input-dob">Date of Birth</label>
-                <input id="input-dob" type="date">
-            </div>
-        </div>
-        <div class="editor-row">
-            <div class="col">
-                <label for="input-grade">Grade</label>
-                <input id="input-grade" type="text" placeholder="Enter grade">
-            </div>
-            <div class="col">
-                <label for="input-photo">Photo Upload</label>
-                <input id="input-photo" type="file" accept="image/*">
-            </div>
-        </div>
-        <div class="toolbar">
-            <button id="clear-btn" type="button">Clear</button>
-            <button id="print-btn" type="button" class="secondary">Print</button>
-            <button id="save-jpg-btn" type="button" class="ghost">Save as JPG</button>
-            <button id="save-pdf-btn" type="button" class="ghost">Download PDF</button>
-        </div>
-    </div>
 
     <div class="id-card">
         <header class="main-header">
@@ -462,50 +400,15 @@
                 img.crossOrigin = 'anonymous';
                 img.src = toProxy(img.src);
             };
-            const inputs = {
-                'input-sno': 'sno',
-                'input-name': 'name',
-                'input-uid': 'uid',
-                'input-dob': 'dob',
-                'input-grade': 'grade'
-            };
-
-            const fieldMap = {
-                'input-sno': 'field-sno',
-                'input-name': 'field-name',
-                'input-uid': 'field-uid',
-                'input-dob': 'field-dob',
-                'input-grade': 'field-grade'
-            };
-
-            function updateField(inputId) {
-                const el = document.getElementById(inputId);
-                const target = document.getElementById(inputs[inputId]);
-                const wrapper = document.getElementById(fieldMap[inputId]);
-                if (!el || !target || !wrapper) return;
-                const val = el.value.trim();
-                target.textContent = val;
-                if (val === '') {
-                    wrapper.classList.add('empty');
-                } else {
-                    wrapper.classList.remove('empty');
-                }
-                if (inputId === 'input-name') {
-                    const cert = document.getElementById('certified-name');
-                    if (cert) {
-                        cert.textContent = val;
-                        if (val === '') cert.classList.add('dotted-line'); else cert.classList.remove('dotted-line');
-                    }
+            function setFieldText(id, value) {
+                const target = document.getElementById(id);
+                const wrapper = document.getElementById('field-' + id);
+                if (target) target.textContent = value || '';
+                if (wrapper) {
+                    if (value) wrapper.classList.remove('empty');
+                    else wrapper.classList.add('empty');
                 }
             }
-
-            Object.keys(inputs).forEach(inp => {
-                const el = document.getElementById(inp);
-                if (!el) return;
-                // initialize
-                updateField(inp);
-                el.addEventListener('input', () => updateField(inp));
-            });
 
             // Auto-fill from query parameters when opened from admin panel
             function applyQueryParams() {
@@ -519,44 +422,17 @@
                     const qpPhoto = urlParams.get('photoUrl');
                     const qpDownload = urlParams.get('download');
 
-                    if (qpSno) {
-                        const el = document.getElementById('input-sno');
-                        if (el) {
-                            el.value = qpSno;
-                            updateField('input-sno');
-                        }
-                    }
+                    setFieldText('sno', qpSno || '');
+                    setFieldText('name', qpName || '');
+                    setFieldText('uid', qpUid || '');
+                    setFieldText('dob', qpDob || '');
+                    setFieldText('grade', qpGrade || '');
 
-                    if (qpName) {
-                        const el = document.getElementById('input-name');
-                        if (el) {
-                            el.value = qpName;
-                            updateField('input-name');
-                        }
-                    }
-
-                    if (qpUid) {
-                        const el = document.getElementById('input-uid');
-                        if (el) {
-                            el.value = qpUid;
-                            updateField('input-uid');
-                        }
-                    }
-
-                    if (qpDob) {
-                        const el = document.getElementById('input-dob');
-                        if (el) {
-                            el.value = qpDob;
-                            updateField('input-dob');
-                        }
-                    }
-
-                    if (qpGrade) {
-                        const el = document.getElementById('input-grade');
-                        if (el) {
-                            el.value = qpGrade;
-                            updateField('input-grade');
-                        }
+                    const cert = document.getElementById('certified-name');
+                    if (cert) {
+                        cert.textContent = qpName || '';
+                        if (qpName) cert.classList.remove('dotted-line');
+                        else cert.classList.add('dotted-line');
                     }
 
                     if (qpPhoto) {
@@ -579,7 +455,6 @@
 
             applyQueryParams();
 
-            const photoInput = document.getElementById('input-photo');
             const photoImg = document.getElementById('photo-img');
             let defaultSrc = (photoImg && (photoImg.dataset && photoImg.dataset.defaultSrc)) || (photoImg && photoImg.src) || '';
             if (photoImg && API_BASE) {
@@ -587,43 +462,6 @@
                 defaultSrc = toProxy(defaultSrc);
                 photoImg.src = toProxy(photoImg.src);
             }
-
-            if (photoInput && photoImg) {
-                photoImg.crossOrigin = 'anonymous';
-                photoInput.addEventListener('change', function(){
-                    const file = this.files && this.files[0];
-                    if (!file) {
-                        photoImg.src = defaultSrc;
-                        return;
-                    }
-                    const reader = new FileReader();
-                    reader.onload = function(ev){ photoImg.src = ev.target.result; };
-                    reader.readAsDataURL(file);
-                });
-            }
-
-            const clearBtn = document.getElementById('clear-btn');
-            if (clearBtn) {
-                clearBtn.addEventListener('click', () => {
-                    Object.keys(inputs).forEach(inp=>{
-                        const el = document.getElementById(inp);
-                        const tgt = document.getElementById(inputs[inp]);
-                        const wrapper = document.getElementById(fieldMap[inp]);
-                        if (el) el.value = '';
-                        if (tgt) tgt.textContent = '';
-                        if (wrapper) wrapper.classList.add('empty');
-                    });
-                    const cert = document.getElementById('certified-name');
-                    if (cert) { cert.textContent = ''; cert.classList.add('dotted-line'); }
-                    if (photoImg) photoImg.src = defaultSrc;
-                    if (photoInput) photoInput.value = '';
-                });
-            }
-
-            const printBtn = document.getElementById('print-btn');
-            if (printBtn) printBtn.addEventListener('click', () => {
-                window.print();
-            });
 
             async function waitForImages() {
                 const images = Array.from(document.images || []);
@@ -679,12 +517,6 @@
                     document.body.classList.remove('exporting');
                 }
             }
-
-            const saveBtn = document.getElementById('save-jpg-btn');
-            if (saveBtn) saveBtn.addEventListener('click', exportJpg);
-
-            const savePdfBtn = document.getElementById('save-pdf-btn');
-            if (savePdfBtn) savePdfBtn.addEventListener('click', exportPdf);
 
             if (window.__ddkaAutoDownload) {
                 setTimeout(async () => {
