@@ -480,8 +480,8 @@
                 const el = document.querySelector('.id-card');
                 if (!el) return;
                 try {
-                    const JPG_SCALE = 2.5;
-                    const JPG_QUALITY = 0.92;
+                    const JPG_SCALE = 3;
+                    const JPG_QUALITY = 0.95;
                     document.body.classList.add('exporting');
                     await waitForImages();
                     await new Promise(r => setTimeout(r, 80));
@@ -514,8 +514,8 @@
                 const el = document.querySelector('.id-card');
                 if (!el) return;
                 try {
-                    const PDF_SCALE = 2.5;
-                    const PDF_QUALITY = 0.92;
+                    const PDF_SCALE = 3;
+                    const PDF_QUALITY = 0.95;
                     document.body.classList.add('exporting');
                     await waitForImages();
                     await new Promise(r => setTimeout(r, 80));
