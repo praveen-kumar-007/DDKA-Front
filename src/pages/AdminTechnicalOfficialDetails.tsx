@@ -380,6 +380,8 @@ const AdminTechnicalOfficialDetails: React.FC = () => {
                     if (!official) return '';
                     const suffix = (official._id || '').slice(-4).toUpperCase();
                     const params = new URLSearchParams();
+                    if (API_URL) params.set('api', API_URL);
+                    if (API_URL) params.set('api', API_URL);
                     params.set('name', official.candidateName);
                     params.set('father', official.parentName);
                     if (suffix && official.grade) params.set('regSuffix', suffix);
@@ -395,11 +397,10 @@ const AdminTechnicalOfficialDetails: React.FC = () => {
 
                   const triggerDownload = (url: string) => {
                     if (!url) return;
-                    const iframe = document.createElement('iframe');
-                    iframe.style.display = 'none';
-                    iframe.src = url;
-                    document.body.appendChild(iframe);
-                    setTimeout(() => iframe.remove(), 3000);
+                    const win = window.open(url, '_blank');
+                    if (!win) {
+                      window.location.href = url;
+                    }
                   };
 
                   return (

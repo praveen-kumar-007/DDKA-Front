@@ -90,6 +90,7 @@ const Account: React.FC = () => {
     if (!profile) return '';
     const suffix = getIdSuffix(profile);
     const params = new URLSearchParams();
+    if (API_URL) params.set('api', API_URL);
     const name = profile.candidateName || profile.fullName || profile.instName || '';
     params.set('name', name);
     if (suffix) params.set('sno', suffix);
@@ -108,6 +109,7 @@ const Account: React.FC = () => {
     if (!profile) return '';
     const suffix = getIdSuffix(profile);
     const params = new URLSearchParams();
+    if (API_URL) params.set('api', API_URL);
     const name = profile.candidateName || profile.fullName || profile.instName || '';
     params.set('name', name);
     if (profile.parentName) params.set('father', profile.parentName);
@@ -124,11 +126,10 @@ const Account: React.FC = () => {
 
   const triggerDownload = (url: string) => {
     if (!url) return;
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = url;
-    document.body.appendChild(iframe);
-    setTimeout(() => iframe.remove(), 3000);
+    const win = window.open(url, '_blank');
+    if (!win) {
+      window.location.href = url;
+    }
   };
 
   const canViewOfficialAssets = role === 'official' && profile?.status === 'Approved' && !!profile?.grade;

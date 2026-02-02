@@ -446,6 +446,22 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
         (function(){
+            const urlParams = new URLSearchParams(window.location.search);
+            const API_BASE = urlParams.get('api') || '';
+            const apiPrefix = API_BASE ? API_BASE.replace(/\/$/, '') : '';
+            const toProxy = (url) => {
+                if (!apiPrefix || !url) return url;
+                if (url.includes('/api/proxy/image')) return url;
+                if (!/^https?:/i.test(url)) return url;
+                return `${apiPrefix}/api/proxy/image?url=${encodeURIComponent(url)}`;
+            };
+            const applyProxyToImg = (img) => {
+                if (!img || !img.src) return;
+                if (img.src.startsWith('data:')) return;
+                if (img.src.includes('/api/proxy/image')) return;
+                img.crossOrigin = 'anonymous';
+                img.src = toProxy(img.src);
+            };
             const inputs = {
                 'input-sno': 'sno',
                 'input-name': 'name',
@@ -495,14 +511,13 @@
             function applyQueryParams() {
                 if (!window.location.search) return;
                 try {
-                    const params = new URLSearchParams(window.location.search);
-                    const qpSno = params.get('sno');
-                    const qpName = params.get('name');
-                    const qpUid = params.get('uid');
-                    const qpDob = params.get('dob');
-                    const qpGrade = params.get('grade');
-                    const qpPhoto = params.get('photoUrl');
-                    const qpDownload = params.get('download');
+                    const qpSno = urlParams.get('sno');
+                    const qpName = urlParams.get('name');
+                    const qpUid = urlParams.get('uid');
+                    const qpDob = urlParams.get('dob');
+                    const qpGrade = urlParams.get('grade');
+                    const qpPhoto = urlParams.get('photoUrl');
+                    const qpDownload = urlParams.get('download');
 
                     if (qpSno) {
                         const el = document.getElementById('input-sno');
@@ -547,7 +562,8 @@
                     if (qpPhoto) {
                         const imgEl = document.getElementById('photo-img');
                         if (imgEl && imgEl.tagName === 'IMG') {
-                            imgEl.src = qpPhoto;
+                            imgEl.crossOrigin = 'anonymous';
+                            imgEl.src = toProxy(qpPhoto);
                         }
                     }
 
@@ -557,11 +573,20 @@
                 }
             }
 
+            if (API_BASE) {
+                document.querySelectorAll('img').forEach((img) => applyProxyToImg(img));
+            }
+
             applyQueryParams();
 
             const photoInput = document.getElementById('input-photo');
             const photoImg = document.getElementById('photo-img');
-            const defaultSrc = (photoImg && (photoImg.dataset && photoImg.dataset.defaultSrc)) || (photoImg && photoImg.src) || '';
+            let defaultSrc = (photoImg && (photoImg.dataset && photoImg.dataset.defaultSrc)) || (photoImg && photoImg.src) || '';
+            if (photoImg && API_BASE) {
+                photoImg.crossOrigin = 'anonymous';
+                defaultSrc = toProxy(defaultSrc);
+                photoImg.src = toProxy(photoImg.src);
+            }
 
             if (photoInput && photoImg) {
                 photoImg.crossOrigin = 'anonymous';
@@ -600,11 +625,25 @@
                 window.print();
             });
 
+            async function waitForImages() {
+                const images = Array.from(document.images || []);
+                await Promise.all(images.map((img) => {
+                    if (img.complete) {
+                        return img.decode ? img.decode().catch(() => {}) : Promise.resolve();
+                    }
+                    return new Promise((resolve) => {
+                        img.addEventListener('load', resolve, { once: true });
+                        img.addEventListener('error', resolve, { once: true });
+                    });
+                }));
+            }
+
             async function exportJpg() {
                 const el = document.querySelector('.id-card');
                 if (!el) return;
                 try {
                     document.body.classList.add('exporting');
+                    await waitForImages();
                     await new Promise(r => setTimeout(r, 80));
                     const canvas = await html2canvas(el, {scale:2, backgroundColor: '#ffffff', useCORS: true});
                     const data = canvas.toDataURL('image/jpeg', 0.95);
@@ -626,6 +665,7 @@
                 if (!el) return;
                 try {
                     document.body.classList.add('exporting');
+                    await waitForImages();
                     await new Promise(r => setTimeout(r, 80));
                     const canvas = await html2canvas(el, {scale:3, backgroundColor: '#ffffff', useCORS: true});
                     const imgData = canvas.toDataURL('image/png');

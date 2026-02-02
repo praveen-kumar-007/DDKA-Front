@@ -62,11 +62,26 @@ const DonationReceipt: React.FC = () => {
     return `DDKA-REC-${short}`;
   };
 
+  const buildCanvasOptions = () => ({
+    scale: 3,
+    useCORS: true,
+    allowTaint: true,
+    backgroundColor: '#ffffff',
+    onclone: (clonedDoc: Document) => {
+      clonedDoc.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
+        const href = link.getAttribute('href') || '';
+        if (href.includes('fonts.googleapis.com')) {
+          link.parentNode?.removeChild(link);
+        }
+      });
+    },
+  });
+
   const saveAsJpeg = async () => {
     if (!receiptRef.current) return;
     setBusy(true);
     try {
-      const canvas = await html2canvas(receiptRef.current, { scale: 3, useCORS: true, backgroundColor: '#ffffff' });
+      const canvas = await html2canvas(receiptRef.current, buildCanvasOptions());
       const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
       const a = document.createElement('a');
       a.href = dataUrl;

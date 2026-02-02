@@ -159,7 +159,20 @@ const AdminPlayerIDGenerator = () => {
 
       document.body.appendChild(container);
 
-      const canvas = await html2canvas(container, { scale: 3, useCORS: true, backgroundColor: '#ffffff' });
+      const canvas = await html2canvas(container, {
+        scale: 3,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        onclone: (clonedDoc: Document) => {
+          clonedDoc.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
+            const href = link.getAttribute('href') || '';
+            if (href.includes('fonts.googleapis.com')) {
+              link.parentNode?.removeChild(link);
+            }
+          });
+        },
+      });
       const imgData = canvas.toDataURL('image/png');
 
       const pdf = new jsPDF({ unit: 'px', format: [canvas.width, canvas.height] });
@@ -206,7 +219,20 @@ const AdminPlayerIDGenerator = () => {
 
       document.body.appendChild(container);
 
-      const canvas = await html2canvas(container, { scale: 3, useCORS: true, backgroundColor: '#ffffff' });
+      const canvas = await html2canvas(container, {
+        scale: 3,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        onclone: (clonedDoc: Document) => {
+          clonedDoc.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
+            const href = link.getAttribute('href') || '';
+            if (href.includes('fonts.googleapis.com')) {
+              link.parentNode?.removeChild(link);
+            }
+          });
+        },
+      });
       const dataUrl = canvas.toDataURL('image/png');
 
       const a = document.createElement('a');
