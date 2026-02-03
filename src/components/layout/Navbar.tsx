@@ -10,7 +10,7 @@ interface NavbarProps {
   onLangChange: (lang: Language) => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ currentPage, lang, onLangChange }) => {
+const Navbar: React.FC<NavbarProps> = ({ currentPage, onPageChange, lang, onLangChange }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const t = translations[lang];
@@ -60,9 +60,8 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, lang, onLangChange }) => {
   }, []);
 
   const handleNavClick = (id: string) => {
-    const target = id === 'home' ? '/' : `/${id}`;
-    // Use full navigation to ensure content always refreshes correctly
-    window.location.href = target;
+    // Delegate navigation to parent (App) so React Router handles it as SPA
+    onPageChange(id);
     setIsOpen(false);
     setOpenDropdown(null);
   };

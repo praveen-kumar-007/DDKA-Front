@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, useDeferredValue } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { CheckCircle, Download, Eye, RefreshCcw, Search, Trash2, XCircle } from 'lucide-react';
 import ExportCsvModal from '../components/admin/ExportCsvModal';
 import AdminPageHeader from '../components/admin/AdminPageHeader';
@@ -14,6 +14,7 @@ interface AdminPermissions {
 const AdminRegistrations: React.FC = () => {
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState<'players' | 'institutions'>('players');
   const [data, setData] = useState<any[]>([]);
@@ -488,7 +489,13 @@ const AdminRegistrations: React.FC = () => {
                               const target = activeTab === 'players'
                                 ? `/admin/registration/${item._id}`
                                 : `/admin/institution/${item._id}`;
-                              window.location.href = target;
+                              navigate(target, {
+                                state: {
+                                  data: item,
+                                  type: activeTab === 'players' ? 'player' : 'institution',
+                                  from: location.pathname + location.search,
+                                },
+                              });
                             }}
                             className="px-3 py-2 h-9 bg-blue-600 text-white rounded-lg text-xs font-semibold hover:bg-blue-700 transition-all active:scale-95 flex items-center gap-2"
                             title="View Details"
@@ -557,7 +564,13 @@ const AdminRegistrations: React.FC = () => {
                           const target = activeTab === 'players'
                             ? `/admin/registration/${item._id}`
                             : `/admin/institution/${item._id}`;
-                          window.location.href = target;
+                          navigate(target, {
+                            state: {
+                              data: item,
+                              type: activeTab === 'players' ? 'player' : 'institution',
+                              from: location.pathname + location.search,
+                            },
+                          });
                         }}
                         className="px-3 py-1 bg-blue-600 text-white rounded-full text-xs font-black"
                       >

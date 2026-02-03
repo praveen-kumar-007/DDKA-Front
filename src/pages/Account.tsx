@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { IDCardFront } from './Frontcard';
 import { IDCardBack } from './Backcard';
+import { useNavigate } from 'react-router-dom';
 import { formatDateMDY } from '../utils/date';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -10,6 +11,7 @@ const Account: React.FC = () => {
   const [role, setRole] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [showIdsToUsers, setShowIdsToUsers] = useState<boolean>(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -62,7 +64,7 @@ const Account: React.FC = () => {
     localStorage.removeItem('userToken');
     localStorage.removeItem('userProfile');
     localStorage.removeItem('userRole');
-    window.location.href = '/';
+    navigate('/');
   };
 
   if (error) {
@@ -196,7 +198,13 @@ const Account: React.FC = () => {
           <h2 className="text-2xl font-bold">My Account</h2>
 
           <div className="flex items-center gap-3">
-            <a href="/admin" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm">GO TO DASHBOARD</a>
+            <button
+              type="button"
+              onClick={() => navigate('/admin-portal-access')}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm"
+            >
+              GO TO DASHBOARD
+            </button>
 
             <button onClick={logout} className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">Logout</button>
           </div>

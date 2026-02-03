@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { User, Key, ArrowRight, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
+import { useNavigate } from 'react-router-dom';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -11,6 +12,7 @@ const PublicLogin: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,7 +53,7 @@ const PublicLogin: React.FC = () => {
       }
 
       // Redirect to account page
-      window.location.href = '/account';
+      navigate('/account');
     } catch (err) {
       console.error('Login error:', err);
       setError('Connection failed. Make sure the backend server is running');

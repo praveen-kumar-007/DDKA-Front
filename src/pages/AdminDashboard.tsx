@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   CheckCircle, XCircle,
   Users, Building, Search,
@@ -28,6 +29,7 @@ interface AdminPermissions {
 }
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => { 
+  const navigate = useNavigate();
   const [activeTab] = useState<'players' | 'institutions'>('players');
 
   const [adminRole, setAdminRole] = useState<string | null>(null);
@@ -171,7 +173,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
     localStorage.removeItem('adminRole');
     localStorage.removeItem('adminPermissions');
     sessionStorage.removeItem('isAdminAuthenticated');
-    window.location.href = '/admin-portal-access';
+    navigate('/admin-portal-access');
   };
 
   // Data loading moved to dedicated Registrations page
@@ -561,7 +563,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
               type="button"
               onClick={() => {
                 if (adminRole === 'superadmin' || adminPermissions?.canAccessGallery) {
-                  window.location.href = '/admin/gallery';
+                  navigate('/admin/gallery');
                 } else {
                   alert('You do not have permission to manage gallery. Please contact the superadmin.');
                 }
@@ -590,7 +592,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
               type="button"
               onClick={() => {
                 if (adminRole === 'superadmin' || adminPermissions?.canAccessNews) {
-                  window.location.href = '/admin-news-upload';
+                  navigate('/admin-news-upload');
                 } else {
                   alert('You do not have permission to manage news. Please contact the superadmin.');
                 }
@@ -619,7 +621,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
               type="button"
               onClick={() => {
                 if (adminRole === 'superadmin' || adminPermissions?.canAccessContacts) {
-                  window.location.href = '/admin/contact';
+                  navigate('/admin/contact');
                 } else {
                   alert('You do not have permission to manage contact forms. Please contact the superadmin.');
                 }
@@ -647,7 +649,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
             <button
               type="button"
               onClick={() => {
-                window.location.href = '/admin/bulk-email';
+                navigate('/admin/bulk-email');
               }}
               className="flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-[92px] bg-white hover:bg-slate-50 cursor-pointer"
             >
@@ -664,7 +666,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
             <button
               type="button"
               onClick={() => {
-                window.location.href = '/admin/unified-search';
+                navigate('/admin/unified-search');
               }}
               className="flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-[92px] bg-white hover:bg-slate-50 cursor-pointer"
             >
@@ -679,7 +681,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
               type="button"
               onClick={() => {
                 if (adminRole === 'superadmin' || adminPermissions?.canAccessChampions) {
-                  window.location.href = '/admin/players';
+                  navigate('/admin/players');
                 } else {
                   alert('You do not have permission to manage champions. Please contact the superadmin.');
                 }
@@ -708,7 +710,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
               type="button"
               onClick={() => {
                 if (adminRole === 'superadmin' || adminPermissions?.canAccessReferees) {
-                  window.location.href = '/admin/referees';
+                  navigate('/admin/referees');
                 } else {
                   alert('You do not have permission to manage referees. Please contact the superadmin.');
                 }
@@ -742,7 +744,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
               type="button"
               onClick={() => {
                 if (adminRole === 'superadmin' || adminPermissions?.canAccessDonations) {
-                  window.location.href = '/admin/donations';
+                  navigate('/admin/donations');
                 } else {
                   alert('You do not have permission to manage donations. Please contact the superadmin.');
                 }
@@ -774,7 +776,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
               type="button"
               onClick={() => {
                 if (adminRole === 'superadmin' || adminPermissions?.canAccessTechnicalOfficials) {
-                  window.location.href = '/admin/technical-officials';
+                  navigate('/admin/technical-officials');
                 } else {
                   alert('You do not have permission to manage technical officials. Please contact the superadmin.');
                 }
@@ -804,7 +806,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
           {adminRole === 'superadmin' && (
             <button
               type="button"
-              onClick={() => { window.location.href = '/admin/manage-admins'; }}
+              onClick={() => { navigate('/admin/manage-admins'); }}
               className="flex flex-col items-center justify-center p-4 bg-white rounded-xl shadow border hover:bg-red-50 transition-all w-full min-h-[92px]"
             >
               <UserCog size={28} className="text-red-700 mb-2" />
@@ -876,7 +878,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
               type="button"
               onClick={() => {
                 if (adminRole === 'superadmin' || adminPermissions?.canAccessPlayerDetails) {
-                  window.location.href = '/admin/registrations?tab=players';
+                  navigate('/admin/registrations?tab=players');
                 } else {
                   alert('You do not have permission to view player details. Please contact the superadmin.');
                 }
@@ -913,7 +915,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
             type="button"
             onClick={() => {
               if (adminRole === 'superadmin' || adminPermissions?.canAccessInstitutionDetails) {
-                window.location.href = '/admin/registrations?tab=institutions';
+                navigate('/admin/registrations?tab=institutions');
               } else {
                 alert('You do not have permission to view institution details. Please contact the superadmin.');
               }

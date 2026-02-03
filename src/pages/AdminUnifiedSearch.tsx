@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState, useDeferredValue } from 'react';
 import { Search, Eye } from 'lucide-react';
-// No client-side Link needed; use full navigation for details
+import { useNavigate } from 'react-router-dom';
 import AdminPageHeader from '../components/admin/AdminPageHeader';
 
 interface UnifiedRecord {
@@ -21,6 +21,7 @@ interface UnifiedRecord {
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const AdminUnifiedSearch: React.FC = () => {
+  const navigate = useNavigate();
   const [records, setRecords] = useState<UnifiedRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -306,7 +307,7 @@ const AdminUnifiedSearch: React.FC = () => {
                         <td className="px-4 py-3 text-right">
                           <button
                             type="button"
-                            onClick={() => { window.location.href = detailPath; }}
+                            onClick={() => { navigate(detailPath); }}
                             className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700"
                           >
                             <Eye size={14} /> View Details

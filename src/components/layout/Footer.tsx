@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Phone, MapPin, ShieldCheck, Mail, Youtube, Instagram, Twitter, Facebook, Heart } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { CONTACT_INFO, SOCIAL_LINKS } from '../../constants';
 import { translations } from '../../translations';
 import type { Language } from '../../translations';
@@ -13,6 +14,7 @@ const Footer: React.FC<FooterProps> = ({ lang }) => {
   const t = translations[lang];
   const footer = t.footer;
   const [akfiTapCount, setAkfiTapCount] = useState(0);
+  const navigate = useNavigate();
 
   const handleAkfiTap = () => {
     const next = akfiTapCount + 1;
@@ -24,7 +26,7 @@ const Footer: React.FC<FooterProps> = ({ lang }) => {
   };
 
   const go = (path: string) => {
-    window.location.href = path;
+    navigate(path);
   };
 
   return (

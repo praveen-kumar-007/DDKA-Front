@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Shield, UserCog, Mail, Trash2, ToggleLeft, ToggleRight, ArrowLeft } from 'lucide-react';
 import AdminPageHeader from '../components/admin/AdminPageHeader';
 
@@ -32,6 +33,7 @@ const AdminManageAdmins: React.FC = () => {
   const [admins, setAdmins] = useState<AdminItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
   const role = typeof window !== 'undefined' ? localStorage.getItem('adminRole') : null;
@@ -149,7 +151,7 @@ const AdminManageAdmins: React.FC = () => {
       <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 p-4">
         <p className="text-red-600 font-bold mb-4">{error}</p>
         <button
-          onClick={() => (window.location.href = '/admin-portal-access')}
+          onClick={() => navigate('/admin-portal-access')}
           className="px-4 py-2 rounded-full bg-blue-900 text-white text-xs font-bold uppercase tracking-widest hover:bg-blue-700 transition-all flex items-center gap-2"
         >
           <ArrowLeft size={16} /> Back to Dashboard

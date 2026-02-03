@@ -3,6 +3,7 @@ import { Mail, Phone, Trash2, CheckCircle, XCircle, RefreshCcw, Eye, ListChecks,
 import AdminPageHeader from '../components/admin/AdminPageHeader';
 import StatusMark from '../components/admin/StatusMark';
 import ExportCsvModal from '../components/admin/ExportCsvModal';
+import { useNavigate } from 'react-router-dom';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -30,6 +31,8 @@ const AdminContact: React.FC = () => {
 
   const [adminRole, setAdminRole] = useState<string | null>(null);
   const [adminPermissions, setAdminPermissions] = useState<AdminPermissions | null>(null);
+
+  const navigate = useNavigate();
 
   // Selection & export state
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -89,7 +92,7 @@ const AdminContact: React.FC = () => {
   useEffect(() => {
     // Simple auth check: redirect if not logged in
     if (sessionStorage.getItem('isAdminAuthenticated') !== 'true') {
-      window.location.href = '/admin-portal-access';
+      navigate('/admin-portal-access');
       return;
     }
     const storedRole = localStorage.getItem('adminRole');
@@ -103,7 +106,7 @@ const AdminContact: React.FC = () => {
       }
     }
     fetchContacts();
-  }, []);
+  }, [navigate]);
 
   const canDelete = adminRole === 'superadmin' && !!adminPermissions?.canDelete;
 
