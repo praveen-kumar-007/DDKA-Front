@@ -465,24 +465,7 @@ const AdminRegistrations: React.FC = () => {
 
                       <td className="p-3 md:p-6">
                         <div className="flex justify-end flex-wrap gap-2">
-                          {canApprove && (
-                            <button
-                              onClick={() => updateStatus(item._id, 'Approved')}
-                              className="p-2 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-600 hover:text-white transition-all active:scale-90"
-                              title="Approve"
-                            >
-                              <CheckCircle size={18} />
-                            </button>
-                          )}
-                          {canReject && (
-                            <button
-                              onClick={() => updateStatus(item._id, 'Rejected')}
-                              className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all active:scale-90"
-                              title="Reject"
-                            >
-                              <XCircle size={18} />
-                            </button>
-                          )}
+                          {/* View always first for clarity */}
                           <button
                             type="button"
                             onClick={() => {
@@ -502,10 +485,31 @@ const AdminRegistrations: React.FC = () => {
                           >
                             <Eye size={16} /> View
                           </button>
+
+                          {canApprove && (
+                            <button
+                              onClick={() => updateStatus(item._id, 'Approved')}
+                              className="p-2 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-600 hover:text-white transition-all active:scale-90"
+                              title="Approve"
+                            >
+                              <CheckCircle size={18} />
+                            </button>
+                          )}
+
+                          {canReject && (
+                            <button
+                              onClick={() => updateStatus(item._id, 'Rejected')}
+                              className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all active:scale-90"
+                              title="Reject"
+                            >
+                              <XCircle size={18} />
+                            </button>
+                          )}
+
                           {(adminRole === 'superadmin' || adminPermissions?.canDelete) && (
                             <button
                               onClick={() => deleteEntry(item._id)}
-                              className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all active:scale-90"
+                              className="p-2 bg-slate-100 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all active:scale-90"
                               title="Delete"
                             >
                               <Trash2 size={18} />

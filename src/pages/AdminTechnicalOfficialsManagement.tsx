@@ -342,15 +342,42 @@ const AdminTechnicalOfficialsManagement: React.FC = () => {
                 </div>
 
                 <div className="mt-3 flex gap-2 flex-wrap">
-                  <button onClick={() => handleViewDetails(off)} className="flex-1 min-w-0 px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold">View Details</button>
+                  <button
+                    onClick={() => handleViewDetails(off)}
+                    className="flex-1 min-w-[140px] px-3 py-2 bg-blue-600 text-white rounded-full text-xs font-black tracking-widest uppercase"
+                  >
+                    View Details
+                  </button>
                   {isPending && (
                     <>
-                      <button onClick={() => handleStatusChange(off._id, 'Approved')} className="px-3 py-2 bg-emerald-50 text-emerald-700 rounded-lg text-sm">Approve</button>
-                      <button onClick={() => handleStatusChange(off._id, 'Rejected')} className="px-3 py-2 bg-red-50 text-red-700 rounded-lg text-sm">Reject</button>
+                      <button
+                        onClick={() => handleStatusChange(off._id, 'Approved')}
+                        className="flex-1 min-w-[110px] px-3 py-2 bg-emerald-50 text-emerald-700 rounded-full text-xs font-semibold"
+                      >
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => handleStatusChange(off._id, 'Rejected')}
+                        className="flex-1 min-w-[110px] px-3 py-2 bg-red-50 text-red-700 rounded-full text-xs font-semibold"
+                      >
+                        Reject
+                      </button>
                     </>
                   )}
-                  <button onClick={() => openEdit(off)} className="px-3 py-2 bg-slate-50 text-slate-700 rounded-lg text-sm">Edit</button>
-                  {canDelete && <button onClick={() => handleDelete(off._id)} className="px-3 py-2 bg-red-50 text-red-700 rounded-lg text-sm">Delete</button>}
+                  <button
+                    onClick={() => openEdit(off)}
+                    className="flex-1 min-w-[110px] px-3 py-2 bg-slate-50 text-slate-700 rounded-full text-xs font-semibold"
+                  >
+                    Edit
+                  </button>
+                  {canDelete && (
+                    <button
+                      onClick={() => handleDelete(off._id)}
+                      className="flex-1 min-w-[110px] px-3 py-2 bg-slate-100 text-red-600 rounded-full text-xs font-semibold"
+                    >
+                      Delete
+                    </button>
+                  )}
                 </div>
               </div>
             );
@@ -447,7 +474,14 @@ const AdminTechnicalOfficialsManagement: React.FC = () => {
                         {off.remarks || '-'}
                       </td>
                       <td className="px-4 py-3 text-right text-xs">
-                        <div className="flex justify-end gap-2">
+                        <div className="flex justify-end gap-2 flex-wrap">
+                          <button
+                            onClick={() => handleViewDetails(off)}
+                            className="inline-flex items-center justify-center px-3 h-8 rounded-lg bg-blue-600 text-white hover:bg-blue-700 text-xs font-semibold"
+                            title="View details"
+                          >
+                            View
+                          </button>
                           {isPending && (
                             <>
                               <button
@@ -467,13 +501,6 @@ const AdminTechnicalOfficialsManagement: React.FC = () => {
                             </>
                           )}
                           <button
-                            onClick={() => handleViewDetails(off)}
-                            className="inline-flex items-center justify-center px-3 h-8 rounded-lg bg-blue-600 text-white hover:bg-blue-700 text-xs font-semibold"
-                            title="View details"
-                          >
-                            View Details
-                          </button>
-                          <button
                             onClick={() => openEdit(off)}
                             className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-50 text-slate-700 hover:bg-slate-100"
                             title="Edit"
@@ -483,7 +510,7 @@ const AdminTechnicalOfficialsManagement: React.FC = () => {
                           {canDelete && (
                             <button
                               onClick={() => handleDelete(off._id)}
-                              className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-red-50 text-red-700 hover:bg-red-100"
+                              className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 text-red-700 hover:bg-red-100"
                               title="Delete"
                             >
                               <Trash2 className="w-4 h-4" />
