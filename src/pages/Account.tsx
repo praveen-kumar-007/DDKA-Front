@@ -531,8 +531,8 @@ const Account: React.FC = () => {
                 </div>
               )}
 
-              {/* ID Card card */}
-{profile.idNo && showIdsToUsers && (
+              {/* ID Card card (only for approved profiles with visible IDs) */}
+              {profile.idNo && showIdsToUsers && profile.status === 'Approved' && (
                 <div className="bg-white rounded-2xl shadow-md border border-slate-100 p-6">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold">Your ID Card</h3>

@@ -7,7 +7,7 @@ import StatusMark from '../components/admin/StatusMark';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-const DEFAULT_ROLES = ['Player', 'Coach', 'Referee', 'Official', 'Manager', 'Support Staff'];
+const DEFAULT_ROLES = ['Player', 'Captain', 'Vice Captain', 'Goalkeeper'];
 
 const getAgeGroup = (dob?: string) => {
   if (!dob) return 'N/A';
@@ -37,89 +37,11 @@ const AdminRegistrationDetails = () => {
   const [type, setType] = useState<'player' | 'institution' | null>(initialType);
   const [loading, setLoading] = useState(!initialData);
   const [error, setError] = useState<string | null>(null);
+  const [adminRole, setAdminRole] = useState<string | null>(null);
+  const [showIdOptions, setShowIdOptions] = useState(false);
   const [memberRole, setMemberRole] = useState<string>('Player');
   const [customRole, setCustomRole] = useState<string>('');
   const [customIdInput, setCustomIdInput] = useState<string>('');
-  const [showIdOptions, setShowIdOptions] = useState<boolean>(false);
-  const [adminRole, setAdminRole] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (initialData && initialType === 'player') {
-      const existingRole = initialData?.memberRole;
-      if (existingRole && DEFAULT_ROLES.includes(existingRole)) {
-        setMemberRole(existingRole);
-        setCustomRole('');
-      } else if (existingRole) {
-        setMemberRole('Player');
-        setCustomRole(existingRole);
-      }
-    }
-  }, [initialData, initialType]);
-
-  // Generate ID (with optional custom ID and role)
-  const generateIdNo = async () => {
-    if (!data || type !== 'player') return;
-
-    // First click: reveal options, second click actually generates
-    if (!showIdOptions) {
-      setShowIdOptions(true);
-      return;
-    }
-
-    const roleToSave = (customRole.trim() || memberRole || 'Player');
-    const custom = customIdInput.trim().toUpperCase();
-
-    let newIdNo: string;
-    if (custom) {
-      newIdNo = custom;
-    } else if (data.idNo) {
-      // Reuse existing assigned ID if admin didn't provide a new one
-      newIdNo = data.idNo;
-    } else {
-      // Default: generate a 4-digit random ID number for players
-      const randomNumber = Math.floor(1000 + Math.random() * 9000);
-      newIdNo = `DDKA-${randomNumber}`;
-    }
-
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/api/players/assign-id`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({
-          id: data._id,
-          transactionId: data.transactionId,
-          idNo: newIdNo,
-          memberRole: roleToSave,
-        }),
-      });
-
-      let result: any = {};
-      try {
-        result = await response.json();
-      } catch {
-        // ignore JSON parse errors
-      }
-
-      if (response.ok && result.success) {
-        setData((prev: any) =>
-          prev ? { ...prev, idNo: newIdNo, memberRole: roleToSave } : prev
-        );
-        setShowIdOptions(false);
-        window.open(`/id-card/${newIdNo}`, '_blank');
-        return;
-      }
-
-      const message: string = result?.message || `Failed to save ID (status ${response.status})`;
-      throw new Error(message);
-    } catch (err: any) {
-      console.error(err);
-      alert(err?.message || 'Failed to save ID number. Please try again.');
-    }
-  };
 
   const handleDeleteId = async () => {
     if (!data || type !== 'player' || !data.idNo) return;
@@ -143,7 +65,6 @@ const AdminRegistrationDetails = () => {
       }
 
       setData((prev: any) => (prev ? { ...prev, idNo: null, memberRole: 'Player' } : prev));
-      setShowIdOptions(false);
       alert('ID deleted successfully.');
     } catch (err: any) {
       console.error(err);
@@ -204,17 +125,10 @@ const AdminRegistrationDetails = () => {
     };
 
     const hydrateRole = (payload: any) => {
-      const existingRole = payload?.memberRole;
-      if (existingRole && DEFAULT_ROLES.includes(existingRole)) {
-        setMemberRole(existingRole);
-        setCustomRole('');
-      } else if (existingRole) {
-        setMemberRole('Player');
-        setCustomRole(existingRole);
-      } else {
-        setMemberRole('Player');
-        setCustomRole('');
-      }
+      if (!payload) return;
+      setMemberRole(payload.memberRole || 'Player');
+      setCustomIdInput(payload.idNo || '');
+      setCustomRole('');
     };
 
     const run = async () => {
@@ -270,6 +184,51 @@ const AdminRegistrationDetails = () => {
     }
   };
 
+  const handleSaveIdSettings = async () => {
+    if (!data || type !== 'player') return;
+
+    const baseId = (customIdInput || data.idNo || '').trim();
+    if (!baseId) {
+      alert('ID number is required to save.');
+      return;
+    }
+
+    const chosenRole = memberRole === 'Custom'
+      ? (customRole.trim() || 'Player')
+      : memberRole;
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/players/assign-id`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          id: data._id,
+          idNo: baseId.toUpperCase(),
+          memberRole: chosenRole,
+        }),
+      });
+
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || 'Failed to save ID settings');
+      }
+
+      const updated = result.data;
+      setData(updated);
+      setMemberRole(updated.memberRole || 'Player');
+      setCustomIdInput(updated.idNo || '');
+      setCustomRole('');
+      alert('ID and role updated successfully.');
+    } catch (err: any) {
+      console.error(err);
+      alert(err?.message || 'Failed to save ID settings. Please try again.');
+    }
+  };
+
   if (loading) return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
   if (error || !data) return <div className="flex justify-center items-center min-h-screen">{error || 'Not found'}</div>;
 
@@ -281,9 +240,7 @@ const AdminRegistrationDetails = () => {
       ? 'bg-red-100 text-red-700'
       : 'bg-amber-100 text-amber-700';
   const ageGroup = type === 'player' ? getAgeGroup(data?.dob) : 'N/A';
-  const idDisplay = data?.idNo
-    ? data.idNo
-    : (data?.transactionId ? `DDKA-${String(data.transactionId).slice(-6).toUpperCase()}` : 'N/A');
+  const idDisplay = data?.idNo ? data.idNo : 'Not assigned yet';
 
   // --- Layout: Two columns on desktop, stacked on mobile ---
   return (
@@ -314,13 +271,29 @@ const AdminRegistrationDetails = () => {
               {type === 'player' && data?.status === 'Approved' && (
                 <>
                   {data?.idNo ? (
-                    <button onClick={handleViewIdCard} className="px-3 py-2 h-9 rounded-full bg-green-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-green-700 transition-all flex items-center gap-2"><Wallet size={16} /> View ID Card</button>
-                  ) : (
-                    <button onClick={generateIdNo} className="px-3 py-2 h-9 rounded-full bg-green-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-green-700 transition-all flex items-center gap-2"><Wallet size={16} /> Generate ID</button>
-                  )}
+                    <button
+                      onClick={handleViewIdCard}
+                      className="px-3 py-2 h-9 rounded-full bg-green-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-green-700 transition-all flex items-center gap-2"
+                    >
+                      <Wallet size={16} /> View ID Card
+                    </button>
+                  ) : null}
+
+                  <button
+                    type="button"
+                    onClick={() => setShowIdOptions((prev) => !prev)}
+                    className="px-3 py-2 h-9 rounded-full bg-indigo-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-indigo-700 transition-all flex items-center gap-2"
+                  >
+                    <Wallet size={16} /> {showIdOptions ? 'Close ID Settings' : 'Edit ID / Role'}
+                  </button>
 
                   {data?.idNo && adminRole === 'superadmin' && (
-                    <button onClick={handleDeleteId} className="px-3 py-2 h-9 rounded-full bg-red-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-red-700 transition-all">Delete ID</button>
+                    <button
+                      onClick={handleDeleteId}
+                      className="px-3 py-2 h-9 rounded-full bg-red-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-red-700 transition-all"
+                    >
+                      Delete ID
+                    </button>
                   )}
                 </>
               )}
@@ -379,46 +352,7 @@ const AdminRegistrationDetails = () => {
         <div className="flex flex-col gap-6 w-full">
 
 
-          {/* Member Role & Custom ID controls for ID card */}
-          {type === 'player' && data?.status === 'Approved' && showIdOptions && (
-            <div className="mb-4 flex flex-col md:flex-row md:items-center md:justify-end gap-3">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-slate-700">Member Role</span>
-                <select
-                  value={memberRole}
-                  onChange={(e) => setMemberRole(e.target.value)}
-                  className="border border-slate-300 rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
-                >
-                  <option value="Player">Player</option>
-                  <option value="Coach">Coach</option>
-                  <option value="Referee">Referee</option>
-                  <option value="Official">Official</option>
-                  <option value="Manager">Manager</option>
-                  <option value="Support Staff">Support Staff</option>
-                </select>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-slate-700">Custom Role (optional)</span>
-                <input
-                  type="text"
-                  value={customRole}
-                  onChange={(e) => setCustomRole(e.target.value)}
-                  placeholder="e.g. Captain"
-                  className="border border-slate-300 rounded px-2 py-1 text-xs w-32 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-slate-700">Custom ID (optional)</span>
-                <input
-                  type="text"
-                  value={customIdInput}
-                  onChange={(e) => setCustomIdInput(e.target.value)}
-                  placeholder="e.g. DDKA-1001"
-                  className="border border-slate-300 rounded px-2 py-1 text-xs w-32 focus:outline-none focus:ring-1 focus:ring-blue-500 uppercase"
-                />
-              </div>
-            </div>
-          )}
+          {/* Member Role / ID now handled automatically when approved */}
 
           {/* Summary Header */}
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-4">
@@ -448,6 +382,67 @@ const AdminRegistrationDetails = () => {
           {/* PLAYER: Sectioned Details */}
           {type === 'player' && (
             <div className="flex flex-col gap-6 w-full">
+              {/* ID & Role Management */}
+              {showIdOptions && (
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 w-full">
+                  <div className="flex items-center justify-between gap-2 mb-4">
+                    <div className="flex items-center gap-2">
+                      <Wallet className="text-indigo-600 bg-indigo-100 rounded-full p-1" size={28} />
+                      <span className="font-extrabold text-lg text-slate-900 tracking-wide">ID & Role Management</span>
+                    </div>
+                    <span className="text-xs text-slate-500">Current ID: {idDisplay}</span>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-xs font-semibold text-slate-500 mb-1">Member Role</p>
+                      <select
+                        value={memberRole}
+                        onChange={(e) => setMemberRole(e.target.value)}
+                        className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      >
+                        {DEFAULT_ROLES.map((role) => (
+                          <option key={role} value={role}>{role}</option>
+                        ))}
+                        <option value="Custom">Custom</option>
+                      </select>
+                    </div>
+                    {memberRole === 'Custom' && (
+                      <div>
+                        <p className="text-xs font-semibold text-slate-500 mb-1">Custom Role</p>
+                        <input
+                          type="text"
+                          value={customRole}
+                          onChange={(e) => setCustomRole(e.target.value)}
+                          placeholder="Enter custom role"
+                          className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        />
+                      </div>
+                    )}
+                    <div className="md:col-span-2">
+                      <p className="text-xs font-semibold text-slate-500 mb-1">Player ID Number</p>
+                      <input
+                        type="text"
+                        value={customIdInput}
+                        onChange={(e) => setCustomIdInput(e.target.value)}
+                        placeholder={data.idNo || 'DDKA-1234'}
+                        className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                      <p className="text-[11px] text-slate-500 mt-1">
+                        ID is automatically generated when approved as DDKA-1234 style. Admins can update it here if needed.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-4 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={handleSaveIdSettings}
+                      className="px-4 py-2 rounded-full bg-indigo-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-indigo-700 transition-all"
+                    >
+                      Save ID Settings
+                    </button>
+                  </div>
+                </div>
+              )}
               {/* Personal Information */}
               <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 w-full">
                 <div className="flex items-center gap-2 mb-4">
