@@ -20,6 +20,7 @@ const AdminBulkEmail: React.FC = () => {
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
+  const [manualEmails, setManualEmails] = useState('');
   const [sending, setSending] = useState(false);
 
   const keyFor = (r: Recipient) => `${r.type}:${r.id}`;
@@ -82,13 +83,35 @@ const AdminBulkEmail: React.FC = () => {
     return recipients.filter(r => set.has(keyFor(r)));
   }, [selectedKeys, recipients]);
 
+  const parseManualEmails = () => {
+    const raw = manualEmails
+      .split(/[\s,;]+/)
+      .map(e => e.trim())
+      .filter(Boolean);
+    const unique = Array.from(new Set(raw.map(e => e.toLowerCase())));
+    const invalid = unique.filter(e => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e));
+    return { emails: unique, invalid };
+  };
+
   const sendEmails = async () => {
     if (!subject.trim() || !message.trim()) {
       alert('Subject and message are required');
       return;
     }
-    if (selectedRecipients.length === 0) {
-      alert('Select at least one recipient');
+    const { emails: manualList, invalid } = parseManualEmails();
+    if (invalid.length > 0) {
+      alert(`Invalid email(s): ${invalid.join(', ')}`);
+      return;
+    }
+    const manualRecipients = manualList.map(email => ({
+      email,
+      name: '',
+      type: 'Manual',
+      noGreeting: true
+    }));
+    const allRecipients = [...selectedRecipients, ...manualRecipients];
+    if (allRecipients.length === 0) {
+      alert('Select at least one recipient or add manual emails');
       return;
     }
     setSending(true);
@@ -103,11 +126,12 @@ const AdminBulkEmail: React.FC = () => {
         body: JSON.stringify({
           subject,
           message,
-          recipients: selectedRecipients.map(r => ({
+          recipients: allRecipients.map(r => ({
             email: r.email,
             name: r.name,
             type: r.type,
-            status: r.status
+            status: 'status' in r ? (r as Recipient).status : undefined,
+            noGreeting: 'noGreeting' in r ? (r as any).noGreeting : undefined
           }))
         })
       });
@@ -117,6 +141,7 @@ const AdminBulkEmail: React.FC = () => {
         return;
       }
       alert(`Sent: ${json.data.sent}, Failed: ${json.data.failed}`);
+      setManualEmails('');
     } catch (err) {
       alert('Failed to send emails');
     } finally {
@@ -142,18 +167,18 @@ const AdminBulkEmail: React.FC = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 bg-white rounded-2xl shadow border border-slate-200 overflow-hidden">
-            <div className="p-4 border-b flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
-              <div className="flex flex-wrap gap-2">
+            <div className="p-4 border-b flex flex-col lg:flex-row gap-3 lg:items-center lg:justify-between">
+              <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 w-full">
                 <input
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search name/email/type"
-                  className="px-3 py-2 rounded-lg border border-slate-200 text-sm w-full md:w-64"
+                  className="px-3 py-2 rounded-lg border border-slate-200 text-sm w-full sm:w-64"
                 />
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value as any)}
-                  className="px-3 py-2 rounded-lg border border-slate-200 text-sm"
+                  className="px-3 py-2 rounded-lg border border-slate-200 text-sm w-full sm:w-auto"
                 >
                   {['All', 'Pending', 'Approved', 'Rejected'].map(s => (
                     <option key={s} value={s}>{s}</option>
@@ -162,17 +187,17 @@ const AdminBulkEmail: React.FC = () => {
                 <select
                   value={typeFilter}
                   onChange={(e) => setTypeFilter(e.target.value as any)}
-                  className="px-3 py-2 rounded-lg border border-slate-200 text-sm"
+                  className="px-3 py-2 rounded-lg border border-slate-200 text-sm w-full sm:w-auto"
                 >
                   {['All', 'Player', 'Institution', 'Technical Official', 'Newsletter', 'Contact'].map(t => (
                     <option key={t} value={t}>{t}</option>
                   ))}
                 </select>
               </div>
-              <div className="text-xs font-bold text-slate-500">Selected: {selectedRecipients.length}</div>
+              <div className="text-xs font-bold text-slate-500 lg:whitespace-nowrap">Selected: {selectedRecipients.length}</div>
             </div>
 
-            <div className="overflow-auto">
+            <div className="overflow-auto hidden md:block">
               <table className="w-full text-sm">
                 <thead className="bg-slate-50">
                   <tr>
@@ -217,6 +242,37 @@ const AdminBulkEmail: React.FC = () => {
                 </tbody>
               </table>
             </div>
+            <div className="md:hidden">
+              {loading ? (
+                <div className="p-6 text-sm">Loading...</div>
+              ) : filtered.length === 0 ? (
+                <div className="p-6 text-sm">No recipients found</div>
+              ) : (
+                <div className="divide-y">
+                  {filtered.map(r => {
+                    const key = keyFor(r);
+                    return (
+                      <label key={key} className="flex gap-3 p-4">
+                        <input
+                          type="checkbox"
+                          className="mt-1"
+                          checked={selectedKeys.includes(key)}
+                          onChange={(e) => toggleOne(key, e.currentTarget.checked)}
+                        />
+                        <div className="flex-1">
+                          <div className="font-semibold text-slate-800">{r.name}</div>
+                          <div className="text-xs text-slate-500 break-all">{r.email}</div>
+                          <div className="mt-2 flex flex-wrap gap-2 text-[11px]">
+                            <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">{r.type}</span>
+                            <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">{r.status || 'Pending'}</span>
+                          </div>
+                        </div>
+                      </label>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="bg-white rounded-2xl shadow border border-slate-200 p-5">
@@ -238,6 +294,13 @@ const AdminBulkEmail: React.FC = () => {
               className="mt-1 mb-4 w-full px-3 py-2 rounded-lg border border-slate-200 text-sm min-h-[160px]"
               placeholder="Type your message..."
             />
+            <label className="text-xs font-bold text-slate-500">Add manual emails</label>
+            <textarea
+              value={manualEmails}
+              onChange={(e) => setManualEmails(e.target.value)}
+              className="mt-1 mb-4 w-full px-3 py-2 rounded-lg border border-slate-200 text-sm min-h-[80px]"
+              placeholder="Enter emails separated by comma or space"
+            />
             <button
               onClick={sendEmails}
               disabled={sending}
@@ -245,7 +308,7 @@ const AdminBulkEmail: React.FC = () => {
             >
               <Send size={16} /> {sending ? 'Sending...' : 'Send Email'}
             </button>
-            <p className="text-xs text-slate-400 mt-3">Emails use the current templates and logo/footer automatically.</p>
+            <p className="text-xs text-slate-400 mt-3">Manual emails are sent without any greeting line.</p>
           </div>
         </div>
       </div>
