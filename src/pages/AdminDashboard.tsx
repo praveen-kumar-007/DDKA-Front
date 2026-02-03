@@ -488,7 +488,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
           </div>
           <div className="flex items-center gap-3 flex-wrap w-full md:w-auto">
             {adminRole === 'superadmin' && (
-              <div className="relative" ref={manageRef}>
+              <div className="relative w-full sm:w-auto" ref={manageRef}>
                 <button
                   type="button"
                   onClick={() => setShowManage(prev => !prev)}
@@ -504,7 +504,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
                 {showManage && (
                   <div
                     id="manage-toggles"
-                    className="absolute left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:right-0 mt-3 w-[90vw] sm:w-80 bg-white border border-slate-200 rounded-xl shadow-lg p-4 z-50"
+                    className="absolute left-0 right-0 sm:left-auto sm:right-0 mt-3 w-full sm:w-80 max-w-sm sm:max-w-none mx-auto bg-white border border-slate-200 rounded-xl shadow-lg p-4 z-50"
                     role="dialog"
                     aria-label="Manage settings"
                   >
@@ -512,23 +512,29 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
                     <div className="w-full">
                       <div className="flex items-center justify-between text-left text-slate-500 text-xs font-bold uppercase tracking-widest border-b pb-2 mb-2">
                         <div>Setting</div>
-                        <div>Toggle</div>
+                        <div className="hidden sm:block">Action</div>
                       </div>
 
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="font-semibold text-slate-700">ID</div>
-                          <div className="flex justify-end scale-[0.85] sm:scale-90 origin-right"><ToggleShowIDs /></div>
+                      <div className="space-y-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                          <div className="text-sm font-semibold text-slate-700">ID visibility</div>
+                          <div className="flex sm:justify-end">
+                            <div className="scale-[0.9] origin-left sm:origin-right"><ToggleShowIDs /></div>
+                          </div>
                         </div>
 
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="font-semibold text-slate-700">MAIL</div>
-                          <div className="flex justify-end scale-[0.85] sm:scale-90 origin-right"><ToggleEmail /></div>
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                          <div className="text-sm font-semibold text-slate-700">Mail sending</div>
+                          <div className="flex sm:justify-end">
+                            <div className="scale-[0.9] origin-left sm:origin-right"><ToggleEmail /></div>
+                          </div>
                         </div>
 
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="font-semibold text-slate-700">EXP</div>
-                          <div className="flex justify-end scale-[0.85] sm:scale-90 origin-right"><ToggleExportAll /></div>
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                          <div className="text-sm font-semibold text-slate-700">Export</div>
+                          <div className="flex sm:justify-end">
+                            <div className="scale-[0.9] origin-left sm:origin-right"><ToggleExportAll /></div>
+                          </div>
                         </div>
                       </div>
                     </div>
