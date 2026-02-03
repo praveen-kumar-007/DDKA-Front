@@ -509,28 +509,29 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
                     aria-label="Manage settings"
                   >
                     <div className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">Settings</div>
-                    <table className="w-full text-sm table-auto">
-                      <thead>
-                        <tr className="text-left text-slate-500">
-                          <th className="py-1">Setting</th>
-                          <th className="py-1 text-right">Toggle</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y">
-                        <tr>
-                          <td className="py-2 font-semibold text-slate-700">ID</td>
-                          <td className="py-2 text-right"><div className="flex justify-end scale-90 origin-right"><ToggleShowIDs /></div></td>
-                        </tr>
-                        <tr>
-                          <td className="py-2 font-semibold text-slate-700">MAIL</td>
-                          <td className="py-2 text-right"><div className="flex justify-end scale-90 origin-right"><ToggleEmail /></div></td>
-                        </tr>
-                        <tr>
-                          <td className="py-2 font-semibold text-slate-700">EXP</td>
-                          <td className="py-2 text-right"><div className="flex justify-end scale-90 origin-right"><ToggleExportAll /></div></td>
-                        </tr>
-                      </tbody>
-                    </table>
+                    <div className="w-full">
+                      <div className="flex items-center justify-between text-left text-slate-500 text-xs font-bold uppercase tracking-widest border-b pb-2 mb-2">
+                        <div>Setting</div>
+                        <div>Toggle</div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="font-semibold text-slate-700">ID</div>
+                          <div className="flex justify-end scale-[0.85] sm:scale-90 origin-right"><ToggleShowIDs /></div>
+                        </div>
+
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="font-semibold text-slate-700">MAIL</div>
+                          <div className="flex justify-end scale-[0.85] sm:scale-90 origin-right"><ToggleEmail /></div>
+                        </div>
+
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="font-semibold text-slate-700">EXP</div>
+                          <div className="flex justify-end scale-[0.85] sm:scale-90 origin-right"><ToggleExportAll /></div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
