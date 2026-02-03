@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
-import { Download, User, Phone, Info, Building2, Wallet } from "lucide-react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { ArrowLeft, Download, User, Phone, Info, Building2, Wallet } from "lucide-react";
 import { formatDateMDY } from '../utils/date';
 import AdminPageHeader from '../components/admin/AdminPageHeader';
 import StatusMark from '../components/admin/StatusMark';
@@ -28,9 +28,11 @@ const getAgeGroup = (dob?: string) => {
 const AdminRegistrationDetails = () => {
   const { id } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const initialState = (location.state as { data?: any; type?: 'player' | 'institution' } | null) || null;
   const initialData = initialState?.data || null;
   const initialType = initialState?.type || null;
+  const fromPath = (location.state as { from?: string } | null)?.from || null;
   const [data, setData] = useState<any>(initialData);
   const [type, setType] = useState<'player' | 'institution' | null>(initialType);
   const [loading, setLoading] = useState(!initialData);
@@ -74,12 +76,9 @@ const AdminRegistrationDetails = () => {
       // Reuse existing assigned ID if admin didn't provide a new one
       newIdNo = data.idNo;
     } else {
-      // Default deterministic unique ID based on transactionId
-      const suffixSource = data.transactionId || '';
-      const suffix = suffixSource
-        ? suffixSource.slice(-6).toUpperCase()
-        : String(Math.floor(100000 + Math.random() * 900000));
-      newIdNo = `DDKA-${suffix}`;
+      // Default: generate a 4-digit random ID number for players
+      const randomNumber = Math.floor(1000 + Math.random() * 9000);
+      newIdNo = `DDKA-${randomNumber}`;
     }
 
     try {
@@ -294,17 +293,34 @@ const AdminRegistrationDetails = () => {
           title={type === 'player' ? data.fullName : data.instName}
           subtitle={type === 'player' ? data.email : 'Institution registration'}
           actions={(
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  if (fromPath) {
+                    navigate(fromPath);
+                    return;
+                  }
+                  if (window.history.length > 1) {
+                    navigate(-1);
+                    return;
+                  }
+                  navigate(`/admin/registrations?tab=${type === 'institution' ? 'institutions' : 'players'}`);
+                }}
+                className="px-3 py-2 h-9 rounded-full bg-white text-slate-700 text-xs font-bold uppercase tracking-widest border border-slate-200 hover:bg-slate-50 transition-all flex items-center gap-2"
+              >
+                <ArrowLeft size={14} /> Back
+              </button>
               {type === 'player' && data?.status === 'Approved' && (
                 <>
                   {data?.idNo ? (
-                    <button onClick={handleViewIdCard} className="px-4 py-2 rounded-full bg-green-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-green-700 transition-all flex items-center gap-2"><Wallet size={16} /> View ID Card</button>
+                    <button onClick={handleViewIdCard} className="px-3 py-2 h-9 rounded-full bg-green-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-green-700 transition-all flex items-center gap-2"><Wallet size={16} /> View ID Card</button>
                   ) : (
-                    <button onClick={generateIdNo} className="px-4 py-2 rounded-full bg-green-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-green-700 transition-all flex items-center gap-2"><Wallet size={16} /> Generate ID</button>
+                    <button onClick={generateIdNo} className="px-3 py-2 h-9 rounded-full bg-green-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-green-700 transition-all flex items-center gap-2"><Wallet size={16} /> Generate ID</button>
                   )}
 
                   {data?.idNo && adminRole === 'superadmin' && (
-                    <button onClick={handleDeleteId} className="px-4 py-2 rounded-full bg-red-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-red-700 transition-all">Delete ID</button>
+                    <button onClick={handleDeleteId} className="px-3 py-2 h-9 rounded-full bg-red-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-red-700 transition-all">Delete ID</button>
                   )}
                 </>
               )}

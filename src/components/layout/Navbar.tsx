@@ -10,7 +10,7 @@ interface NavbarProps {
   onLangChange: (lang: Language) => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ currentPage, onPageChange, lang, onLangChange }) => {
+const Navbar: React.FC<NavbarProps> = ({ currentPage, lang, onLangChange }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const t = translations[lang];
@@ -60,7 +60,9 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onPageChange, lang, onLang
   }, []);
 
   const handleNavClick = (id: string) => {
-    onPageChange(id);
+    const target = id === 'home' ? '/' : `/${id}`;
+    // Use full navigation to ensure content always refreshes correctly
+    window.location.href = target;
     setIsOpen(false);
     setOpenDropdown(null);
   };

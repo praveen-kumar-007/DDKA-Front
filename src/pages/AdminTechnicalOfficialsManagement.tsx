@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState, useDeferredValue, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { CheckCircle2, XCircle, Edit2, Trash2, Save, X, Download } from 'lucide-react';
 import AdminPageHeader from '../components/admin/AdminPageHeader';
 import ExportCsvModal from '../components/admin/ExportCsvModal';
@@ -56,7 +55,7 @@ const AdminTechnicalOfficialsManagement: React.FC = () => {
   // Export fields: use the actual saved 'grade' field (A/B/C) as a single column
   const exportFields = officialFields.map(k => ({ key: k, label: k }));
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -203,8 +202,9 @@ const AdminTechnicalOfficialsManagement: React.FC = () => {
   };
 
   const handleViewDetails = useCallback((official: TechnicalOfficial) => {
-    navigate(`/admin/technical-officials/${official._id}`, { state: { official } });
-  }, [navigate]);
+    const target = `/admin/technical-officials/${official._id}`;
+    window.location.href = target;
+  }, []);
 
   const filteredOfficials = useMemo(() => {
     const q = deferredSearchTerm.trim().toLowerCase();

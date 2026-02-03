@@ -5,7 +5,6 @@ import {
   LogOut, Newspaper, Image as ImageIcon, Mail, UserCheck, Heart,
   Trophy, Gavel, UserCog, FileText, Award
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import type { Language } from '../translations';
 
 interface AdminDashboardProps {
@@ -803,10 +802,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang }) => {
             </button>
           )}
           {adminRole === 'superadmin' && (
-            <Link to="/admin/manage-admins" className="flex flex-col items-center justify-center p-4 bg-white rounded-xl shadow border hover:bg-red-50 transition-all w-full min-h-[92px]">
+            <button
+              type="button"
+              onClick={() => { window.location.href = '/admin/manage-admins'; }}
+              className="flex flex-col items-center justify-center p-4 bg-white rounded-xl shadow border hover:bg-red-50 transition-all w-full min-h-[92px]"
+            >
               <UserCog size={28} className="text-red-700 mb-2" />
               <span className="font-bold text-xs text-red-900">Manage Admins</span>
-            </Link>
+            </button>
           )} 
 
           {(adminRole === 'superadmin' || (publicSettings.allowImportantDocs && adminPermissions?.canAccessImportantDocs)) && (

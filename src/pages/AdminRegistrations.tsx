@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, useDeferredValue } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { CheckCircle, Download, Eye, RefreshCcw, Search, Trash2, XCircle } from 'lucide-react';
 import ExportCsvModal from '../components/admin/ExportCsvModal';
 import AdminPageHeader from '../components/admin/AdminPageHeader';
@@ -463,7 +463,7 @@ const AdminRegistrations: React.FC = () => {
                       </td>
 
                       <td className="p-3 md:p-6">
-                        <div className="flex justify-end gap-2">
+                        <div className="flex justify-end flex-wrap gap-2">
                           {canApprove && (
                             <button
                               onClick={() => updateStatus(item._id, 'Approved')}
@@ -482,14 +482,19 @@ const AdminRegistrations: React.FC = () => {
                               <XCircle size={18} />
                             </button>
                           )}
-                          <Link
-                            to={activeTab === 'players' ? `/admin/registration/${item._id}` : `/admin/institution/${item._id}`}
-                            state={activeTab === 'players' ? { data: item, type: 'player' } : { data: item, type: 'institution' }}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-semibold hover:bg-blue-700 transition-all active:scale-95 flex items-center gap-2"
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const target = activeTab === 'players'
+                                ? `/admin/registration/${item._id}`
+                                : `/admin/institution/${item._id}`;
+                              window.location.href = target;
+                            }}
+                            className="px-3 py-2 h-9 bg-blue-600 text-white rounded-lg text-xs font-semibold hover:bg-blue-700 transition-all active:scale-95 flex items-center gap-2"
                             title="View Details"
                           >
-                            <Eye size={16} /> View Details
-                          </Link>
+                            <Eye size={16} /> View
+                          </button>
                           {(adminRole === 'superadmin' || adminPermissions?.canDelete) && (
                             <button
                               onClick={() => deleteEntry(item._id)}
@@ -546,13 +551,18 @@ const AdminRegistrations: React.FC = () => {
                       </div>
                     </div>
                     <div className="mt-3 flex flex-wrap gap-2">
-                      <Link
-                        to={activeTab === 'players' ? `/admin/registration/${item._id}` : `/admin/institution/${item._id}`}
-                        state={activeTab === 'players' ? { data: item, type: 'player' } : { data: item, type: 'institution' }}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const target = activeTab === 'players'
+                            ? `/admin/registration/${item._id}`
+                            : `/admin/institution/${item._id}`;
+                          window.location.href = target;
+                        }}
                         className="px-3 py-1 bg-blue-600 text-white rounded-full text-xs font-black"
                       >
                         View
-                      </Link>
+                      </button>
                       {(item.status || 'Pending').toLowerCase() !== 'approved' && (
                         <button onClick={() => updateStatus(item._id, 'Approved')} className="px-3 py-1 bg-green-50 text-green-600 rounded-full text-xs font-black">Approve</button>
                       )}

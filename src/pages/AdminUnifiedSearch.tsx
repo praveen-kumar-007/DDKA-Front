@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState, useDeferredValue } from 'react';
 import { Search, Eye } from 'lucide-react';
-import { Link } from 'react-router-dom';
+// No client-side Link needed; use full navigation for details
 import AdminPageHeader from '../components/admin/AdminPageHeader';
 
 interface UnifiedRecord {
@@ -291,14 +291,6 @@ const AdminUnifiedSearch: React.FC = () => {
                         ? `/admin/institution/${r.id}`
                         : `/admin/technical-officials/${r.id}`;
 
-                    const detailState = r.group === 'Player'
-                      ? { data: r.raw, type: 'player' as const }
-                      : r.group === 'Institution'
-                        ? { data: r.raw, type: 'institution' as const }
-                        : r.raw
-                          ? { official: r.raw }
-                          : undefined;
-
                     return (
                       <tr key={`${r.group}-${r.id}`} className="hover:bg-slate-50 transition-colors">
                         <td className="px-4 py-3">
@@ -312,13 +304,13 @@ const AdminUnifiedSearch: React.FC = () => {
                           <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${statusClass}`}>{statusValue}</span>
                         </td>
                         <td className="px-4 py-3 text-right">
-                          <Link
-                            to={detailPath}
-                            state={detailState}
+                          <button
+                            type="button"
+                            onClick={() => { window.location.href = detailPath; }}
                             className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700"
                           >
                             <Eye size={14} /> View Details
-                          </Link>
+                          </button>
                         </td>
                       </tr>
                     );

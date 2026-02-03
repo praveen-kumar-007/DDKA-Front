@@ -11,6 +11,7 @@ const AdminInstitutionDetails = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const initialData = ((location.state as { data?: any } | null) || null)?.data || null;
+  const fromPath = (location.state as { from?: string } | null)?.from || null;
   const [data, setData] = useState<any>(initialData);
   const [loading, setLoading] = useState(!initialData);
   const [error, setError] = useState<string | null>(null);
@@ -125,7 +126,22 @@ const AdminInstitutionDetails = () => {
             showBack={false}
             actions={(
               <div className="flex items-center gap-2">
-                <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-blue-900 font-bold hover:underline w-fit"><ArrowLeft size={22} /> Back</button>
+                <button
+                  onClick={() => {
+                    if (fromPath) {
+                      navigate(fromPath);
+                      return;
+                    }
+                    if (window.history.length > 1) {
+                      navigate(-1);
+                      return;
+                    }
+                    navigate('/admin/registrations?tab=institutions');
+                  }}
+                  className="flex items-center gap-2 text-blue-900 font-bold hover:underline w-fit"
+                >
+                  <ArrowLeft size={22} /> Back
+                </button>
                 {adminRole === 'superadmin' && (
                   <button onClick={handleDelete} className="flex items-center gap-2 px-4 py-2 rounded-full bg-red-50 text-red-600 text-xs font-bold uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all border border-red-100"><Trash2 size={16} /> Delete Record</button>
                 )}

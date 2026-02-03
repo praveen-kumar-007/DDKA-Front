@@ -92,7 +92,7 @@ const App: React.FC = () => {
       
       <main className="flex-grow">
         <Suspense fallback={<div className="p-8 text-center">Loading...</div>}>
-        <Routes>
+        <Routes location={location} key={location.pathname}>
           <Route path="/" element={<Home lang={lang} onNavigate={handlePageChange} />} />
           <Route path="/about" element={<About lang={lang} />} />
           <Route path="/affiliated-institutions" element={<AffiliatedInstitutions lang={lang} />} />
@@ -281,15 +281,21 @@ const App: React.FC = () => {
 
           <Route path="/contact" element={<Contact lang={lang} />} />
 
-          <Route path="*" element={<Home lang={lang} onNavigate={handlePageChange} />} />
-          <Route path="/admin/registration/:id" element={<AdminRegistrationDetails />} />
+          {/* Admin registration details (protected) */}
+          <Route path="/admin/registration/:id" element={
+            isAuthenticated ? <AdminRegistrationDetails /> : <AdminLogin onLoginSuccess={() => setIsAuthenticated(true)} />
+          } />
+          <Route path="/admin/institution/:id" element={
+            isAuthenticated ? <AdminInstitutionDetails /> : <AdminLogin onLoginSuccess={() => setIsAuthenticated(true)} />
+          } />
+
           <Route path="/id-card/:idNo" element={<PlayerIDCardPage />} />
           {/* Public institution details for SEO */}
           <Route path="/institution/:id" element={
             // lazy load to reduce initial bundle size
             <InstitutionDetailsPublic />
           } />
-          <Route path="/admin/institution/:id" element={<AdminInstitutionDetails />} />
+          <Route path="*" element={<Home lang={lang} onNavigate={handlePageChange} />} />
         </Routes>
         </Suspense>
       </main>

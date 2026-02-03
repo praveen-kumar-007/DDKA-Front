@@ -34,7 +34,7 @@ const AdminPageHeader: React.FC<Props> = ({ title, subtitle, showManageModules, 
 
         {showBack && (
           <button
-            onClick={() => (window.location.href = '/admin-portal-access')}
+            onClick={() => { window.location.href = '/admin-portal-access'; }}
             className="w-full sm:w-auto px-4 py-2 rounded-full bg-blue-900 text-white text-xs font-bold uppercase tracking-widest hover:bg-blue-700 transition-all flex items-center justify-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" /> Back to Dashboard
