@@ -195,7 +195,6 @@
             color: var(--text-main);
             display: flex;
             align-items: center;
-            white-space: nowrap; /* keep label and dots on one line */
         }
         /* only show dotted border when field is empty */
         .field.empty { border-bottom: 1px dotted #ccc; padding-bottom:6px; }
@@ -204,6 +203,7 @@
             font-weight: bold;
             width: 115px; /* enough space so text doesn't wrap */
             display: inline-block;
+            white-space: nowrap; /* keep label on one line, allow value to wrap */
         }
 
         .value {
