@@ -469,6 +469,7 @@ const AdminRegistrationDetails = () => {
         <AdminPageHeader
           title={type === 'player' ? data.fullName : data.instName}
           subtitle={type === 'player' ? data.email : 'Institution registration'}
+          showBack={false}
           actions={(
             <div className="flex flex-wrap items-center justify-end gap-2 w-full md:w-auto">
               <button
