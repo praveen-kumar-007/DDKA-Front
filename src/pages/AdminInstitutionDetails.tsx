@@ -181,7 +181,7 @@ const AdminInstitutionDetails = () => {
             subtitle="View institution registration and payment proof"
             showBack={false}
             actions={(
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center justify-end gap-2 w-full md:w-auto">
                 <button
                   onClick={() => {
                     if (fromPath) {
@@ -194,10 +194,19 @@ const AdminInstitutionDetails = () => {
                     }
                     navigate('/admin/registrations?tab=institutions');
                   }}
-                  className="flex items-center gap-2 text-blue-900 font-bold hover:underline w-fit"
+                  className="w-full sm:w-auto px-3 py-2 h-9 rounded-full bg-white text-blue-900 text-xs font-bold uppercase tracking-widest border border-slate-200 hover:bg-slate-50 transition-all flex items-center justify-center gap-2"
                 >
-                  <ArrowLeft size={22} /> Back
+                  <ArrowLeft size={14} /> Back
                 </button>
+                {data.status !== 'Approved' && (
+                  <button
+                    type="button"
+                    onClick={() => handleStatusChange('Approved')}
+                    className="w-full sm:w-auto px-3 py-2 h-9 rounded-full bg-emerald-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-emerald-700 transition-all flex items-center justify-center gap-2"
+                  >
+                    <CheckCircle2 size={14} /> Approve
+                  </button>
+                )}
               </div>
             )}
           />
@@ -299,7 +308,7 @@ const AdminInstitutionDetails = () => {
             </div>
           </div>
 
-          {/* Final admin action bar for status & delete */}
+          {/* Final admin action bar for status & delete (bottom: reject & delete only) */}
           <div className="mt-4 flex justify-end">
             <div className="flex flex-wrap gap-2">
               {data.status !== 'Rejected' && (
@@ -310,16 +319,6 @@ const AdminInstitutionDetails = () => {
                 >
                   <XCircle size={16} />
                   <span>Reject</span>
-                </button>
-              )}
-              {data.status !== 'Approved' && (
-                <button
-                  type="button"
-                  onClick={() => handleStatusChange('Approved')}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold hover:bg-emerald-600 hover:text-white transition-all active:scale-95"
-                >
-                  <CheckCircle2 size={16} />
-                  <span>Approve</span>
                 </button>
               )}
               {adminRole === 'superadmin' && (

@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { CheckCircle, Download, Eye, RefreshCcw, Search } from 'lucide-react';
 import ExportCsvModal from '../components/admin/ExportCsvModal';
 import AdminPageHeader from '../components/admin/AdminPageHeader';
-import StatusMark from '../components/admin/StatusMark';
 
 interface AdminPermissions {
   canAccessPlayerDetails?: boolean;
@@ -444,13 +443,11 @@ const AdminRegistrations: React.FC = () => {
                       </td>
 
                       <td className="p-3 md:p-6">
-                        <div className="flex justify-end flex-wrap gap-2">
+                        <div className="flex justify-end items-center gap-2 flex-nowrap">
                           <button
                             type="button"
                             onClick={() => {
-                              const target = activeTab === 'players'
-                                ? `/admin/registration/${item._id}`
-                                : `/admin/institution/${item._id}`;
+                              const target = `/admin/registration/${item._id}`;
                               navigate(target, {
                                 state: {
                                   data: item,
@@ -460,10 +457,28 @@ const AdminRegistrations: React.FC = () => {
                               });
                             }}
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition-all active:scale-95"
-                            title="View details"
+                            title="View"
                           >
                             <Eye size={16} />
                             <span>View</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const target = `/admin/registration/${item._id}`;
+                              navigate(target, {
+                                state: {
+                                  data: item,
+                                  type: activeTab === 'players' ? 'player' : 'institution',
+                                  from: location.pathname + location.search,
+                                  autoEdit: true,
+                                },
+                              });
+                            }}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 text-slate-800 text-xs font-semibold hover:bg-slate-200 transition-all active:scale-95"
+                          >
+                            <span>Edit</span>
                           </button>
 
                           {canApprove && (
@@ -490,72 +505,118 @@ const AdminRegistrations: React.FC = () => {
                 <div className="p-8 text-center"><RefreshCcw className="animate-spin mx-auto text-blue-900 mb-4" size={40} /></div>
               ) : filteredData.length === 0 ? (
                 <div className="p-8 text-center text-slate-300 font-bold uppercase tracking-widest">No records found</div>
-              ) : filteredData.map((item) => (
-                <div key={item._id} className="p-4 rounded-lg border bg-slate-50 shadow-sm flex items-start gap-4">
-                  {publicSettings.allowExportAll !== false && !showExportModal && (
-                    <div className="flex-shrink-0">
-                      <input type="checkbox" checked={selectedIds.includes(item._id)} onChange={(e) => {
-                        if (e.currentTarget.checked) setSelectedIds(prev => Array.from(new Set([...prev, item._id])));
-                        else setSelectedIds(prev => prev.filter(id => id !== item._id));
-                      }} />
-                    </div>
-                  )}
-                  <div className="flex-shrink-0">
-                    {item.photo || item.photoUrl || item.instLogoUrl || item.instLogo || item.logo ? (
-                      <img src={item.photo || item.photoUrl || item.instLogoUrl || item.instLogo || item.logo} alt={item.fullName || item.instName || 'Photo'} className="w-14 h-14 rounded-full object-cover border-2 border-slate-200" />
-                    ) : (
-                      <div className="w-14 h-14 bg-blue-900 rounded-full flex items-center justify-center text-white font-black text-lg shadow-lg">
-                        {(item.fullName || item.instName || 'U')[0].toUpperCase()}
+              ) : filteredData.map((item) => {
+                const statusValue = (item.status || 'Pending');
+                const statusKey = statusValue.toLowerCase();
+                const statusClass = statusKey === 'approved'
+                  ? 'bg-emerald-100 text-emerald-700'
+                  : statusKey === 'rejected'
+                    ? 'bg-red-100 text-red-700'
+                    : 'bg-amber-100 text-amber-700';
+                const isPending = statusKey === 'pending';
+
+                return (
+                  <div key={item._id} className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm flex items-start gap-4">
+                    {publicSettings.allowExportAll !== false && !showExportModal && (
+                      <div className="flex-shrink-0">
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.includes(item._id)}
+                          onChange={(e) => {
+                            if (e.currentTarget.checked) setSelectedIds(prev => Array.from(new Set([...prev, item._id])));
+                            else setSelectedIds(prev => prev.filter(id => id !== item._id));
+                          }}
+                        />
                       </div>
                     )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-2">
-                      <div>
-                        <p className="font-black text-blue-950 text-base leading-tight">{item.fullName || item.instName}</p>
-                        <p className="text-sm text-slate-600">{item.email || item.phone || '-'}</p>
-                      </div>
-                      <div className="text-right">
-                        <div className="flex items-center gap-2">
-                        <StatusMark status={item.status} className="w-6 h-6" title={item.status || 'Pending'} />
-                        <span className="sr-only">{item.status || 'Pending'}</span>
-                      </div>
-                      </div>
-                    </div>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const target = activeTab === 'players'
-                            ? `/admin/registration/${item._id}`
-                            : `/admin/institution/${item._id}`;
-                          navigate(target, {
-                            state: {
-                              data: item,
-                              type: activeTab === 'players' ? 'player' : 'institution',
-                              from: location.pathname + location.search,
-                            },
-                          });
-                        }}
-                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition-all active:scale-95"
-                      >
-                        <Eye size={14} />
-                        <span>View</span>
-                      </button>
-
-                      {(item.status || 'Pending').toLowerCase() !== 'approved' && (
-                        <button
-                          onClick={() => updateStatus(item._id, 'Approved')}
-                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold hover:bg-emerald-600 hover:text-white transition-all active:scale-95"
-                        >
-                          <CheckCircle size={14} />
-                          <span>Approve</span>
-                        </button>
+                    <div className="flex-shrink-0">
+                      {item.photo || item.photoUrl || item.instLogoUrl || item.instLogo || item.logo ? (
+                        <img
+                          src={item.photo || item.photoUrl || item.instLogoUrl || item.instLogo || item.logo}
+                          alt={item.fullName || item.instName || 'Photo'}
+                          className="w-14 h-14 rounded-full object-cover border-2 border-slate-200"
+                        />
+                      ) : (
+                        <div className="w-14 h-14 bg-blue-900 rounded-full flex items-center justify-center text-white font-black text-lg shadow-lg">
+                          {(item.fullName || item.instName || 'U')[0].toUpperCase()}
+                        </div>
                       )}
                     </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="font-black text-blue-950 text-base leading-tight truncate">{item.fullName || item.instName}</p>
+                          <p className="text-xs text-slate-600 break-words">{item.email || item.phone || '-'}</p>
+                          {activeTab === 'players' && (
+                            <p className="text-xs text-slate-600 mt-0.5">
+                              {getAgeGroup(item.dob)}
+                            </p>
+                          )}
+                          {activeTab === 'institutions' && (
+                            <p className="text-xs text-slate-600 mt-0.5">
+                              {item.instType || 'Institution'}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="mt-2">
+                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${statusClass}`}>
+                          {statusValue}
+                        </span>
+                      </div>
+                      <div className="mt-3 space-y-2">
+                        <div className="flex w-full gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const target = `/admin/registration/${item._id}`;
+                              navigate(target, {
+                                state: {
+                                  data: item,
+                                  type: activeTab === 'players' ? 'player' : 'institution',
+                                  from: location.pathname + location.search,
+                                },
+                              });
+                            }}
+                            className="flex-1 px-3 py-2 bg-blue-600 text-white rounded-full text-[11px] font-black tracking-widest uppercase flex items-center justify-center gap-1.5"
+                          >
+                            <Eye size={14} />
+                            <span>View</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const target = `/admin/registration/${item._id}`;
+                              navigate(target, {
+                                state: {
+                                  data: item,
+                                  type: activeTab === 'players' ? 'player' : 'institution',
+                                  from: location.pathname + location.search,
+                                  autoEdit: true,
+                                },
+                              });
+                            }}
+                            className="flex-1 px-3 py-2 bg-slate-50 text-slate-700 rounded-full text-[11px] font-semibold flex items-center justify-center gap-1.5"
+                          >
+                            <span>Edit</span>
+                          </button>
+                        </div>
+
+                        {isPending && (
+                          <button
+                            onClick={() => updateStatus(item._id, 'Approved')}
+                            className="w-full px-3 py-2 bg-emerald-50 text-emerald-700 rounded-full text-xs font-semibold flex items-center justify-center gap-1.5"
+                          >
+                            <CheckCircle size={14} />
+                            <span>Approve</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              )) }
+                );
+              }) }
             </div>
           )}
         </div>

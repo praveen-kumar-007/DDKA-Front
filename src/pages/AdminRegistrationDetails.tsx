@@ -33,7 +33,7 @@ const AdminRegistrationDetails = () => {
   const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const initialState = (location.state as { data?: any; type?: 'player' | 'institution' } | null) || null;
+  const initialState = (location.state as { data?: any; type?: 'player' | 'institution'; autoEdit?: boolean } | null) || null;
   const initialData = initialState?.data || null;
   const initialType = initialState?.type || null;
   const fromPath = (location.state as { from?: string } | null)?.from || null;
@@ -47,6 +47,19 @@ const AdminRegistrationDetails = () => {
   const [memberRole, setMemberRole] = useState<string>('Player');
   const [customRole, setCustomRole] = useState<string>('');
   const [customIdInput, setCustomIdInput] = useState<string>('');
+
+  const [editingDetails, setEditingDetails] = useState(false);
+  const [savingEdit, setSavingEdit] = useState(false);
+  const [editForm, setEditForm] = useState<any>({});
+  const [editFiles, setEditFiles] = useState<{
+    photo?: File | null;
+    front?: File | null;
+    back?: File | null;
+    receipt?: File | null;
+    screenshot?: File | null;
+    instLogo?: File | null;
+  }>({});
+  const [autoEditRequested] = useState<boolean>(Boolean(initialState?.autoEdit));
 
   const handleDeleteId = async () => {
     if (!data || type !== 'player' || !data.idNo) return;
@@ -74,6 +87,109 @@ const AdminRegistrationDetails = () => {
     } catch (err: any) {
       console.error(err);
       alert(err?.message || 'Failed to delete ID. Please try again.');
+    }
+  };
+
+  const beginEditDetails = () => {
+    if (!data || !type) return;
+    if (type === 'player') {
+      setEditForm({
+        fullName: data.fullName || '',
+        fathersName: data.fathersName || '',
+        gender: data.gender || 'Male',
+        dob: data.dob ? String(data.dob).slice(0, 10) : '',
+        bloodGroup: data.bloodGroup || '',
+        email: data.email || '',
+        phone: data.phone || '',
+        parentsPhone: data.parentsPhone || '',
+        address: data.address || '',
+        aadharNumber: data.aadharNumber || '',
+        sportsExperience: data.sportsExperience || '',
+        reasonForJoining: data.reasonForJoining || '',
+        memberRole: data.memberRole || 'Player',
+      });
+    } else if (type === 'institution') {
+      setEditForm({
+        instName: data.instName || '',
+        instType: data.instType || 'School',
+        regNo: data.regNo || '',
+        year: data.year || '',
+        headName: data.headName || '',
+        secretaryName: data.secretaryName || '',
+        totalPlayers: data.totalPlayers || '',
+        area: data.area || '',
+        surfaceType: data.surfaceType || '',
+        officePhone: data.officePhone || '',
+        altPhone: data.altPhone || '',
+        email: data.email || '',
+        address: data.address || '',
+        description: data.description || '',
+      });
+    }
+    setEditFiles({});
+    setEditingDetails(true);
+  };
+
+  const handleEditInputChange = (field: string, value: string) => {
+    setEditForm((prev: any) => ({ ...prev, [field]: value }));
+  };
+
+  const handleEditFileChange = (
+    field: 'photo' | 'front' | 'back' | 'receipt' | 'screenshot' | 'instLogo',
+    file: File | null
+  ) => {
+    setEditFiles((prev) => ({ ...prev, [field]: file }));
+  };
+
+  const handleSaveDetails = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!data || !type) return;
+
+    try {
+      setSavingEdit(true);
+      const endpoint = type === 'player' ? `/api/players/${data._id}` : `/api/institutions/${data._id}`;
+      const token = localStorage.getItem('token');
+
+      const formData = new FormData();
+      Object.keys(editForm).forEach((key) => {
+        if (editForm[key] !== undefined && editForm[key] !== null) {
+          formData.append(key, String(editForm[key]));
+        }
+      });
+
+      if (type === 'player') {
+        if (editFiles.photo) formData.append('photo', editFiles.photo);
+        if (editFiles.front) formData.append('front', editFiles.front);
+        if (editFiles.back) formData.append('back', editFiles.back);
+        if (editFiles.receipt) formData.append('receipt', editFiles.receipt);
+      } else if (type === 'institution') {
+        if (editFiles.screenshot) formData.append('screenshot', editFiles.screenshot);
+        if (editFiles.instLogo) formData.append('instLogo', editFiles.instLogo);
+      }
+
+      const response = await fetch(`${API_URL}${endpoint}`, {
+        method: 'PUT',
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: formData,
+      });
+
+      const result = await response.json().catch(() => null);
+      if (!response.ok || !result?.success) {
+        throw new Error(result?.message || 'Failed to update details');
+      }
+
+      if (result.data) {
+        setData(result.data);
+      }
+      setEditingDetails(false);
+      alert('Details updated successfully.');
+    } catch (err: any) {
+      console.error(err);
+      alert(err?.message || 'Failed to update details');
+    } finally {
+      setSavingEdit(false);
     }
   };
 
@@ -190,6 +306,12 @@ const AdminRegistrationDetails = () => {
 
     run();
   }, [id, initialData, initialType]);
+
+  useEffect(() => {
+    if (autoEditRequested && data && type && !editingDetails) {
+      beginEditDetails();
+    }
+  }, [autoEditRequested, data, type, editingDetails]);
 
   const handleViewIdCard = () => {
     if (type === 'player' && data?.idNo) {
@@ -348,7 +470,7 @@ const AdminRegistrationDetails = () => {
           title={type === 'player' ? data.fullName : data.instName}
           subtitle={type === 'player' ? data.email : 'Institution registration'}
           actions={(
-            <div className="flex flex-wrap items-center justify-end gap-2">
+            <div className="flex flex-wrap items-center justify-end gap-2 w-full md:w-auto">
               <button
                 type="button"
                 onClick={() => {
@@ -362,16 +484,34 @@ const AdminRegistrationDetails = () => {
                   }
                   navigate(`/admin/registrations?tab=${type === 'institution' ? 'institutions' : 'players'}`);
                 }}
-                className="px-3 py-2 h-9 rounded-full bg-white text-slate-700 text-xs font-bold uppercase tracking-widest border border-slate-200 hover:bg-slate-50 transition-all flex items-center gap-2"
+                className="w-full sm:w-auto px-3 py-2 h-9 rounded-full bg-white text-slate-700 text-xs font-bold uppercase tracking-widest border border-slate-200 hover:bg-slate-50 transition-all flex items-center justify-center gap-2"
               >
                 <ArrowLeft size={14} /> Back
               </button>
+              {type && (
+                <button
+                  type="button"
+                  onClick={() => (editingDetails ? setEditingDetails(false) : beginEditDetails())}
+                  className="w-full sm:w-auto px-3 py-2 h-9 rounded-full bg-indigo-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-indigo-700 transition-all flex items-center justify-center gap-2"
+                >
+                  {editingDetails ? 'Cancel Edit' : 'Edit Details'}
+                </button>
+              )}
+              {statusKey !== 'approved' && (
+                <button
+                  type="button"
+                  onClick={() => handleStatusChange('Approved')}
+                  className="w-full sm:w-auto px-3 py-2 h-9 rounded-full bg-emerald-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-emerald-700 transition-all flex items-center justify-center gap-2"
+                >
+                  <CheckCircle size={14} /> Approve
+                </button>
+              )}
               {type === 'player' && data?.status === 'Approved' && (
                 <>
                   {data?.idNo ? (
                     <button
                       onClick={handleViewIdCard}
-                      className="px-3 py-2 h-9 rounded-full bg-green-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-green-700 transition-all flex items-center gap-2"
+                      className="w-full sm:w-auto px-3 py-2 h-9 rounded-full bg-green-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-green-700 transition-all flex items-center justify-center gap-2"
                     >
                       <Wallet size={16} /> View ID Card
                     </button>
@@ -380,7 +520,7 @@ const AdminRegistrationDetails = () => {
                   <button
                     type="button"
                     onClick={() => setShowIdOptions((prev) => !prev)}
-                    className="px-3 py-2 h-9 rounded-full bg-indigo-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-indigo-700 transition-all flex items-center gap-2"
+                    className="w-full sm:w-auto px-3 py-2 h-9 rounded-full bg-indigo-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-indigo-700 transition-all flex items-center justify-center gap-2"
                   >
                     <Wallet size={16} /> {showIdOptions ? 'Close ID Settings' : 'Edit ID / Role'}
                   </button>
@@ -403,7 +543,7 @@ const AdminRegistrationDetails = () => {
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-12 items-start">
         {/* LEFT COLUMN: Photo & Documents */}
         <div className="flex flex-col gap-8 min-w-[320px]">
-          {/* Passport Photo Card */}
+          {/* Passport Photo Card (Player) */}
           {type === 'player' && data.photo && (
             <div className="bg-white rounded-xl shadow border p-6 flex flex-col items-center justify-start h-full">
               <div className="flex flex-col items-center w-full">
@@ -414,7 +554,7 @@ const AdminRegistrationDetails = () => {
               <span className="mt-3 inline-block bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full font-bold">Verified</span>
             </div>
           )}
-          {/* Aadhar Card Documents Card */}
+          {/* Aadhar Card Documents Card (Player) */}
           {type === 'player' && (data.front || data.back) && (
             <div className="bg-white rounded-xl shadow border p-6 flex flex-col items-center justify-start h-full">
               <div className="font-bold text-lg mb-4 w-full text-center">Aadhar Card Documents</div>
@@ -436,12 +576,54 @@ const AdminRegistrationDetails = () => {
               </div>
             </div>
           )}
-          {/* Payment Receipt Card */}
+          {/* Payment Receipt Card (Player) */}
           {type === 'player' && data.receipt && (
             <div className="bg-white rounded-xl shadow border p-6 flex flex-col items-center justify-start h-full">
               <div className="font-bold text-lg mb-2 w-full text-center">Payment Receipt</div>
               <img src={data.receipt} alt="Receipt" className="w-40 h-28 object-cover rounded border mb-2" />
               <a href={data.receipt} target="_blank" rel="noopener noreferrer" className="w-full mt-2 text-center bg-yellow-50 hover:bg-yellow-100 text-yellow-700 font-semibold py-2 rounded flex items-center justify-center gap-2 border"><Download size={16} />Download Receipt</a>
+            </div>
+          )}
+
+          {/* Institution Logo Card (Institution) */}
+          {type === 'institution' && (data.instLogoUrl || data.instLogo) && (
+            <div className="bg-white rounded-xl shadow border p-6 flex flex-col items-center justify-start h-full">
+              <div className="flex flex-col items-center w-full">
+                <img
+                  src={data.instLogoUrl || data.instLogo}
+                  alt="Institution Logo"
+                  className="w-32 h-32 object-contain rounded-lg border mb-4 bg-white"
+                />
+                <div className="font-bold text-lg mb-2">Institution Logo</div>
+              </div>
+              <a
+                href={data.instLogoUrl || data.instLogo}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full mt-2 text-center bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold py-2 rounded flex items-center justify-center gap-2 border"
+              >
+                <Download size={16} /> Download Logo
+              </a>
+            </div>
+          )}
+
+          {/* Institution Payment Screenshot Card (Institution) */}
+          {type === 'institution' && data.screenshotUrl && (
+            <div className="bg-white rounded-xl shadow border p-6 flex flex-col items-center justify-start h-full">
+              <div className="font-bold text-lg mb-2 w-full text-center">Payment Screenshot</div>
+              <img
+                src={data.screenshotUrl}
+                alt="Payment Screenshot"
+                className="w-40 h-28 object-cover rounded border mb-2"
+              />
+              <a
+                href={data.screenshotUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full mt-2 text-center bg-yellow-50 hover:bg-yellow-100 text-yellow-700 font-semibold py-2 rounded flex items-center justify-center gap-2 border"
+              >
+                <Download size={16} /> Download Screenshot
+              </a>
             </div>
           )}
         </div>
@@ -480,6 +662,252 @@ const AdminRegistrationDetails = () => {
           {/* PLAYER: Sectioned Details */}
           {type === 'player' && (
             <div className="flex flex-col gap-6 w-full">
+              {editingDetails && (
+                <form onSubmit={handleSaveDetails} className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 w-full space-y-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-extrabold text-lg text-slate-900 tracking-wide">Edit Player Details</span>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-xs font-semibold text-slate-500 mb-1">Full Name</p>
+                      <input
+                        type="text"
+                        value={editForm.fullName || ''}
+                        onChange={(e) => handleEditInputChange('fullName', e.target.value)}
+                        className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-slate-500 mb-1">Father's Name</p>
+                      <input
+                        type="text"
+                        value={editForm.fathersName || ''}
+                        onChange={(e) => handleEditInputChange('fathersName', e.target.value)}
+                        className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-slate-500 mb-1">Gender</p>
+                      <select
+                        value={editForm.gender || 'Male'}
+                        onChange={(e) => handleEditInputChange('gender', e.target.value)}
+                        className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      >
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                      </select>
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-slate-500 mb-1">Date of Birth</p>
+                      <input
+                        type="date"
+                        value={editForm.dob || ''}
+                        onChange={(e) => handleEditInputChange('dob', e.target.value)}
+                        className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-slate-500 mb-1">Blood Group</p>
+                      <input
+                        type="text"
+                        value={editForm.bloodGroup || ''}
+                        onChange={(e) => handleEditInputChange('bloodGroup', e.target.value)}
+                        className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-slate-500 mb-1">Email</p>
+                      <input
+                        type="email"
+                        value={editForm.email || ''}
+                        onChange={(e) => handleEditInputChange('email', e.target.value)}
+                        className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-slate-500 mb-1">Phone</p>
+                      <input
+                        type="text"
+                        value={editForm.phone || ''}
+                        onChange={(e) => handleEditInputChange('phone', e.target.value)}
+                        className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-slate-500 mb-1">Parent's Phone</p>
+                      <input
+                        type="text"
+                        value={editForm.parentsPhone || ''}
+                        onChange={(e) => handleEditInputChange('parentsPhone', e.target.value)}
+                        className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <p className="text-xs font-semibold text-slate-500 mb-1">Address</p>
+                      <textarea
+                        value={editForm.address || ''}
+                        onChange={(e) => handleEditInputChange('address', e.target.value)}
+                        className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-slate-500 mb-1">Aadhar Number</p>
+                      <input
+                        type="text"
+                        value={editForm.aadharNumber || ''}
+                        onChange={(e) => handleEditInputChange('aadharNumber', e.target.value)}
+                        className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-slate-500 mb-1">Sports Experience</p>
+                      <textarea
+                        value={editForm.sportsExperience || ''}
+                        onChange={(e) => handleEditInputChange('sportsExperience', e.target.value)}
+                        className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <p className="text-xs font-semibold text-slate-500 mb-1">Reason For Joining</p>
+                      <textarea
+                        value={editForm.reasonForJoining || ''}
+                        onChange={(e) => handleEditInputChange('reasonForJoining', e.target.value)}
+                        className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-slate-50 border rounded-xl p-3 flex flex-col sm:flex-row gap-3">
+                      <div className="flex-1">
+                        <p className="text-xs font-semibold text-slate-500 mb-1">Current Passport Photo</p>
+                        <div className="mt-1">
+                          {data.photo ? (
+                            <img src={data.photo} alt="Current passport" className="w-full max-w-[160px] rounded-lg border object-cover" />
+                          ) : (
+                            <p className="text-xs text-slate-400">No image</p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-xs font-semibold text-slate-500 mb-1">New Passport Photo</p>
+                        <div className="mt-1 mb-2">
+                          {editFiles.photo ? (
+                            <img src={URL.createObjectURL(editFiles.photo)} alt="New passport preview" className="w-full max-w-[160px] rounded-lg border object-cover" />
+                          ) : (
+                            <p className="text-xs text-slate-400">No new file selected</p>
+                          )}
+                        </div>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleEditFileChange('photo', e.target.files?.[0] || null)}
+                          className="w-full text-xs"
+                        />
+                      </div>
+                    </div>
+                    <div className="bg-slate-50 border rounded-xl p-3 flex flex-col sm:flex-row gap-3">
+                      <div className="flex-1">
+                        <p className="text-xs font-semibold text-slate-500 mb-1">Current Aadhar Front</p>
+                        <div className="mt-1">
+                          {data.front ? (
+                            <img src={data.front} alt="Current Aadhar front" className="w-full max-w-[160px] rounded-lg border object-cover" />
+                          ) : (
+                            <p className="text-xs text-slate-400">No image</p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-xs font-semibold text-slate-500 mb-1">New Aadhar Front</p>
+                        <div className="mt-1 mb-2">
+                          {editFiles.front ? (
+                            <img src={URL.createObjectURL(editFiles.front)} alt="New Aadhar front preview" className="w-full max-w-[160px] rounded-lg border object-cover" />
+                          ) : (
+                            <p className="text-xs text-slate-400">No new file selected</p>
+                          )}
+                        </div>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleEditFileChange('front', e.target.files?.[0] || null)}
+                          className="w-full text-xs"
+                        />
+                      </div>
+                    </div>
+                    <div className="bg-slate-50 border rounded-xl p-3 flex flex-col sm:flex-row gap-3">
+                      <div className="flex-1">
+                        <p className="text-xs font-semibold text-slate-500 mb-1">Current Aadhar Back</p>
+                        <div className="mt-1">
+                          {data.back ? (
+                            <img src={data.back} alt="Current Aadhar back" className="w-full max-w-[160px] rounded-lg border object-cover" />
+                          ) : (
+                            <p className="text-xs text-slate-400">No image</p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-xs font-semibold text-slate-500 mb-1">New Aadhar Back</p>
+                        <div className="mt-1 mb-2">
+                          {editFiles.back ? (
+                            <img src={URL.createObjectURL(editFiles.back)} alt="New Aadhar back preview" className="w-full max-w-[160px] rounded-lg border object-cover" />
+                          ) : (
+                            <p className="text-xs text-slate-400">No new file selected</p>
+                          )}
+                        </div>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleEditFileChange('back', e.target.files?.[0] || null)}
+                          className="w-full text-xs"
+                        />
+                      </div>
+                    </div>
+                    <div className="bg-slate-50 border rounded-xl p-3 flex flex-col sm:flex-row gap-3">
+                      <div className="flex-1">
+                        <p className="text-xs font-semibold text-slate-500 mb-1">Current Payment Receipt</p>
+                        <div className="mt-1">
+                          {data.receipt ? (
+                            <img src={data.receipt} alt="Current receipt" className="w-full max-w-[160px] rounded-lg border object-cover" />
+                          ) : (
+                            <p className="text-xs text-slate-400">No image</p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-xs font-semibold text-slate-500 mb-1">New Payment Receipt</p>
+                        <div className="mt-1 mb-2">
+                          {editFiles.receipt ? (
+                            <img src={URL.createObjectURL(editFiles.receipt)} alt="New receipt preview" className="w-full max-w-[160px] rounded-lg border object-cover" />
+                          ) : (
+                            <p className="text-xs text-slate-400">No new file selected</p>
+                          )}
+                        </div>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleEditFileChange('receipt', e.target.files?.[0] || null)}
+                          className="w-full text-xs"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex justify-end mt-4 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setEditingDetails(false)}
+                      className="px-4 py-2 rounded-full border text-xs font-bold uppercase tracking-widest text-slate-600 bg-white hover:bg-slate-50"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={savingEdit}
+                      className="px-4 py-2 rounded-full bg-blue-900 text-white text-xs font-bold uppercase tracking-widest hover:bg-blue-800 disabled:opacity-60"
+                    >
+                      {savingEdit ? 'Saving…' : 'Save Changes'}
+                    </button>
+                  </div>
+                </form>
+              )}
               {/* ID & Role Management */}
               {showIdOptions && (
                 <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 w-full">
@@ -658,6 +1086,217 @@ const AdminRegistrationDetails = () => {
           {/* INSTITUTION: Sectioned Details */}
           {type === 'institution' && (
             <div className="flex flex-col gap-6 w-full">
+              {editingDetails && (
+                <form onSubmit={handleSaveDetails} className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 w-full space-y-4 mb-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-extrabold text-lg text-slate-900 tracking-wide">Edit Institution Details</span>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-xs font-semibold text-slate-500 mb-1">Institution Name</p>
+                      <input
+                        type="text"
+                        value={editForm.instName || ''}
+                        onChange={(e) => handleEditInputChange('instName', e.target.value)}
+                        className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-slate-500 mb-1">Type</p>
+                      <select
+                        value={editForm.instType || 'School'}
+                        onChange={(e) => handleEditInputChange('instType', e.target.value)}
+                        className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      >
+                        <option value="School">School</option>
+                        <option value="College">College</option>
+                        <option value="Club">Club</option>
+                        <option value="Academy">Academy</option>
+                      </select>
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-slate-500 mb-1">Registration No</p>
+                      <input
+                        type="text"
+                        value={editForm.regNo || ''}
+                        onChange={(e) => handleEditInputChange('regNo', e.target.value)}
+                        className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-slate-500 mb-1">Est. Year</p>
+                      <input
+                        type="number"
+                        value={editForm.year || ''}
+                        onChange={(e) => handleEditInputChange('year', e.target.value)}
+                        className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-slate-500 mb-1">Principal/Head Name</p>
+                      <input
+                        type="text"
+                        value={editForm.headName || ''}
+                        onChange={(e) => handleEditInputChange('headName', e.target.value)}
+                        className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-slate-500 mb-1">Secretary Name</p>
+                      <input
+                        type="text"
+                        value={editForm.secretaryName || ''}
+                        onChange={(e) => handleEditInputChange('secretaryName', e.target.value)}
+                        className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-slate-500 mb-1">Surface Type</p>
+                      <input
+                        type="text"
+                        value={editForm.surfaceType || ''}
+                        onChange={(e) => handleEditInputChange('surfaceType', e.target.value)}
+                        className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-slate-500 mb-1">Field Area (sqft)</p>
+                      <input
+                        type="number"
+                        value={editForm.area || ''}
+                        onChange={(e) => handleEditInputChange('area', e.target.value)}
+                        className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-slate-500 mb-1">Total Players</p>
+                      <input
+                        type="number"
+                        value={editForm.totalPlayers || ''}
+                        onChange={(e) => handleEditInputChange('totalPlayers', e.target.value)}
+                        className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-slate-500 mb-1">Office Phone</p>
+                      <input
+                        type="text"
+                        value={editForm.officePhone || ''}
+                        onChange={(e) => handleEditInputChange('officePhone', e.target.value)}
+                        className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-slate-500 mb-1">Alternate Phone</p>
+                      <input
+                        type="text"
+                        value={editForm.altPhone || ''}
+                        onChange={(e) => handleEditInputChange('altPhone', e.target.value)}
+                        className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-slate-500 mb-1">Email</p>
+                      <input
+                        type="email"
+                        value={editForm.email || ''}
+                        onChange={(e) => handleEditInputChange('email', e.target.value)}
+                        className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <p className="text-xs font-semibold text-slate-500 mb-1">Address</p>
+                      <textarea
+                        value={editForm.address || ''}
+                        onChange={(e) => handleEditInputChange('address', e.target.value)}
+                        className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <p className="text-xs font-semibold text-slate-500 mb-1">Description</p>
+                      <textarea
+                        value={editForm.description || ''}
+                        onChange={(e) => handleEditInputChange('description', e.target.value)}
+                        className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-slate-50 border rounded-xl p-3 flex flex-col sm:flex-row gap-3">
+                      <div className="flex-1">
+                        <p className="text-xs font-semibold text-slate-500 mb-1">Current Payment Screenshot</p>
+                        <div className="mt-1">
+                          {data.screenshotUrl ? (
+                            <img src={data.screenshotUrl} alt="Current payment screenshot" className="w-full max-w-[200px] rounded-lg border object-cover" />
+                          ) : (
+                            <p className="text-xs text-slate-400">No image</p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-xs font-semibold text-slate-500 mb-1">New Payment Screenshot</p>
+                        <div className="mt-1 mb-2">
+                          {editFiles.screenshot ? (
+                            <img src={URL.createObjectURL(editFiles.screenshot)} alt="New payment screenshot preview" className="w-full max-w-[200px] rounded-lg border object-cover" />
+                          ) : (
+                            <p className="text-xs text-slate-400">No new file selected</p>
+                          )}
+                        </div>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleEditFileChange('screenshot', e.target.files?.[0] || null)}
+                          className="w-full text-xs"
+                        />
+                      </div>
+                    </div>
+                    <div className="bg-slate-50 border rounded-xl p-3 flex flex-col sm:flex-row gap-3">
+                      <div className="flex-1">
+                        <p className="text-xs font-semibold text-slate-500 mb-1">Current Institution Logo</p>
+                        <div className="mt-1">
+                          {data.instLogoUrl ? (
+                            <img src={data.instLogoUrl} alt="Current institution logo" className="w-full max-w-[160px] rounded-lg border object-cover" />
+                          ) : (
+                            <p className="text-xs text-slate-400">No image</p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-xs font-semibold text-slate-500 mb-1">New Institution Logo</p>
+                        <div className="mt-1 mb-2">
+                          {editFiles.instLogo ? (
+                            <img src={URL.createObjectURL(editFiles.instLogo)} alt="New institution logo preview" className="w-full max-w-[160px] rounded-lg border object-cover" />
+                          ) : (
+                            <p className="text-xs text-slate-400">No new file selected</p>
+                          )}
+                        </div>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleEditFileChange('instLogo', e.target.files?.[0] || null)}
+                          className="w-full text-xs"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex justify-end mt-4 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setEditingDetails(false)}
+                      className="px-4 py-2 rounded-full border text-xs font-bold uppercase tracking-widest text-slate-600 bg-white hover:bg-slate-50"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={savingEdit}
+                      className="px-4 py-2 rounded-full bg-blue-900 text-white text-xs font-bold uppercase tracking-widest hover:bg-blue-800 disabled:opacity-60"
+                    >
+                      {savingEdit ? 'Saving…' : 'Save Changes'}
+                    </button>
+                  </div>
+                </form>
+              )}
               {/* Institution Information */}
               <div className="bg-white rounded-xl shadow border p-6 w-full">
                 <div className="flex items-center gap-2 mb-4">
@@ -696,7 +1335,7 @@ const AdminRegistrationDetails = () => {
         </div>
       </div>
 
-      {/* Final action bar for admin controls */}
+      {/* Final action bar for admin controls (bottom: reject & delete only) */}
       <div className="max-w-6xl mx-auto mt-8 flex justify-end">
         <div className="flex flex-wrap gap-2">
           {statusKey !== 'rejected' && (
@@ -707,16 +1346,6 @@ const AdminRegistrationDetails = () => {
             >
               <XCircle size={16} />
               <span>Reject</span>
-            </button>
-          )}
-          {statusKey !== 'approved' && (
-            <button
-              type="button"
-              onClick={() => handleStatusChange('Approved')}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold hover:bg-emerald-600 hover:text-white transition-all active:scale-95"
-            >
-              <CheckCircle size={16} />
-              <span>Approve</span>
             </button>
           )}
           {(adminRole === 'superadmin' || adminPermissions?.canDelete) && (

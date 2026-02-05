@@ -35,6 +35,7 @@ const AdminTechnicalOfficialsManagement: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<TechnicalOfficial | null>(null);
   const [editForm, setEditForm] = useState<Partial<TechnicalOfficial>>({});
+  const [editFiles, setEditFiles] = useState<{ photo?: File | null; signature?: File | null; receipt?: File | null }>({});
   const [searchTerm, setSearchTerm] = useState('');
   const deferredSearchTerm = useDeferredValue(searchTerm);
 
@@ -148,6 +149,7 @@ const AdminTechnicalOfficialsManagement: React.FC = () => {
   const openEdit = (official: TechnicalOfficial) => {
     setEditing(official);
     setEditForm({ ...official });
+    setEditFiles({});
   };
 
   const closeEdit = () => {
@@ -157,6 +159,10 @@ const AdminTechnicalOfficialsManagement: React.FC = () => {
 
   const handleEditChange = (field: keyof TechnicalOfficial, value: string) => {
     setEditForm(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleEditFileChange = (field: 'photo' | 'signature' | 'receipt', file: File | null) => {
+    setEditFiles(prev => ({ ...prev, [field]: file }));
   };
 
   const handleViewDetails = useCallback((official: TechnicalOfficial) => {
@@ -182,26 +188,30 @@ const AdminTechnicalOfficialsManagement: React.FC = () => {
     if (!editing) return;
 
     try {
+      const formData = new FormData();
+      formData.append('candidateName', editForm.candidateName || '');
+      formData.append('parentName', editForm.parentName || '');
+      formData.append('dob', editForm.dob || '');
+      formData.append('address', editForm.address || '');
+      formData.append('aadharNumber', editForm.aadharNumber || '');
+      formData.append('gender', editForm.gender || '');
+      formData.append('playerLevel', editForm.playerLevel || '');
+      formData.append('work', editForm.work || '');
+      formData.append('mobile', editForm.mobile || '');
+      formData.append('education', editForm.education || '');
+      formData.append('email', editForm.email || '');
+      if (editForm.remarks !== undefined) formData.append('remarks', editForm.remarks || '');
+
+      if (editFiles.photo) formData.append('photo', editFiles.photo);
+      if (editFiles.signature) formData.append('signature', editFiles.signature);
+      if (editFiles.receipt) formData.append('receipt', editFiles.receipt);
+
       const response = await fetch(`${API_URL}/api/technical-officials/${editing._id}`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
         },
-        body: JSON.stringify({
-          candidateName: editForm.candidateName,
-          parentName: editForm.parentName,
-          dob: editForm.dob,
-          address: editForm.address,
-          aadharNumber: editForm.aadharNumber,
-          gender: editForm.gender,
-          playerLevel: editForm.playerLevel,
-          work: editForm.work,
-          mobile: editForm.mobile,
-          education: editForm.education,
-          email: editForm.email,
-          remarks: editForm.remarks
-        })
+        body: formData
       });
       const data = await response.json();
       if (data.success) {
@@ -581,6 +591,108 @@ const AdminTechnicalOfficialsManagement: React.FC = () => {
                   className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm h-20"
                   placeholder="Internal notes about this application (optional)"
                 />
+              </div>
+
+              {/* Image replacement cards: photo, signature, receipt */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+                <div className="bg-slate-50 border rounded-xl p-3 flex flex-col gap-2">
+                  <p className="text-xs font-semibold text-slate-600">Current Photo</p>
+                  <div className="flex justify-center md:justify-start">
+                    {editing?.photoUrl ? (
+                      <img
+                        src={editing.photoUrl}
+                        alt="Current photo"
+                        className="w-24 h-24 rounded-lg border object-cover"
+                      />
+                    ) : (
+                      <p className="text-xs text-slate-400">No image</p>
+                    )}
+                  </div>
+                  <p className="text-xs font-semibold text-slate-600 mt-2">New Photo</p>
+                  <div className="flex flex-col gap-2">
+                    {editFiles.photo ? (
+                      <img
+                        src={URL.createObjectURL(editFiles.photo)}
+                        alt="New photo preview"
+                        className="w-24 h-24 rounded-lg border object-cover self-center md:self-start"
+                      />
+                    ) : (
+                      <p className="text-xs text-slate-400">No new file selected</p>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleEditFileChange('photo', e.target.files?.[0] || null)}
+                      className="text-xs"
+                    />
+                  </div>
+                </div>
+
+                <div className="bg-slate-50 border rounded-xl p-3 flex flex-col gap-2">
+                  <p className="text-xs font-semibold text-slate-600">Current Signature</p>
+                  <div className="flex justify-center md:justify-start">
+                    {editing?.signatureUrl ? (
+                      <img
+                        src={editing.signatureUrl}
+                        alt="Current signature"
+                        className="w-24 h-16 rounded-lg border object-contain bg-white"
+                      />
+                    ) : (
+                      <p className="text-xs text-slate-400">No image</p>
+                    )}
+                  </div>
+                  <p className="text-xs font-semibold text-slate-600 mt-2">New Signature</p>
+                  <div className="flex flex-col gap-2">
+                    {editFiles.signature ? (
+                      <img
+                        src={URL.createObjectURL(editFiles.signature)}
+                        alt="New signature preview"
+                        className="w-24 h-16 rounded-lg border object-contain bg-white self-center md:self-start"
+                      />
+                    ) : (
+                      <p className="text-xs text-slate-400">No new file selected</p>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleEditFileChange('signature', e.target.files?.[0] || null)}
+                      className="text-xs"
+                    />
+                  </div>
+                </div>
+
+                <div className="bg-slate-50 border rounded-xl p-3 flex flex-col gap-2">
+                  <p className="text-xs font-semibold text-slate-600">Current Payment Receipt</p>
+                  <div className="flex justify-center md:justify-start">
+                    {editing?.receiptUrl ? (
+                      <img
+                        src={editing.receiptUrl}
+                        alt="Current receipt"
+                        className="w-24 h-24 rounded-lg border object-cover"
+                      />
+                    ) : (
+                      <p className="text-xs text-slate-400">No image</p>
+                    )}
+                  </div>
+                  <p className="text-xs font-semibold text-slate-600 mt-2">New Receipt</p>
+                  <div className="flex flex-col gap-2">
+                    {editFiles.receipt ? (
+                      <img
+                        src={URL.createObjectURL(editFiles.receipt)}
+                        alt="New receipt preview"
+                        className="w-24 h-24 rounded-lg border object-cover self-center md:self-start"
+                      />
+                    ) : (
+                      <p className="text-xs text-slate-400">No new file selected</p>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleEditFileChange('receipt', e.target.files?.[0] || null)}
+                      className="text-xs"
+                    />
+                  </div>
+                </div>
               </div>
 
               <div className="flex justify-end gap-3 pt-2">
