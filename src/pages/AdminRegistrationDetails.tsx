@@ -1083,11 +1083,13 @@ const AdminRegistrationDetails = () => {
                 </div>
               </div>
 
-              <LoginActivityCard
-                activities={data.loginActivities}
-                title="Player Login History"
-                subtitle="Recent sign-ins and browser info"
-              />
+              {adminRole === 'superadmin' && (
+                <LoginActivityCard
+                  activities={data.loginActivities}
+                  title="Player Login History"
+                  subtitle="Recent sign-ins and browser info"
+                />
+              )}
             </div>
           )}
 

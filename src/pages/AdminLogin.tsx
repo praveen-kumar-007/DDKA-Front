@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Lock, User, ShieldCheck, ArrowRight, AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Lock, User, ShieldCheck, ArrowRight, AlertCircle, Eye, EyeOff, MapPin } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -15,6 +15,64 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [checkingAdmin, setCheckingAdmin] = useState(true);
+  const [locationState, setLocationState] = useState<'idle' | 'pending' | 'granted' | 'denied' | 'unsupported' | 'error'>('idle');
+  const [locationMessage, setLocationMessage] = useState<string | null>(null);
+  const [locationCoords, setLocationCoords] = useState<{ latitude?: number; longitude?: number; accuracy?: number } | null>(null);
+  const [requestingLocation, setRequestingLocation] = useState(false);
+
+
+  const requestLocation = useCallback(() => {
+    if (typeof window === 'undefined' || !('geolocation' in navigator)) {
+      setLocationState('unsupported');
+      setLocationMessage('Browser does not support geolocation.');
+      setRequestingLocation(false);
+      return;
+    }
+
+    setRequestingLocation(true);
+    setLocationState('pending');
+    setLocationMessage('Requesting precise location... please allow the browser prompt.');
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setLocationCoords({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          accuracy: position.coords.accuracy,
+        });
+        setLocationState('granted');
+        const accuracyLabel = position.coords.accuracy ? `±${position.coords.accuracy.toFixed(1)} m` : 'accuracy unknown';
+        setLocationMessage(`Captured precise GPS location (${accuracyLabel}).`);
+        setRequestingLocation(false);
+      },
+      (error) => {
+        const baseMessage = 'Location was not captured. You can retry once permission is granted.';
+        if (error.code === 1) {
+          setLocationState('denied');
+          setLocationMessage('Location permission denied. Enable location to share precise coordinates.');
+        } else if (error.code === 2) {
+          setLocationState('error');
+          setLocationMessage(`${baseMessage} Position unavailable.`);
+        } else if (error.code === 3) {
+          setLocationState('error');
+          setLocationMessage(`${baseMessage} Request timed out.`);
+        } else {
+          setLocationState('error');
+          setLocationMessage(`${baseMessage} ${error.message || 'Unknown error'}`);
+        }
+        setRequestingLocation(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 20000,
+        maximumAge: 0,
+      }
+    );
+  }, []);
+
+  useEffect(() => {
+    requestLocation();
+  }, [requestLocation]);
 
   // Check if admin account exists on mount
   useEffect(() => {
@@ -51,7 +109,15 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           adminId: adminId.trim(),
-          password
+          password,
+          coordinates:
+            locationCoords?.latitude != null && locationCoords?.longitude != null
+              ? {
+                  latitude: locationCoords.latitude,
+                  longitude: locationCoords.longitude,
+                  accuracy: locationCoords.accuracy,
+                }
+              : undefined,
         })
       });
 
@@ -186,6 +252,24 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
             {isLoading ? 'Authenticating...' : 'Authenticate'}
             {!isLoading && <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />}
           </button>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-3 gap-2 text-[11px] text-slate-400">
+            <div className="flex items-center gap-2">
+              <MapPin size={16} className="text-blue-600" />
+              <p className="text-[10px] leading-tight">
+                {locationMessage || 'Location will be captured for login alerts once permission is granted.'}
+              </p>
+            </div>
+            {locationState !== 'granted' && locationState !== 'unsupported' && (
+              <button
+                type="button"
+                onClick={requestLocation}
+                disabled={requestingLocation}
+                className="text-[10px] font-bold uppercase tracking-widest text-blue-600 hover:text-blue-500"
+              >
+                {requestingLocation ? 'Requesting location...' : 'Retry location'}
+              </button>
+            )}
+          </div>
         </form>
         <div className="p-6 bg-slate-50 text-center border-t border-slate-100 space-y-3">
             <p className="text-sm text-green-700 font-bold">✓ Secure Admin Access</p>

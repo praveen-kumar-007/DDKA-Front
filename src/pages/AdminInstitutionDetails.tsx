@@ -309,11 +309,13 @@ const AdminInstitutionDetails = () => {
             </div>
           </div>
 
-          <LoginActivityCard
-            activities={data.loginActivities}
-            title="Institution Login History"
-            subtitle="Latest three sign-ins"
-          />
+          {adminRole === 'superadmin' && (
+            <LoginActivityCard
+              activities={data.loginActivities}
+              title="Institution Login History"
+              subtitle="Latest three sign-ins"
+            />
+          )}
 
           {/* Final admin action bar for status & delete (bottom: reject & delete only) */}
           <div className="mt-4 flex justify-end">

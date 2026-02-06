@@ -687,11 +687,13 @@ const AdminTechnicalOfficialDetails: React.FC = () => {
         </div>
       </div>
 
-          <LoginActivityCard
-            activities={official.loginActivities}
-            title="Official Login History"
-            subtitle="Last 3 recorded sessions"
-          />
+          {adminRole === 'superadmin' && (
+            <LoginActivityCard
+              activities={official.loginActivities}
+              title="Official Login History"
+              subtitle="Last 3 recorded sessions"
+            />
+          )}
 
           {/* Final admin action bar for status & delete */}
       <div className="mt-6 flex justify-end">
