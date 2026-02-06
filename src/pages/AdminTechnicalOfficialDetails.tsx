@@ -519,6 +519,29 @@ const AdminTechnicalOfficialDetails: React.FC = () => {
                     return `/important-docs/official-certificate.html?${params.toString()}`;
                   };
 
+                  const buildIdCardUrl = (autoDownload?: boolean) => {
+                    if (!official) return '';
+                    const suffix = (official._id || '').slice(-4).toUpperCase();
+                    const params = new URLSearchParams();
+                    if (API_URL) params.set('api', API_URL);
+                    params.set('name', official.candidateName);
+                    if (suffix) {
+                      params.set('sno', suffix);
+                    }
+                    if (official.aadharNumber) {
+                      params.set('uid', official.aadharNumber);
+                    }
+                    const dobDate = official.dob ? new Date(official.dob) : null;
+                    if (dobDate && !Number.isNaN(dobDate.getTime())) {
+                      params.set('dob', dobDate.toISOString().slice(0, 10));
+                    }
+                    if (official.grade) params.set('grade', official.grade);
+                    if (official.photoUrl) params.set('photoUrl', official.photoUrl);
+                    if (official.bloodGroup) params.set('bloodGroup', official.bloodGroup);
+                    if (autoDownload) { params.set('download', 'pdf'); }
+                    return `/important-docs/technical-id-card.html?${params.toString()}`;
+                  };
+
                   const triggerDownload = (url: string, filenameBase?: string) => {
                     if (!url) return;
                     const win = window.open(url, '_blank');
@@ -589,25 +612,8 @@ const AdminTechnicalOfficialDetails: React.FC = () => {
                   type="button"
                   disabled={official.status !== 'Approved' || !official.grade}
                   onClick={() => {
-                    if (!official) return;
-                    const suffix = (official._id || '').slice(-4).toUpperCase();
-                    const params = new URLSearchParams();
-                    params.set('name', official.candidateName);
-                    if (suffix) {
-                      // Registration number suffix; full Reg. No. formatting is handled in the ID card template
-                      params.set('sno', suffix);
-                    }
-                    if (official.aadharNumber) {
-                      // Pass the original Aadhar number from MongoDB to show under "Aadhar No"
-                      params.set('uid', official.aadharNumber);
-                    }
-                    const dobDate = official.dob ? new Date(official.dob) : null;
-                    if (dobDate && !Number.isNaN(dobDate.getTime())) {
-                      params.set('dob', dobDate.toISOString().slice(0, 10));
-                    }
-                    if (official.grade) params.set('grade', official.grade);
-                    if (official.photoUrl) params.set('photoUrl', official.photoUrl);
-                    const url = `/important-docs/technical-id-card.html?${params.toString()}`;
+                    const url = buildIdCardUrl(false);
+                    if (!url) return;
                     window.open(url, '_blank', 'noopener,noreferrer');
                   }}
                   className="w-full sm:w-auto px-4 py-2 rounded-full bg-indigo-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-indigo-700 disabled:bg-slate-300 disabled:text-slate-600"
@@ -618,6 +624,24 @@ const AdminTechnicalOfficialDetails: React.FC = () => {
                       : 'Open Technical Official ID card'}
                 >
                   View / Download ID Card
+                </button>
+                <button
+                  type="button"
+                  disabled={official.status !== 'Approved' || !official.grade}
+                  onClick={() => {
+                    const url = buildIdCardUrl(true);
+                    if (!url) return;
+                    const filenameBase = official ? `ID_${official.candidateName?.replace(/\s+/g, '_') || 'technical_official'}` : 'technical_official';
+                    triggerDownload(url, filenameBase);
+                  }}
+                  className="w-full sm:w-auto px-4 py-2 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold uppercase tracking-widest hover:bg-indigo-100 disabled:bg-slate-300 disabled:text-slate-600 border border-indigo-200"
+                  title={official.status !== 'Approved'
+                    ? 'ID card download available only after approval'
+                    : !official.grade
+                      ? 'Set a grade to generate ID card'
+                      : 'Download Technical Official ID card'}
+                >
+                  Download ID Card
                 </button>
                 <button
                   type="button"
