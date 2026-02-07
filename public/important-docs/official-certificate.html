@@ -219,6 +219,7 @@
           <button id="ai-btn" class="btn primary">✨ AI Language Assist</button>
           <div style="display:flex;gap:8px;margin-top:8px">
             <button id="download-btn" class="btn">⬇️ Download PNG</button>
+            <button id="download-jpeg-btn" class="btn ghost">🖼️ Download JPEG</button>
             <button id="download-pdf-btn" class="btn primary">📄 Download PDF</button>
           </div>
           <button id="reset-btn" class="btn" style="margin-top:8px">↺ Reset Workspace</button>
@@ -318,6 +319,7 @@
       const photoThumb = document.getElementById('photo-thumb');
       const photoInner = document.getElementById('photo-inner');
       const downloadBtn = document.getElementById('download-btn');
+      const downloadJpegBtn = document.getElementById('download-jpeg-btn');
       const downloadPdfBtn = document.getElementById('download-pdf-btn');
       const aiBtn = document.getElementById('ai-btn');
       const resetBtn = document.getElementById('reset-btn');
@@ -451,7 +453,12 @@
 
           // Grade is applied after grade helpers are wired up
           window.__ddkaInitialGrade = qpGrade ? qpGrade.toUpperCase() : '';
-          window.__ddkaAutoDownload = qpDownload === '1' || qpDownload === 'true' ? 'png' : (qpDownload === 'pdf' ? 'pdf' : '');
+          const downloadFlag = (qpDownload || '').toLowerCase();
+          window.__ddkaAutoDownload = downloadFlag === 'pdf'
+            ? 'pdf'
+            : (downloadFlag === 'jpg' || downloadFlag === 'jpeg'
+                ? 'jpg'
+                : (downloadFlag === 'png' || downloadFlag === '1' || downloadFlag === 'true' ? 'png' : ''));
 
           updateFields();
         } catch (e) {
@@ -655,46 +662,53 @@
               pdf.save(`${filenameBase}.pdf`);
             }
           } else {
-            // For PNGs, keep size reasonable (default ~2x), allow up to 4k equivalent
             const resParam = urlParams.get('resolution') || '';
             const requestedWidth = resParam === '8k' ? 7680 : (resParam === '4k' ? 3840 : DEFAULT_TARGET_WIDTH);
             const targetWidthPx = Math.min(requestedWidth, MAX_TARGET_WIDTH);
             const pixelRatio = Math.max(1, Math.ceil(targetWidthPx / BASE_WIDTH));
-            const dataUrl = await window.htmlToImage.toPng(exportClone || cert, { ...renderOptions, pixelRatio });
+            const normalizedFormat = (format || '').toLowerCase();
+            const isJpeg = normalizedFormat === 'jpg' || normalizedFormat === 'jpeg';
+            const imageOptions = { ...renderOptions, pixelRatio };
+            const dataUrl = isJpeg
+              ? await window.htmlToImage.toJpeg(exportClone || cert, { ...imageOptions, quality: JPEG_QUALITY })
+              : await window.htmlToImage.toPng(exportClone || cert, imageOptions);
             const filenameBase = 'DDKA-Certificate-'+(nameInput.value||'candidate').replace(/\s+/g,'-');
-            let pngBlob = null;
+            let imageBlob = null;
             try {
-              pngBlob = await (await fetch(dataUrl)).blob();
+              imageBlob = await (await fetch(dataUrl)).blob();
             } catch (e) {
-              console.error('Failed to convert PNG dataUrl to blob', e);
+              console.error('Failed to convert image dataUrl to blob', e);
             }
+            const imageExtension = isJpeg ? 'jpg' : 'png';
             try {
-              if (window.opener || window.parent) {
-                const target = window.opener || window.parent;
-                if (pngBlob) {
-                  target.postMessage({ type: 'ddka:certificate', format: 'png', blob: pngBlob }, window.location.origin);
+              const hasRemoteOpener = window.opener && window.opener !== window;
+              const hasRemoteParent = window.parent && window.parent !== window;
+              if (hasRemoteOpener || hasRemoteParent) {
+                const target = hasRemoteOpener ? window.opener : window.parent;
+                if (imageBlob) {
+                  target.postMessage({ type: 'ddka:certificate', format: imageExtension, blob: imageBlob }, window.location.origin);
                 } else {
-                  target.postMessage({ type: 'ddka:certificate', format: 'png', dataUrl }, window.location.origin);
+                  target.postMessage({ type: 'ddka:certificate', format: imageExtension, dataUrl }, window.location.origin);
                 }
                 setTimeout(() => { try { window.close(); } catch (e) {} }, 300);
                 return;
               }
             } catch (e) {
-              console.error('PostMessage failed for PNG:', e);
+              console.error('PostMessage failed for image export:', e);
             }
 
             const a=document.createElement('a');
-            if (pngBlob) {
-              const pngUrl = URL.createObjectURL(pngBlob);
-              a.href=pngUrl;
-              a.download = `${filenameBase}.png`;
+            if (imageBlob) {
+              const blobUrl = URL.createObjectURL(imageBlob);
+              a.href=blobUrl;
+              a.download = `${filenameBase}.${imageExtension}`;
               document.body.appendChild(a);
               a.click();
               a.remove();
-              URL.revokeObjectURL(pngUrl);
+              URL.revokeObjectURL(blobUrl);
             } else {
               a.href=dataUrl;
-              a.download = `${filenameBase}.png`;
+              a.download = `${filenameBase}.${imageExtension}`;
               document.body.appendChild(a);
               a.click();
               a.remove();
@@ -736,6 +750,14 @@
         await exportCertificate('png');
         downloadBtn.disabled=false; downloadBtn.textContent='⬇️ Download PNG';
       });
+
+      if (downloadJpegBtn) {
+        downloadJpegBtn.addEventListener('click', async ()=>{
+          downloadJpegBtn.disabled = true; downloadJpegBtn.textContent = 'Rendering JPEG...';
+          await exportCertificate('jpg');
+          downloadJpegBtn.disabled=false; downloadJpegBtn.textContent='🖼️ Download JPEG';
+        });
+      }
 
       // Download high-resolution PDF directly (no print preview)
       if (downloadPdfBtn) {

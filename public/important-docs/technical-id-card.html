@@ -262,7 +262,7 @@
         }
 
         .sig-box {
-            width: 30%;
+            width: 45%;
             font-size: 10px;
             line-height: 1.15;
         }
@@ -304,6 +304,10 @@
 </head>
 <body>
 
+    <div class="toolbar" style="justify-content:flex-end;padding:10px 28px;">
+        <button id="download-jpeg-btn" class="ghost">🖼️ Download JPEG</button>
+    </div>
+
     <div class="id-card">
         <header class="main-header">
             <h1 class="jska-title">DHANBAD DISTRICT KABADDI ASSOCIATION</h1>
@@ -344,16 +348,9 @@
             
             <div class="sig-grid">
                 <div class="sig-box">
-                    <img class="sig-img" crossorigin="anonymous" src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1768749957/Tilak_Ram_Sahu_srluua.png" alt="Rajeev Signature">
-                    <div class="sig-name">Rajeev Srivastav</div>
-                    <div>President</div>
-                    <div class="sig-line"></div>
-                </div>
-                
-                <div class="sig-box">
                     <img class="sig-img" crossorigin="anonymous" src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1768749991/Mintoo_Thakur_Sign_cg8gxm.png" alt="Mintoo Signature">
                     <div class="sig-name">Mintoo Thakur</div>
-                    <div>Secretary</div>
+                    <div>Secretary (DDKA)</div>
                     <div class="sig-line"></div>
                 </div>
 
@@ -486,6 +483,7 @@
                 defaultSrc = toProxy(defaultSrc);
                 photoImg.src = toProxy(photoImg.src);
             }
+            const downloadJpegBtn = document.getElementById('download-jpeg-btn');
 
             async function waitForImages() {
                 const images = Array.from(document.images || []);
@@ -500,6 +498,12 @@
                 }));
             }
 
+            const buildDownloadName = (ext = 'jpg') => {
+                const raw = (document.getElementById('name')?.textContent || '').trim();
+                const safe = raw ? raw.replace(/\s+/g, '_') : 'DDKA-ID';
+                return `DDKA-ID-${safe}.${ext}`;
+            };
+
             async function exportJpg() {
                 const el = document.querySelector('.id-card');
                 if (!el) return;
@@ -513,7 +517,7 @@
                     const data = canvas.toDataURL('image/jpeg', JPG_QUALITY);
                     const a = document.createElement('a');
                     a.href = data;
-                    a.download = 'ddka-id.jpg';
+                    a.download = buildDownloadName('jpg');
                     document.body.appendChild(a);
                     a.click();
                     a.remove();
@@ -548,7 +552,7 @@
                     const { jsPDF } = window.jspdf;
                     const pdf = new jsPDF({ orientation: 'portrait', unit: 'px', format: [canvas.width, canvas.height], compress: true });
                     pdf.addImage(imgData, 'JPEG', 0, 0, canvas.width, canvas.height, undefined, 'FAST');
-                    pdf.save('ddka-id.pdf');
+                    pdf.save(buildDownloadName('pdf'));
                 } catch (err) {
                     console.error('Failed to export PDF:', err);
                     const errMsg = err && (err.message || err.toString()) || 'Unknown error';
@@ -564,6 +568,16 @@
                 } finally {
                     document.body.classList.remove('exporting');
                 }
+            }
+
+            if (downloadJpegBtn) {
+                downloadJpegBtn.addEventListener('click', async () => {
+                    downloadJpegBtn.disabled = true;
+                    downloadJpegBtn.textContent = 'Rendering JPEG...';
+                    await exportJpg();
+                    downloadJpegBtn.disabled = false;
+                    downloadJpegBtn.textContent = '🖼️ Download JPEG';
+                });
             }
 
             if (window.__ddkaAutoDownload) {
