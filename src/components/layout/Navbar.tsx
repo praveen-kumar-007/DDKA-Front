@@ -28,6 +28,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onPageChange, lang, onLang
     },
     { name: t.nav.gallery, id: 'gallery' },
     { name: t.nav.news, id: 'news' },
+    { name: t.verification.navLabel, id: 'verification' },
     { name: t.nav.donate, id: 'donate' },
     { 
       name: t.nav.register, 

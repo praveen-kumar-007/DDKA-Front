@@ -49,6 +49,72 @@ export const translations = {
       line1: 'Affiliated To - JHARKHAND STATE KABADDI ASSOCIATION',
       line2: 'Registered with 1860 Govt. of Jharkhand',
       line3: 'Affiliated for - A.K.F.I. & Jharkhand Olympic Association'
+    },
+    verification: {
+      navLabel: 'Verification Center',
+      heroTitle: 'Official Verification Hub',
+      heroSubtitle: 'Single lookup for players, referees, and institutions',
+      heroDescription: 'Enter any registered ID, email, phone, or Aadhaar to instantly view the authenticated status, snapshot, and role history.',
+      checklist: [
+        'Use the ID, registration number, email, phone, or Aadhaar you received from DDKA',
+        'See photo, DOB, and father name alongside the badge',
+        'Auto-detect player, referee, and institution roles without extra input'
+      ],
+      form: {
+        heading: 'Lookup by ID',
+        subheading: 'Enter the registered ID, email, phone, or Aadhaar number; no extra inputs are required.',
+        fields: {
+          idNumber: 'ID / Email / Phone / Aadhaar'
+        },
+        loading: 'Checking...',
+        submit: 'Check Status'
+      },
+      statuses: {
+        verified: 'Verified',
+        pending: 'Pending',
+        rejected: 'Rejected'
+      },
+      statusCopy: {
+        verified: {
+          badge: 'LIVE',
+          title: 'Verified',
+          detail: 'Your documents and records match DDKA files.'
+        },
+        pending: {
+          badge: 'IN REVIEW',
+          title: 'Pending',
+          detail: 'Admin team is reviewing supporting documents for this ID.'
+        },
+        rejected: {
+          badge: 'REJECTED',
+          title: 'Rejected',
+          detail: 'Please contact the DDKA office to correct the highlighted information.'
+        }
+      },
+      snapshot: {
+        summary: 'Verification snapshot',
+        summaryDetail: 'Role-specific breakdown for the submitted ID',
+        message: 'We will notify you on the registered email or phone once the verification is finalized.'
+      },
+      guidance: {
+        spotlight: 'Records sync nightly at 02:00 AM; reach out to DDKA if you notice a discrepancy.'
+      },
+      errors: {
+        notFound: 'No record matches that ID. Please verify and try again.',
+        fetchFailed: 'Unable to reach the verification service. Please try again shortly.'
+      },
+      tableHeaders: {
+        role: 'Role',
+        name: 'Name',
+        fatherName: 'Father',
+        dob: 'DOB',
+        idNumber: 'ID Number'
+      },
+      roleNames: {
+        player: 'Player',
+        official: 'Referee',
+        institute: 'Institution'
+      }
     }
   },
   hi: {
@@ -99,6 +165,72 @@ export const translations = {
       line1: 'झारखंड राज्य कबड्डी संघ से संबद्ध',
       line2: 'झारखंड सरकार (1860) के तहत पंजीकृत',
       line3: 'ए.के.एफ.आई. एवं झारखंड ओलंपिक संघ से संबद्ध'
+    },
+    verification: {
+      navLabel: 'सत्यापन केंद्र',
+      heroTitle: 'आधिकारिक सत्यापन हब',
+      heroSubtitle: 'खिलाड़ी, रेफरी और संस्थानों के लिए एक ही खोज',
+      heroDescription: 'किसी भी पंजीकृत ID, ईमेल, फोन या आधार नंबर को दर्ज करें और स्थिति, फोटो तथा रोल की जानकारी तुरंत देखें।',
+      checklist: [
+        'DDKA की ID, पंजीकरण, ईमेल, फोन या आधार नंबर का उपयोग करें',
+        'फोटो, जन्मतिथि और पिता का नाम एक ही कार्ड में देखें',
+        'प्लेयर्स, रेफरी और संस्थान रोल स्वतः दिखते हैं'
+      ],
+      form: {
+        heading: 'ID से सत्यापन',
+        subheading: 'ID, ईमेल, फोन या आधार नंबर दर्ज करें; किसी अन्य जानकारी की आवश्यकता नहीं।',
+        fields: {
+          idNumber: 'ID / ईमेल / फोन / आधार'
+        },
+        loading: 'जाँच कर रहा है...',
+        submit: 'स्थिति देखें'
+      },
+      statuses: {
+        verified: 'सत्यापित',
+        pending: 'प्रक्रिया में',
+        rejected: 'अस्वीकृत'
+      },
+      statusCopy: {
+        verified: {
+          badge: 'सक्रिय',
+          title: 'सत्यापित',
+          detail: 'आपकी दस्तावेज़ और रिकॉर्ड DDKA फाइलों से मेल खाते हैं।'
+        },
+        pending: {
+          badge: 'समीक्षा में',
+          title: 'प्रक्रिया में',
+          detail: 'प्रशासक टीम इस ID के समर्थन दस्तावेजों की समीक्षा कर रही है।'
+        },
+        rejected: {
+          badge: 'नकारा गया',
+          title: 'अस्वीकृत',
+          detail: 'कृपया DDKA कार्यालय से संपर्क करके जानकारी को ठीक करें।'
+        }
+      },
+      snapshot: {
+        summary: 'सत्यापन स्नैपशॉट',
+        summaryDetail: 'सबमिट किए गए ID के रोल-विशिष्ट विवरण',
+        message: 'सत्यापन की पुष्टि होने पर पंजीकृत ईमेल या फोन पर सूचना मिल जाएगी।'
+      },
+      guidance: {
+        spotlight: 'रिकॉर्ड प्रतिदिन 02:00 बजे रात को सिंक होते हैं; कोई गलती दिखे तो DDKA को सूचित करें।'
+      },
+      errors: {
+        notFound: 'इस ID के लिए कोई रिकॉर्ड नहीं मिला। कृपया जांचें और पुनः प्रयास करें।',
+        fetchFailed: 'सत्यापन सेवा से संपर्क नहीं हो पा रहा है। थोड़ी देर में पुनः प्रयास करें।'
+      },
+      tableHeaders: {
+        role: 'भूमिका',
+        name: 'नाम',
+        fatherName: 'पिता',
+        dob: 'जन्मतिथि',
+        idNumber: 'ID संख्या'
+      },
+      roleNames: {
+        player: 'खिलाड़ी',
+        official: 'रेफरी',
+        institute: 'संस्थान'
+      }
     }
   }
 } as const; // Adding "as const" makes TypeScript more strict and reliable

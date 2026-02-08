@@ -35,6 +35,7 @@ const AdminPlayersManagement = React.lazy(() => import('./pages/AdminPlayersMana
 const AdminRefereesManagement = React.lazy(() => import('./pages/AdminRefereesManagement'));
 const AdminDonations = React.lazy(() => import('./pages/AdminDonations'));
 import DonationReceipt from './pages/DonationReceipt';
+import VerificationCenter from './pages/VerificationCenter';
 const AdminTechnicalOfficialsManagement = React.lazy(() => import('./pages/AdminTechnicalOfficialsManagement'));
 const AdminTechnicalOfficialDetails = React.lazy(() => import('./pages/AdminTechnicalOfficialDetails'));
 const AdminManageAdmins = React.lazy(() => import('./pages/AdminManageAdmins'));
@@ -101,6 +102,7 @@ const App: React.FC = () => {
           <Route path="/news" element={<News />} />
           <Route path="/news/:id" element={<NewsArticle />} />
           <Route path="/donate" element={<Donate lang={lang} />} />
+          <Route path="/verification" element={<VerificationCenter lang={lang} />} />
           <Route path="/donation/:id" element={<DonationReceipt />} />
           <Route path="/terms-conditions" element={<TermsConditions lang={lang} />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy lang={lang} />} />
