@@ -138,7 +138,7 @@ const AdminSignup: React.FC = () => {
       <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in zoom-in duration-500">
         <div className="bg-blue-900 p-8 text-center text-white">
           <a href="/" className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg rotate-3">
-            <img src="/logo.svg" alt="DDKA Logo" className="w-12 h-12 object-contain" />
+            <img src="/logo.png" alt="DDKA Logo" className="w-12 h-12 object-contain" />
           </a>
           <h2 className="text-3xl font-oswald font-bold uppercase tracking-tight">Create Admin Account</h2>
           <p className="text-blue-200 text-sm mt-1 uppercase tracking-widest font-bold">Secure Registration</p>
