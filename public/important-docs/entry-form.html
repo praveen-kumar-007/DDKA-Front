@@ -246,7 +246,10 @@
 <body>
 <div style="text-align:center; margin-top:20px; margin-bottom:10px;">
     <button onclick="window.print()" style="background:var(--primary-blue);color:white;padding:8px 18px;border:none;border-radius:4px;cursor:pointer;margin-right:10px;font-size:16px;">Print Form</button>
-    <button onclick="downloadPDF()" style="background:var(--accent-gold);color:var(--primary-blue);padding:8px 18px;border:none;border-radius:4px;cursor:pointer;font-size:16px;">Download as PDF</button>
+    <button onclick="downloadPDF()" style="background:var(--accent-gold);color:var(--primary-blue);padding:8px 18px;border:none;border-radius:4px;cursor:pointer;font-size:16px;margin-right:10px;">Download as PDF</button>
+
+    <a id="participationLink" href="/important-docs/participation-letter.pdf" download style="background:#0b5;color:#043;padding:8px 14px;border-radius:4px;text-decoration:none;display:inline-block;margin-left:8px;font-weight:700;">Participation Letter (PDF)</a>
+    <span id="participationStatus" style="margin-left:8px;color:#666;font-size:13px;display:none;">(coming soon)</span>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -262,6 +265,82 @@ function downloadPDF() {
     };
     html2pdf().set(opt).from(element).save();
 }
+
+// generate a PDF containing only the first `count` .page elements
+function downloadPDFPages(count) {
+  var pages = document.querySelectorAll('.page');
+  if (!pages || pages.length === 0) return downloadPDF();
+
+  // clone container and keep only first `count` pages
+  var clone = document.createElement('div');
+  clone.style.position = 'fixed';
+  clone.style.left = '-9999px';
+  clone.style.top = '0';
+  var container = document.createElement('div');
+  container.className = 'page-container';
+
+  for (var i = 0; i < Math.min(count, pages.length); i++) {
+    container.appendChild(pages[i].cloneNode(true));
+  }
+  clone.appendChild(container);
+  document.body.appendChild(clone);
+
+  var opt = {
+    margin:       0,
+    filename:     'DDKA_Entry_Form_pages_1-2.pdf',
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 2 },
+    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+
+  html2pdf().set(opt).from(container).save().then(function () {
+    // cleanup clone after download
+    document.body.removeChild(clone);
+  }).catch(function () {
+    document.body.removeChild(clone);
+  });
+}
+
+// If page opened with ?download=pdf or ?download=pdf2, auto-generate and download PDF once DOM is ready.
+(function autoDownloadIfRequested() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var mode = params.get('download');
+    if (mode === 'pdf' || mode === 'pdf2') {
+      window.addEventListener('DOMContentLoaded', function () {
+        setTimeout(function () {
+          if (mode === 'pdf2') downloadPDFPages(2);
+          else downloadPDF();
+        }, 500);
+      });
+    }
+
+    // check participation-letter availability and update UI
+    window.addEventListener('DOMContentLoaded', function () {
+      var participationLink = document.getElementById('participationLink');
+      var participationStatus = document.getElementById('participationStatus');
+      if (!participationLink) return;
+
+      // try HEAD request to see if file exists
+      fetch(participationLink.href, { method: 'HEAD' }).then(function (res) {
+        if (!res.ok) {
+          participationLink.style.pointerEvents = 'none';
+          participationLink.style.opacity = '0.6';
+          participationStatus.style.display = 'inline';
+        } else {
+          participationLink.style.pointerEvents = 'auto';
+          participationStatus.style.display = 'none';
+        }
+      }).catch(function () {
+        participationLink.style.pointerEvents = 'none';
+        participationLink.style.opacity = '0.6';
+        participationStatus.style.display = 'inline';
+      });
+    });
+  } catch (err) {
+    console.warn('Auto-download check failed', err);
+  }
+})();
 </script>
 
 <div class="page-container">

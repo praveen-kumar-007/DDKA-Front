@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import Hero from '../components/ui/Hero';
-import { Trophy, Users, Award, Zap, ExternalLink, Megaphone, Calendar, ArrowRight, Activity } from 'lucide-react';
+import { Trophy, Users, Award, Zap, ExternalLink, Megaphone, Activity } from 'lucide-react';
 import NewsCard from '../components/ui/NewsCard';
 import type { HomeNewsItem } from '../components/ui/NewsCard';
 import type { Language } from '../translations';
@@ -15,6 +15,8 @@ interface HomeProps {
 export const Home: React.FC<HomeProps> = ({ lang, onNavigate }) => {
   const [news, setNews] = useState<HomeNewsItem[]>([]);
   const [isLoadingNews, setIsLoadingNews] = useState(false);
+  // tracks video load error so we can show a graceful image fallback
+  const [videoError, setVideoError] = useState(false);
   const t = translations[lang];
 
   useEffect(() => {
@@ -76,106 +78,89 @@ export const Home: React.FC<HomeProps> = ({ lang, onNavigate }) => {
       />
       
       {/* ----------------------------------------------------------------------- */}
-      {/* FEATURED CHAMPIONSHIP ANNOUNCEMENT SECTION */}
+      {/* MINI TOURNAMENT POSTER (Home-only) */}
       {/* ----------------------------------------------------------------------- */}
       <section className="relative py-10 lg:py-16 bg-gradient-to-br from-red-900 to-blue-950 text-white overflow-hidden border-y-8 border-orange-500">
-        <div className="absolute top-0 right-0 p-4 opacity-10">
-           <Trophy size={400} />
-        </div>
-        
         <div className="max-w-7xl mx-auto px-4 relative z-10">
-          <div className="flex flex-col lg:flex-row items-center gap-6 lg:gap-12">
-            
-            {/* Left Side: Poster Image */}
-            <div className="w-full lg:w-1/3">
-              <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-orange-600 to-pink-600 rounded-2xl blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-tilt"></div>
-                <img 
-                  src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1766845990/Gemini_Generated_Image_eyfw6eyfw6eyfw6e_pldumt.png" 
-                  alt="Dhanbad Kabaddi Championship 2026" 
-                  className="relative rounded-2xl shadow-2xl w-full object-cover transform transition group-hover:scale-[1.02] border-4 border-white/20"
-                />
+          <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
+
+            {/* Left: Looping video (with fallback) */}
+            <div className="w-full lg:w-1/2">
+              <div className="rounded-2xl overflow-hidden shadow-2xl border-4 border-white/10 bg-black">
+                {!videoError ? (
+                  <video
+                    src="/videos/dhanbad-mini-kabaddi-2026.mp4"
+                    poster="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1766845990/Gemini_Generated_Image_eyfw6eyfw6eyfw6e_pldumt.png"
+                    className="w-full h-72 object-cover"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    onError={() => setVideoError(true)}
+                    aria-label="Dhanbad Mini Kabaddi Tournament 2026 video"
+                  />
+                ) : (
+                  <img
+                    src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1766845990/Gemini_Generated_Image_eyfw6eyfw6eyfw6e_pldumt.png"
+                    alt="Dhanbad Mini Kabaddi Tournament poster"
+                    className="w-full h-72 object-cover"
+                  />
+                )}
               </div>
+              {videoError && (
+                <p className="mt-2 text-sm text-orange-200">Video not found — please add <code>/public/videos/dhanbad-mini-kabaddi-2026.mp4</code> or refresh the page.</p>
+              )}
             </div>
 
-            {/* Right Side: The Registration Focus */}
-            <div className="w-full lg:w-2/3">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 rounded-full text-xs font-bold uppercase tracking-widest mb-4 lg:mb-6 animate-pulse">
+            {/* Right: Poster copy + download CTA */}
+            <div className="w-full lg:w-1/2 space-y-4">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 rounded-full text-xs font-bold uppercase tracking-widest mb-2 lg:mb-3">
                 <Megaphone size={16} />
-                {lang === 'hi' ? 'आगामी प्रतियोगिता' : 'Upcoming Championship'}
+                {lang === 'hi' ? 'घोषणा' : 'Announcement'}
               </div>
 
-              <h2 className="text-3xl md:text-5xl font-oswald font-bold mb-3 lg:mb-4 leading-tight">
-                {lang === 'hi' 
-                  ? 'इंटर स्कूल धनबाद कबड्डी चैंपियनशिप 2026' 
-                  : 'Inter School Dhanbad Kabaddi Championship 2026'}
-              </h2>
-              
-              <p className="text-lg lg:text-xl text-blue-200 mb-5 lg:mb-8 font-light border-l-4 border-orange-500 pl-4">
-                  {lang === 'hi' 
-                  ? 'सब-जूनियर (अंडर-16) बालक एवं बालिका वर्ग' 
-                  : 'Sub-Junior (Under-16) Boys & Girls Category'}
-              </p>
+              <h2 className="text-3xl md:text-4xl font-oswald font-bold mb-2 leading-tight uppercase">DHANBAD DISTRICT MINI KABADDI TOURNAMENT — 2026</h2>
 
-              {/* Attractive Info Box */}
-              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 lg:p-6 border border-white/10 mb-5 lg:mb-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
-                  {/* Date Block */}
-                  <div className="flex items-start gap-4">
-                    <div className="bg-orange-500/20 p-3 rounded-lg text-orange-400">
-                      <Calendar size={28} />
-                    </div>
-                    <div>
-                      <h4 className="text-sm uppercase tracking-wider text-blue-300 font-bold mb-1">
-                        {lang === 'hi' ? 'रजिस्ट्रेशन प्रारंभ' : 'Registration Starts'}
-                      </h4>
-                      <p className="text-2xl font-oswald font-bold text-white">5 Jan 2026</p>
-                      <p className="text-xs text-blue-200 mt-1">
-                        {lang === 'hi' ? '(ऑनलाइन और ऑफलाइन)' : '(Online & Offline)'}
-                      </p>
-                    </div>
-                  </div>
+              <div className="bg-white/5 p-4 rounded-xl border border-white/10 text-slate-100">
+                <p className="font-bold">When &amp; Where</p>
+                <p className="mb-2">Sunday, 8 Mar 2026 — Birsa Munda Stadium</p>
 
-                  {/* Format Block */}
-                  <div className="flex items-start gap-4">
-                    <div className="bg-blue-500/20 p-3 rounded-lg text-blue-400">
-                      <Trophy size={28} />
-                    </div>
-                    <div>
-                      <h4 className="text-sm uppercase tracking-wider text-blue-300 font-bold mb-1">
-                        {lang === 'hi' ? 'प्रतियोगिता प्रारूप' : 'Tournament Format'}
-                      </h4>
-                      <p className="text-lg font-bold text-white leading-tight">
-                        {lang === 'hi' ? 'मार्च में' : 'In March'}
-                      </p>
-                      <p className="text-xs text-blue-200 mt-1">
-                        {lang === 'hi' ? 'उद्घाटन और समापन समारोह' : 'Opening & Closing Ceremony'}
-                      </p>
-                    </div>
-                  </div>
+                <p className="font-bold">Who can play</p>
+                <p className="mb-2">Students in Class 3–5; under 11 years; max weight 36.97 kg</p>
+
+                <p className="font-bold">How to register</p>
+                <ul className="list-disc pl-5 mt-2 text-sm space-y-1">
+                  <li>Submit team list on official school letterhead (Name, Father’s Name, DOB) + 1 passport photo per player.</li>
+                  <li>Deadline: <strong>27 Feb 2026</strong>.</li>
+                </ul>
+
+                <div className="mt-4 flex flex-col sm:flex-row gap-3">
+                  <a
+                    href="/important-docs/entry-form.html?download=pdf2"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block bg-orange-600 hover:bg-orange-500 text-white px-6 py-3 rounded-2xl font-bold shadow-lg text-center"
+                  >
+                    Download Entry Form (PDF)
+                  </a>
+
+                  <a
+                    href="/important-docs/participation-letter.pdf"
+                    download
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block bg-white/6 hover:bg-white text-white px-6 py-3 rounded-2xl font-bold border border-white/10 ml-2"
+                  >
+                    Participation Letter (PDF)
+                  </a>
                 </div>
 
-                <div className="mt-6 pt-6 border-t border-white/10">
-                   <p className="text-sm text-center italic text-blue-100">
-                     {lang === 'hi' 
-                       ? '"सभी स्कूल और क्लब अपनी टीमें तैयार रखें! रजिस्ट्रेशन लिंक जल्द ही सक्रिय होगा।"'
-                       : '"Schools and Clubs, get your teams ready! Registration link activating soon."'}
-                   </p>
-                </div>
+                <p className="mt-3 text-xs text-slate-300">Complete registration before the deadline — incomplete/late entries will not be accepted.</p>
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4">
-                <button 
-                  onClick={() => onNavigate('institution')}
-                  className="bg-orange-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-orange-700 transition-all shadow-lg hover:shadow-orange-500/20 flex items-center justify-center gap-2 flex-1 group"
-                >
-                  <Award size={20} />
-                  {lang === 'hi' ? 'संस्थान एफिलिएशन (Institution Affiliation)' : 'Institution Affiliation'}
-                  <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform"/>
-                </button>
-              </div>
+
             </div>
+
           </div>
         </div>
       </section>
