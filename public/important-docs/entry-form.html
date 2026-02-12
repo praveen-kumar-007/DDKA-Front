@@ -21,7 +21,7 @@
         /* ---- A4 Page Setup ---- */
         @page {
             size: A4;
-            margin: 0;
+            margin: 10mm 10mm 10mm 10mm; /* 1 cm top/right/bottom/left for printing */
         }
         body {
             margin: 0;
@@ -31,19 +31,21 @@
             color: var(--text-dark);
         }
         .page-container {
-             padding: 30px 0;
+             padding: 0 0 30px 0; /* top padding removed per request */
         }
         .page {
             width: 210mm;
             min-height: 297mm;
-            padding: 15mm 20mm;
+            /* set top and side padding to 1cm (10mm); bottom kept at 10mm */
+            padding: 10mm 10mm 10mm 10mm; /* top right bottom left */
             margin: 0 auto 30px auto;
             background: white;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             box-sizing: border-box;
             position: relative;
             overflow: hidden;
-            border-top: 5px solid var(--primary-blue);
+            /* top border removed — replaced by colorful header with logos */
+            border-top: none;
             display: block; 
         }
 
@@ -65,6 +67,35 @@
             background-color: transparent; /* Ensures no extra background color is added */
             pointer-events: none;
         }
+
+        /* Explicit watermark element — html2canvas reliably captures real DOM nodes (pseudo-elements are flaky). */
+        .page .page-watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -10%);
+            width: 50%;
+            max-width: 420px;
+            opacity: 0.15;
+            z-index: 1; /* behind content-layer (z-index:2) */
+            pointer-events: none;
+        }
+
+        /* Header row (logos + centered title) */
+        .header-row{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:18px;
+            margin-bottom:18px;
+            width:100%;
+            padding-top:0; /* top area removed per request */
+        }
+        /* larger, full‑colour logos on both sides */
+        .header-logo{ width:120px; height:auto; display:block; }
+        .header-title{ flex:1; text-align:center; padding:0 8px; }
+        .header-main{ margin:0; font-size:30px; letter-spacing:1.5px; color:var(--primary-blue); font-weight:900; line-height:1; }
+        .header-sub{ margin-top:6px; font-size:16px; color:var(--secondary-blue); font-weight:800; }
 
         /* Ensures text sits on top of the watermark */
         .content-layer {
@@ -260,7 +291,7 @@ function downloadPDF() {
         margin:       0,
         filename:     'DDKA_Entry_Form.pdf',
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2 },
+        html2canvas:  { scale: 2, useCORS: true, allowTaint: false, imageTimeout: 15000 },
         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
     html2pdf().set(opt).from(element).save();
@@ -289,7 +320,7 @@ function downloadPDFPages(count) {
     margin:       0,
     filename:     'DDKA_Entry_Form_pages_1-2.pdf',
     image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2 },
+    html2canvas:  { scale: 2, useCORS: true, allowTaint: false, imageTimeout: 15000 },
     jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
   };
 
@@ -348,7 +379,14 @@ function downloadPDFPages(count) {
     <div class="page">
         <div class="content-layer">
             
-            <h1>Dhanbad District Kabaddi Association Entry Form</h1>
+            <div class="header-row">
+                <img class="header-logo" src="https://res.cloudinary.com/dmmll82la/image/upload/v1766683651/ddka-logo_ywnhyh.png" alt="DDKA logo left">
+                <div class="header-title">
+                    <h1 class="header-main">Dhanbad District Kabaddi Association</h1>
+                    <div class="header-sub">Entry Form</div>
+                </div>
+                <img class="header-logo" src="https://res.cloudinary.com/dmmll82la/image/upload/v1766683651/ddka-logo_ywnhyh.png" alt="DDKA logo right">
+            </div>
             <h2>Inter District Dhanbad Kabaddi Tour 2026 (Page 1 of 2)</h2>
             <div class="header-note">Note: All participants must be in Proper Sports Kit</div>
 
@@ -388,7 +426,14 @@ function downloadPDFPages(count) {
     <div class="page">
         <div class="content-layer">
             
-            <h1>Dhanbad District Kabaddi Association Entry Form</h1>
+            <div class="header-row">
+                <img class="header-logo" src="https://res.cloudinary.com/dmmll82la/image/upload/v1766683651/ddka-logo_ywnhyh.png" alt="DDKA logo left">
+                <div class="header-title">
+                    <h1 class="header-main">Dhanbad District Kabaddi Association</h1>
+                    <div class="header-sub">Entry Form</div>
+                </div>
+                <img class="header-logo" src="https://res.cloudinary.com/dmmll82la/image/upload/v1766683651/ddka-logo_ywnhyh.png" alt="DDKA logo right">
+            </div>
             <h2>Inter District Dhanbad Kabaddi Tour 2026 (Page 2 of 2)</h2>
             <div class="header-note">Note: All participants must be in Proper Sports Kit</div>
 

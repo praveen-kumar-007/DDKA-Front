@@ -919,7 +919,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang, onLogout }
                   </div>
 
                   <nav className="flex flex-col gap-1">
-                      <a href="/important-docs/entry-form.html" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 py-2 px-2 rounded hover:bg-slate-50">
+                      <a href="/important-docs/entryform.pdf" download className="flex items-center gap-3 py-2 px-2 rounded hover:bg-slate-50">
                       <FileText size={18} className="text-slate-600 w-6" />
                       <span className="text-sm">Entry Form</span>
                       <span className="ml-auto text-slate-400">↗</span>

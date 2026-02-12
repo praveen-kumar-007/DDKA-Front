@@ -136,9 +136,8 @@ export const Home: React.FC<HomeProps> = ({ lang, onNavigate }) => {
 
                 <div className="mt-4 flex flex-col sm:flex-row gap-3">
                   <a
-                    href="/important-docs/entry-form.html?download=pdf2"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    href="/important-docs/entryform.pdf"
+                    download
                     className="inline-block bg-orange-600 hover:bg-orange-500 text-white px-6 py-3 rounded-2xl font-bold shadow-lg text-center"
                   >
                     Download Entry Form (PDF)
@@ -149,7 +148,7 @@ export const Home: React.FC<HomeProps> = ({ lang, onNavigate }) => {
                     download
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-block bg-white/6 hover:bg-white text-white px-6 py-3 rounded-2xl font-bold border border-white/10 ml-2"
+                    className="inline-block bg-white/6 hover:bg-white/10 hover:text-slate-900 text-white px-6 py-3 rounded-2xl font-bold border border-white/10 ml-2"
                   >
                     Participation Letter (PDF)
                   </a>
