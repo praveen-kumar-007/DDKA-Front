@@ -6,6 +6,7 @@ import NewsCard from '../components/ui/NewsCard';
 import type { HomeNewsItem } from '../components/ui/NewsCard';
 import type { Language } from '../translations';
 import { translations } from '../translations';
+import { FEES } from '../constants';
 
 interface HomeProps {
   lang: Language;
@@ -134,27 +135,41 @@ export const Home: React.FC<HomeProps> = ({ lang, onNavigate }) => {
                   <li>Deadline: <strong>27 Feb 2026</strong>.</li>
                 </ul>
 
-                <div className="mt-4 flex flex-col sm:flex-row gap-3">
-                  <a
-                    href="/important-docs/entryform.pdf"
-                    download
-                    className="inline-block bg-orange-600 hover:bg-orange-500 text-white px-6 py-3 rounded-2xl font-bold shadow-lg text-center"
-                  >
-                    Download Entry Form (PDF)
-                  </a>
+                <div className="mt-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <a
+                      href="/important-docs/entryform.pdf"
+                      download
+                      className="w-full flex justify-center items-center bg-orange-600 hover:bg-orange-500 text-white px-6 py-3 rounded-2xl font-bold shadow-lg text-center"
+                    >
+                      Download Entry Form -PDF
+                    </a>
 
-                  <a
-                    href="/important-docs/participation-letter.pdf"
-                    download
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-block bg-white/6 hover:bg-white/10 hover:text-slate-900 text-white px-6 py-3 rounded-2xl font-bold border border-white/10 ml-2"
-                  >
-                    Participation Letter (PDF)
-                  </a>
+                    <a
+                      href="/important-docs/participation-letter.pdf"
+                      download
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full flex justify-center items-center bg-white/6 hover:bg-white/10 hover:text-slate-900 text-white px-6 py-3 rounded-2xl font-bold border border-white/10"
+                    >
+                      Participation Letter -PDF
+                    </a>
+                  </div>
+
+                  <div className="mt-3">
+                    <button
+                      onClick={() => onNavigate('institution')}
+                      className="w-full inline-flex justify-center items-center gap-3 bg-white text-orange-600 px-6 py-3 rounded-2xl font-bold text-sm shadow-xl border-2 border-orange-300 hover:scale-105 transform transition-all ring-4 ring-orange-300/25 animate-pulse"
+                      aria-label="Institution Affiliation - Registration fee"
+                    >
+                      {t.forms.instTitle} — ₹{FEES.INSTITUTION}
+                    </button>
+                  </div>
                 </div>
 
-                <p className="mt-3 text-xs text-slate-300">Complete registration before the deadline — incomplete/late entries will not be accepted.</p>
+                <p className="mt-3 text-xs text-slate-300">
+                  <strong className="text-orange-200">Registration fee:</strong> ₹{FEES.INSTITUTION}
+                </p>
               </div>
 
 
