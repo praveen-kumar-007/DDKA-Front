@@ -43,6 +43,8 @@ const AdminLoginAlerts = React.lazy(() => import('./pages/AdminLoginAlerts'));
 const AdminUnifiedSearch = React.lazy(() => import('./pages/AdminUnifiedSearch'));
 const AdminBulkEmail = React.lazy(() => import('./pages/AdminBulkEmail'));
 const AdminRegistrations = React.lazy(() => import('./pages/AdminRegistrations'));
+const AdminHeroManagement = React.lazy(() => import('./pages/AdminHeroManagement'));
+const AdminHomeMiniTournamentManagement = React.lazy(() => import('./pages/AdminHomeMiniTournamentManagement'));
 
 // Form Components
 import RegisterForm from './components/forms/RegisterForm';
@@ -131,6 +133,14 @@ const App: React.FC = () => {
           {/* Admin Bulk Email (protected) */}
           <Route path="/admin/bulk-email" element={
             isAuthenticated ? <AdminBulkEmail /> : <AdminLogin onLoginSuccess={() => setIsAuthenticated(true)} />
+          } />
+          {/* Admin Hero Management (protected) */}
+          <Route path="/admin/hero" element={
+            isAuthenticated ? <AdminHeroManagement /> : <AdminLogin onLoginSuccess={() => setIsAuthenticated(true)} />
+          } />
+          {/* Admin Home Mini Tournament Section Management (protected) */}
+          <Route path="/admin/home-mini-tournament" element={
+            isAuthenticated ? <AdminHomeMiniTournamentManagement /> : <AdminLogin onLoginSuccess={() => setIsAuthenticated(true)} />
           } />
           {/* Admin Donations Management (protected) */}
           <Route path="/admin/donations" element={

@@ -15,6 +15,57 @@ interface HomeProps {
 
 export const Home: React.FC<HomeProps> = ({ lang, onNavigate }) => {
   const [news, setNews] = useState<HomeNewsItem[]>([]);
+  const [heroConfig, setHeroConfig] = useState({
+    heroEnabled: true,
+    heroShowAffiliations: true,
+    heroShowStats: true,
+    heroShowLogos: true,
+    heroTitle: '',
+    heroSubtitle: '',
+    heroDescription: '',
+    heroImageUrl: '',
+    heroVideoUrl: '',
+    heroBadge: '',
+    heroSlogan: '',
+    heroCtaPrimary: '',
+    heroCtaSecondary: '',
+    heroAffiliationLine1: '',
+    heroAffiliationLine2: '',
+    heroAffiliationLine3: '',
+    heroStat1Value: '',
+    heroStat1Label: '',
+    heroStat2Value: '',
+    heroStat2Label: '',
+    heroStat3Value: '',
+    heroStat3Label: '',
+    heroStat4Value: '',
+    heroStat4Label: '',
+    heroLogo1Url: '',
+    heroLogo2Url: '',
+    heroLogo3Url: '',
+  });
+  const [miniTournamentConfig, setMiniTournamentConfig] = useState({
+    miniTournamentEnabled: true,
+    miniTournamentBadge: '',
+    miniTournamentTitle: '',
+    miniTournamentMediaImageUrl: '',
+    miniTournamentMediaVideoUrl: '',
+    miniTournamentWhenWhereTitle: '',
+    miniTournamentWhenWhereText: '',
+    miniTournamentWhoCanPlayTitle: '',
+    miniTournamentWhoCanPlayText: '',
+    miniTournamentHowToRegisterTitle: '',
+    miniTournamentBullet1: '',
+    miniTournamentBullet2: '',
+    miniTournamentPrimaryCtaLabel: '',
+    miniTournamentPrimaryCtaUrl: '',
+    miniTournamentSecondaryCtaLabel: '',
+    miniTournamentSecondaryCtaUrl: '',
+    miniTournamentAffiliationButtonLabel: '',
+    miniTournamentAffiliationFeeText: '',
+    miniTournamentRegistrationFeeLabel: '',
+    miniTournamentRegistrationFeeValue: '',
+  });
   const [isLoadingNews, setIsLoadingNews] = useState(false);
   // tracks video load error so we can show a graceful image fallback
   const [videoError, setVideoError] = useState(false);
@@ -23,11 +74,13 @@ export const Home: React.FC<HomeProps> = ({ lang, onNavigate }) => {
   useEffect(() => {
     setIsLoadingNews(true);
     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-    fetch(`${API_URL}/api/news`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.success && Array.isArray(data.data)) {
-          const sorted = data.data
+    Promise.all([
+      fetch(`${API_URL}/api/news`).then(res => res.json()),
+      fetch(`${API_URL}/api/settings/public`).then(res => res.json()),
+    ])
+      .then(([newsData, settingsData]) => {
+        if (newsData.success && Array.isArray(newsData.data)) {
+          const sorted = newsData.data
             .slice()
             .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
           const mapped: HomeNewsItem[] = sorted.slice(0, 3).map((n: any) => ({
@@ -42,12 +95,69 @@ export const Home: React.FC<HomeProps> = ({ lang, onNavigate }) => {
         } else {
           setNews([]);
         }
+
+        const s = settingsData?.data || {};
+        setHeroConfig({
+          heroEnabled: typeof s.heroEnabled === 'boolean' ? s.heroEnabled : true,
+          heroShowAffiliations: typeof s.heroShowAffiliations === 'boolean' ? s.heroShowAffiliations : true,
+          heroShowStats: typeof s.heroShowStats === 'boolean' ? s.heroShowStats : true,
+          heroShowLogos: typeof s.heroShowLogos === 'boolean' ? s.heroShowLogos : true,
+          heroTitle: s.heroTitle || '',
+          heroSubtitle: s.heroSubtitle || '',
+          heroDescription: s.heroDescription || '',
+          heroImageUrl: s.heroImageUrl || '',
+          heroVideoUrl: s.heroVideoUrl || '',
+          heroBadge: s.heroBadge || '',
+          heroSlogan: s.heroSlogan || '',
+          heroCtaPrimary: s.heroCtaPrimary || '',
+          heroCtaSecondary: s.heroCtaSecondary || '',
+          heroAffiliationLine1: s.heroAffiliationLine1 || '',
+          heroAffiliationLine2: s.heroAffiliationLine2 || '',
+          heroAffiliationLine3: s.heroAffiliationLine3 || '',
+          heroStat1Value: s.heroStat1Value || '',
+          heroStat1Label: s.heroStat1Label || '',
+          heroStat2Value: s.heroStat2Value || '',
+          heroStat2Label: s.heroStat2Label || '',
+          heroStat3Value: s.heroStat3Value || '',
+          heroStat3Label: s.heroStat3Label || '',
+          heroStat4Value: s.heroStat4Value || '',
+          heroStat4Label: s.heroStat4Label || '',
+          heroLogo1Url: s.heroLogo1Url || '',
+          heroLogo2Url: s.heroLogo2Url || '',
+          heroLogo3Url: s.heroLogo3Url || '',
+        });
+        setMiniTournamentConfig({
+          miniTournamentEnabled: typeof s.miniTournamentEnabled === 'boolean' ? s.miniTournamentEnabled : true,
+          miniTournamentBadge: s.miniTournamentBadge || '',
+          miniTournamentTitle: s.miniTournamentTitle || '',
+          miniTournamentMediaImageUrl: s.miniTournamentMediaImageUrl || '',
+          miniTournamentMediaVideoUrl: s.miniTournamentMediaVideoUrl || '',
+          miniTournamentWhenWhereTitle: s.miniTournamentWhenWhereTitle || '',
+          miniTournamentWhenWhereText: s.miniTournamentWhenWhereText || '',
+          miniTournamentWhoCanPlayTitle: s.miniTournamentWhoCanPlayTitle || '',
+          miniTournamentWhoCanPlayText: s.miniTournamentWhoCanPlayText || '',
+          miniTournamentHowToRegisterTitle: s.miniTournamentHowToRegisterTitle || '',
+          miniTournamentBullet1: s.miniTournamentBullet1 || '',
+          miniTournamentBullet2: s.miniTournamentBullet2 || '',
+          miniTournamentPrimaryCtaLabel: s.miniTournamentPrimaryCtaLabel || '',
+          miniTournamentPrimaryCtaUrl: s.miniTournamentPrimaryCtaUrl || '',
+          miniTournamentSecondaryCtaLabel: s.miniTournamentSecondaryCtaLabel || '',
+          miniTournamentSecondaryCtaUrl: s.miniTournamentSecondaryCtaUrl || '',
+          miniTournamentAffiliationButtonLabel: s.miniTournamentAffiliationButtonLabel || '',
+          miniTournamentAffiliationFeeText: s.miniTournamentAffiliationFeeText || '',
+          miniTournamentRegistrationFeeLabel: s.miniTournamentRegistrationFeeLabel || '',
+          miniTournamentRegistrationFeeValue: s.miniTournamentRegistrationFeeValue || '',
+        });
       })
       .catch(() => {
         setNews([]);
       })
       .finally(() => setIsLoadingNews(false));
   }, []);
+
+  useEffect(() => {
+    setVideoError(false);
+  }, [miniTournamentConfig.miniTournamentMediaVideoUrl]);
 
   return (
     <>
@@ -72,15 +182,45 @@ export const Home: React.FC<HomeProps> = ({ lang, onNavigate }) => {
       </Helmet>
       <div className="animate-in fade-in duration-500">
       {/* Hero Section */}
-      <Hero 
-        onRegisterClick={() => onNavigate('register')} 
-        onScheduleClick={() => onNavigate('news')} 
-        lang={lang} 
-      />
+      {heroConfig.heroEnabled && (
+        <Hero
+          onRegisterClick={() => onNavigate('register')}
+          onScheduleClick={() => onNavigate('news')}
+          lang={lang}
+          heroEnabled={heroConfig.heroEnabled}
+          heroShowAffiliations={heroConfig.heroShowAffiliations}
+          heroShowStats={heroConfig.heroShowStats}
+          heroShowLogos={heroConfig.heroShowLogos}
+          heroTitle={heroConfig.heroTitle}
+          heroSubtitle={heroConfig.heroSubtitle}
+          heroDescription={heroConfig.heroDescription}
+          heroImageUrl={heroConfig.heroImageUrl}
+          heroVideoUrl={heroConfig.heroVideoUrl}
+          heroBadge={heroConfig.heroBadge}
+          heroSlogan={heroConfig.heroSlogan}
+          heroCtaPrimary={heroConfig.heroCtaPrimary}
+          heroCtaSecondary={heroConfig.heroCtaSecondary}
+          heroAffiliationLine1={heroConfig.heroAffiliationLine1}
+          heroAffiliationLine2={heroConfig.heroAffiliationLine2}
+          heroAffiliationLine3={heroConfig.heroAffiliationLine3}
+          heroStat1Value={heroConfig.heroStat1Value}
+          heroStat1Label={heroConfig.heroStat1Label}
+          heroStat2Value={heroConfig.heroStat2Value}
+          heroStat2Label={heroConfig.heroStat2Label}
+          heroStat3Value={heroConfig.heroStat3Value}
+          heroStat3Label={heroConfig.heroStat3Label}
+          heroStat4Value={heroConfig.heroStat4Value}
+          heroStat4Label={heroConfig.heroStat4Label}
+          heroLogo1Url={heroConfig.heroLogo1Url}
+          heroLogo2Url={heroConfig.heroLogo2Url}
+          heroLogo3Url={heroConfig.heroLogo3Url}
+        />
+      )}
       
       {/* ----------------------------------------------------------------------- */}
       {/* MINI TOURNAMENT POSTER (Home-only) */}
       {/* ----------------------------------------------------------------------- */}
+      {miniTournamentConfig.miniTournamentEnabled && (
       <section className="relative py-10 lg:py-16 bg-gradient-to-br from-red-900 to-blue-950 text-white overflow-hidden border-y-8 border-orange-500">
         <div className="max-w-7xl mx-auto px-4 relative z-10">
           <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
@@ -90,26 +230,26 @@ export const Home: React.FC<HomeProps> = ({ lang, onNavigate }) => {
               <div className="rounded-2xl overflow-hidden shadow-2xl border-4 border-white/10 bg-black">
                 {!videoError ? (
                   <video
-                    src="/videos/dhanbad-mini-kabaddi-2026.mp4"
-                    poster="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1766845990/Gemini_Generated_Image_eyfw6eyfw6eyfw6e_pldumt.png"
+                    src={miniTournamentConfig.miniTournamentMediaVideoUrl || '/videos/dhanbad-mini-kabaddi-2026.mp4'}
+                    poster={miniTournamentConfig.miniTournamentMediaImageUrl || 'https://res.cloudinary.com/dcqo5qt7b/image/upload/v1766845990/Gemini_Generated_Image_eyfw6eyfw6eyfw6e_pldumt.png'}
                     className="w-full h-72 object-cover"
                     autoPlay
                     loop
                     muted
                     playsInline
                     onError={() => setVideoError(true)}
-                    aria-label="Dhanbad Mini Kabaddi Tournament 2026 video"
+                    aria-label="Mini tournament section video"
                   />
                 ) : (
                   <img
-                    src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1766845990/Gemini_Generated_Image_eyfw6eyfw6eyfw6e_pldumt.png"
-                    alt="Dhanbad Mini Kabaddi Tournament poster"
+                    src={miniTournamentConfig.miniTournamentMediaImageUrl || 'https://res.cloudinary.com/dcqo5qt7b/image/upload/v1766845990/Gemini_Generated_Image_eyfw6eyfw6eyfw6e_pldumt.png'}
+                    alt="Mini tournament section poster"
                     className="w-full h-72 object-cover"
                   />
                 )}
               </div>
               {videoError && (
-                <p className="mt-2 text-sm text-orange-200">Video not found — please add <code>/public/videos/dhanbad-mini-kabaddi-2026.mp4</code> or refresh the page.</p>
+                <p className="mt-2 text-sm text-orange-200">Video failed to load. Showing image fallback.</p>
               )}
             </div>
 
@@ -117,42 +257,42 @@ export const Home: React.FC<HomeProps> = ({ lang, onNavigate }) => {
             <div className="w-full lg:w-1/2 space-y-4">
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 rounded-full text-xs font-bold uppercase tracking-widest mb-2 lg:mb-3">
                 <Megaphone size={16} />
-                {lang === 'hi' ? 'घोषणा' : 'Announcement'}
+                {miniTournamentConfig.miniTournamentBadge || (lang === 'hi' ? 'घोषणा' : 'Announcement')}
               </div>
 
-              <h2 className="text-3xl md:text-4xl font-oswald font-bold mb-2 leading-tight uppercase">DHANBAD DISTRICT MINI KABADDI TOURNAMENT — 2026</h2>
+              <h2 className="text-3xl md:text-4xl font-oswald font-bold mb-2 leading-tight uppercase">{miniTournamentConfig.miniTournamentTitle || 'DHANBAD DISTRICT MINI KABADDI TOURNAMENT — 2026'}</h2>
 
               <div className="bg-white/5 p-4 rounded-xl border border-white/10 text-slate-100">
-                <p className="font-bold">When &amp; Where</p>
-                <p className="mb-2">Sunday, 8 Mar 2026 — Birsa Munda Stadium</p>
+                <p className="font-bold">{miniTournamentConfig.miniTournamentWhenWhereTitle || 'When & Where'}</p>
+                <p className="mb-2">{miniTournamentConfig.miniTournamentWhenWhereText || 'Sunday, 8 Mar 2026 — Birsa Munda Stadium'}</p>
 
-                <p className="font-bold">Who can play</p>
-                <p className="mb-2">Students in Class 3–5; under 11 years; max weight 36.97 kg</p>
+                <p className="font-bold">{miniTournamentConfig.miniTournamentWhoCanPlayTitle || 'Who can play'}</p>
+                <p className="mb-2">{miniTournamentConfig.miniTournamentWhoCanPlayText || 'Students in Class 3–5; under 11 years; max weight 36.97 kg'}</p>
 
-                <p className="font-bold">How to register</p>
+                <p className="font-bold">{miniTournamentConfig.miniTournamentHowToRegisterTitle || 'How to register'}</p>
                 <ul className="list-disc pl-5 mt-2 text-sm space-y-1">
-                  <li>Submit team list on official school letterhead (Name, Father’s Name, DOB) + 1 passport photo per player.</li>
-                  <li>Deadline: <strong>27 Feb 2026</strong>.</li>
+                  <li>{miniTournamentConfig.miniTournamentBullet1 || 'Submit team list on official school letterhead (Name, Father’s Name, DOB) + 1 passport photo per player.'}</li>
+                  <li>{miniTournamentConfig.miniTournamentBullet2 || 'Deadline: 27 Feb 2026.'}</li>
                 </ul>
 
                 <div className="mt-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <a
-                      href="/important-docs/entryform.pdf"
+                      href={miniTournamentConfig.miniTournamentPrimaryCtaUrl || '/important-docs/entryform.pdf'}
                       download
                       className="w-full flex justify-center items-center bg-orange-600 hover:bg-orange-500 text-white px-6 py-3 rounded-2xl font-bold shadow-lg text-center"
                     >
-                      Download Entry Form -PDF
+                      {miniTournamentConfig.miniTournamentPrimaryCtaLabel || 'Download Entry Form -PDF'}
                     </a>
 
                     <a
-                      href="/important-docs/participation-letter.pdf"
+                      href={miniTournamentConfig.miniTournamentSecondaryCtaUrl || '/important-docs/participation-letter.pdf'}
                       download
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-full flex justify-center items-center bg-white/6 hover:bg-white/10 hover:text-slate-900 text-white px-6 py-3 rounded-2xl font-bold border border-white/10"
                     >
-                      Participation Letter -PDF
+                      {miniTournamentConfig.miniTournamentSecondaryCtaLabel || 'Participation Letter -PDF'}
                     </a>
                   </div>
 
@@ -162,13 +302,17 @@ export const Home: React.FC<HomeProps> = ({ lang, onNavigate }) => {
                       className="w-full inline-flex justify-center items-center gap-3 bg-white text-orange-600 px-6 py-3 rounded-2xl font-bold text-sm shadow-xl border-2 border-orange-300 hover:scale-105 transform transition-all ring-4 ring-orange-300/25 animate-pulse"
                       aria-label="Institution Affiliation - Registration fee"
                     >
-                      {t.forms.instTitle} — ₹{FEES.INSTITUTION}
+                      {miniTournamentConfig.miniTournamentAffiliationButtonLabel || t.forms.instTitle}
+                      {' — '}
+                      {miniTournamentConfig.miniTournamentAffiliationFeeText || `₹${FEES.INSTITUTION}`}
                     </button>
                   </div>
                 </div>
 
                 <p className="mt-3 text-xs text-slate-300">
-                  <strong className="text-orange-200">Registration fee:</strong> ₹{FEES.INSTITUTION}
+                  <strong className="text-orange-200">{miniTournamentConfig.miniTournamentRegistrationFeeLabel || 'Registration fee:'}</strong>
+                  {' '}
+                  {miniTournamentConfig.miniTournamentRegistrationFeeValue || `₹${FEES.INSTITUTION}`}
                 </p>
               </div>
 
@@ -178,6 +322,7 @@ export const Home: React.FC<HomeProps> = ({ lang, onNavigate }) => {
           </div>
         </div>
       </section>
+      )}
 
       {/* Features Section */}
       <section className="py-12 lg:py-24 bg-white relative z-10">

@@ -10,19 +10,125 @@ interface HeroProps {
   onRegisterClick: () => void;
   onScheduleClick: () => void;
   lang: Language;
+  heroEnabled?: boolean;
+  heroShowAffiliations?: boolean;
+  heroShowStats?: boolean;
+  heroShowLogos?: boolean;
+  heroTitle?: string;
+  heroSubtitle?: string;
+  heroDescription?: string;
+  heroImageUrl?: string;
+  heroVideoUrl?: string;
+  heroBadge?: string;
+  heroSlogan?: string;
+  heroCtaPrimary?: string;
+  heroCtaSecondary?: string;
+  heroAffiliationLine1?: string;
+  heroAffiliationLine2?: string;
+  heroAffiliationLine3?: string;
+  heroStat1Value?: string;
+  heroStat1Label?: string;
+  heroStat2Value?: string;
+  heroStat2Label?: string;
+  heroStat3Value?: string;
+  heroStat3Label?: string;
+  heroStat4Value?: string;
+  heroStat4Label?: string;
+  heroLogo1Url?: string;
+  heroLogo2Url?: string;
+  heroLogo3Url?: string;
 }
 
-const Hero: React.FC<HeroProps> = ({ onRegisterClick, onScheduleClick, lang }) => {
+const Hero: React.FC<HeroProps> = ({
+  onRegisterClick,
+  onScheduleClick,
+  lang,
+  heroShowAffiliations = true,
+  heroShowStats = true,
+  heroShowLogos = true,
+  heroTitle,
+  heroSubtitle,
+  heroDescription,
+  heroImageUrl,
+  heroVideoUrl,
+  heroBadge,
+  heroSlogan,
+  heroCtaPrimary,
+  heroCtaSecondary,
+  heroAffiliationLine1,
+  heroAffiliationLine2,
+  heroAffiliationLine3,
+  heroStat1Value,
+  heroStat1Label,
+  heroStat2Value,
+  heroStat2Label,
+  heroStat3Value,
+  heroStat3Label,
+  heroStat4Value,
+  heroStat4Label,
+  heroLogo1Url,
+  heroLogo2Url,
+  heroLogo3Url,
+}) => {
   const t = translations[lang].hero;
   const aff = translations[lang].affiliation;
+  const resolvedTitle = heroTitle?.trim() || t.title;
+  const resolvedSubtitle = heroSubtitle?.trim() || t.subtitle;
+  const resolvedDescription = heroDescription?.trim() || t.description;
+  const resolvedImageUrl = heroImageUrl?.trim() || 'https://res.cloudinary.com/dcqo5qt7b/image/upload/v1767020556/WhatsApp_Image_2025-12-28_at_9.36.59_PM_sijegu.jpg';
+  const resolvedVideoUrl = heroVideoUrl?.trim() || '';
+  const resolvedBadge = heroBadge?.trim() || t.badge;
+  const resolvedSlogan = heroSlogan?.trim() || t.slogan;
+  const resolvedCtaPrimary = heroCtaPrimary?.trim() || t.ctaPrimary;
+  const resolvedCtaSecondary = heroCtaSecondary?.trim() || t.ctaSecondary;
+  const affiliationItems = [
+    {
+      text: heroAffiliationLine1?.trim() || aff.line1,
+      label: lang === 'hi' ? 'संबद्धता' : 'Affiliation',
+      color: 'bg-orange-500',
+    },
+    {
+      text: heroAffiliationLine2?.trim() || aff.line2,
+      label: lang === 'hi' ? 'पंजीकरण' : 'Registration',
+      color: 'bg-orange-500',
+    },
+    {
+      text: heroAffiliationLine3?.trim() || aff.line3,
+      label: lang === 'hi' ? 'मान्यता' : 'Recognition',
+      color: 'bg-orange-500',
+    },
+  ];
+  const statItems = [
+    { val: heroStat1Value?.trim() || '50+', label: heroStat1Label?.trim() || t.stats.clubs },
+    { val: heroStat2Value?.trim() || '1200+', label: heroStat2Label?.trim() || t.stats.players },
+    { val: heroStat3Value?.trim() || '12', label: heroStat3Label?.trim() || t.stats.titles },
+    { val: heroStat4Value?.trim() || '24/7', label: heroStat4Label?.trim() || t.stats.support },
+  ];
+  const logoItems = [
+    heroLogo1Url?.trim() || 'https://res.cloudinary.com/dmmll82la/image/upload/v1766683651/ddka-logo_ywnhyh.png',
+    heroLogo2Url?.trim() || 'https://res.cloudinary.com/dcqo5qt7b/image/upload/v1767429051/WhatsApp_Image_2026-01-03_at_1.57.17_PM_qg7rs3.jpg',
+    heroLogo3Url?.trim() || 'https://res.cloudinary.com/dmmll82la/image/upload/v1766683651/akfi-logo_sydpx7.png',
+  ];
   
   return (
     <div className="relative min-h-[95vh] flex flex-col overflow-hidden bg-slate-950">
       {/* Background with Advanced Overlay */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center transition-transform duration-[20s] scale-110 opacity-50"
-        style={{ backgroundImage: `url('https://res.cloudinary.com/dcqo5qt7b/image/upload/v1767020556/WhatsApp_Image_2025-12-28_at_9.36.59_PM_sijegu.jpg')` }}
-      >
+      <div className="absolute inset-0 transition-transform duration-[20s] scale-110 opacity-50">
+        {resolvedVideoUrl ? (
+          <video
+            src={resolvedVideoUrl}
+            className="absolute inset-0 w-full h-full object-cover"
+            autoPlay
+            muted
+            loop
+            playsInline
+          />
+        ) : (
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: `url('${resolvedImageUrl}')` }}
+          />
+        )}
         <div className="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-transparent to-slate-950"></div>
         <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/40 to-transparent"></div>
       </div>
@@ -37,26 +143,27 @@ const Hero: React.FC<HeroProps> = ({ onRegisterClick, onScheduleClick, lang }) =
             <div className="bg-orange-600 p-1.5 rounded-full animate-pulse shadow-[0_0_15px_rgba(234,88,12,0.5)]">
               <Trophy size={16} className="text-white" />
             </div>
-            <span className="text-xs font-black uppercase tracking-[0.2em] text-orange-500">{t.badge}</span>
+            <span className="text-xs font-black uppercase tracking-[0.2em] text-orange-500">{resolvedBadge}</span>
           </div>
 
           <h2 className="text-xl md:text-3xl font-bold text-white/70 mb-4 lg:mb-6 tracking-tight uppercase flex items-center gap-4">
              <span className="h-px w-12 bg-orange-600"></span>
-             {t.slogan}
+             {resolvedSlogan}
           </h2>
 
           <h1 className="text-5xl sm:text-8xl md:text-[10rem] font-black mb-6 lg:mb-10 leading-[0.85] uppercase tracking-tighter text-white">
-            {t.title} <br />
+            {resolvedTitle} <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-orange-400 to-white drop-shadow-2xl">
-              {t.subtitle}
+              {resolvedSubtitle}
             </span>
           </h1>
           
           <p className="text-lg sm:text-2xl text-slate-300 mb-8 lg:mb-14 leading-relaxed font-medium max-w-2xl border-l-4 border-orange-600 pl-8">
-            {t.description}
+            {resolvedDescription}
           </p>
 
           {/* Advanced Affiliation Glass Card */}
+          {heroShowAffiliations && (
           <div className="mb-8 lg:mb-16 relative group max-w-4xl">
             <div className="absolute -inset-1 bg-gradient-to-r from-orange-600/20 to-blue-600/20 rounded-3xl blur-xl opacity-50 group-hover:opacity-100 transition duration-1000"></div>
             <div className="relative bg-slate-900/40 backdrop-blur-2xl border border-white/10 p-5 lg:p-8 rounded-3xl shadow-2xl overflow-hidden">
@@ -64,11 +171,7 @@ const Hero: React.FC<HeroProps> = ({ onRegisterClick, onScheduleClick, lang }) =
               <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/5 to-transparent pointer-events-none"></div>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-8 relative z-10">
-                {[
-                  { text: aff.line1, label: lang === 'hi' ? 'संबद्धता' : 'Affiliation', color: 'bg-orange-500' },
-                  { text: aff.line2, label: lang === 'hi' ? 'पंजीकरण' : 'Registration', color: 'bg-orange-500' },
-                  { text: aff.line3, label: lang === 'hi' ? 'मान्यता' : 'Recognition', color: 'bg-orange-500' }
-                ].map((item, i) => (
+                {affiliationItems.map((item, i) => (
                   <div key={i} className="flex flex-col space-y-3 group/item">
                     <div className="flex items-center gap-2">
                       <div className={`w-2 h-2 rounded-full ${item.color} shadow-[0_0_10px_rgba(249,115,22,0.8)] animate-pulse`}></div>
@@ -82,6 +185,7 @@ const Hero: React.FC<HeroProps> = ({ onRegisterClick, onScheduleClick, lang }) =
               </div>
             </div>
           </div>
+          )}
           
           <div className="flex flex-col sm:flex-row gap-6">
             <button 
@@ -89,7 +193,7 @@ const Hero: React.FC<HeroProps> = ({ onRegisterClick, onScheduleClick, lang }) =
               className="relative overflow-hidden bg-orange-600 hover:bg-orange-500 text-white px-14 py-7 rounded-2xl font-black text-2xl uppercase tracking-tighter transition-all group shadow-[0_20px_50px_rgba(234,88,12,0.3)] active:scale-95 transform hover:-translate-y-1"
             >
               <span className="relative z-10 flex items-center justify-center">
-                {t.ctaPrimary}
+                {resolvedCtaPrimary}
                 <ChevronRight className="ml-2 group-hover:translate-x-2 transition-transform duration-300" strokeWidth={3} />
               </span>
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
@@ -99,36 +203,28 @@ const Hero: React.FC<HeroProps> = ({ onRegisterClick, onScheduleClick, lang }) =
               onClick={onScheduleClick}
               className="bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white hover:text-slate-950 text-white px-14 py-7 rounded-2xl font-black text-2xl uppercase tracking-tighter transition-all active:scale-95 transform hover:-translate-y-1"
             >
-              {t.ctaSecondary}
+              {resolvedCtaSecondary}
             </button>
           </div>
         </div>
       </div>
 
       {/* Stats Overlay - Desktop */}
+      {heroShowStats && (
       <div className="hidden lg:block bg-slate-950/50 backdrop-blur-3xl border-t border-white/5 w-full mt-auto">
         <div className="max-w-7xl mx-auto px-4 py-12 flex items-center justify-between">
-          <div className="flex items-center space-x-12 border-r border-white/10 pr-20">
-            <div className="relative group">
-              <div className="absolute -inset-2 bg-white rounded-full blur opacity-0 group-hover:opacity-20 transition duration-500"></div>
-              <img src="https://res.cloudinary.com/dmmll82la/image/upload/v1766683651/ddka-logo_ywnhyh.png" alt="DDKA" className="h-24 w-24 rounded-full bg-white p-1.5 relative" />
+          {heroShowLogos ? (
+            <div className="flex items-center space-x-12 border-r border-white/10 pr-20">
+              {logoItems.map((logo, index) => (
+                <div key={index} className="relative group">
+                  <div className="absolute -inset-2 bg-white rounded-full blur opacity-0 group-hover:opacity-20 transition duration-500"></div>
+                  <img src={logo} alt={`Hero logo ${index + 1}`} className="h-24 w-24 rounded-full bg-white p-1.5 relative object-cover" />
+                </div>
+              ))}
             </div>
-            <div className="relative group">
-              <div className="absolute -inset-2 bg-white rounded-full blur opacity-0 group-hover:opacity-20 transition duration-500"></div>
-              <img src="https://res.cloudinary.com/dcqo5qt7b/image/upload/v1767429051/WhatsApp_Image_2026-01-03_at_1.57.17_PM_qg7rs3.jpg" alt="Jharkhand State Kabaddi Association" className="h-24 w-24 rounded-full bg-white p-1.5 relative" />
-            </div>
-            <div className="relative group">
-              <div className="absolute -inset-2 bg-white rounded-full blur opacity-0 group-hover:opacity-20 transition duration-500"></div>
-              <img src="https://res.cloudinary.com/dmmll82la/image/upload/v1766683651/akfi-logo_sydpx7.png" alt="AKFI" className="h-24 w-24 rounded-full bg-white p-1.5 relative" />
-            </div>
-          </div>
-          <div className="flex-1 grid grid-cols-4 gap-16 text-white text-center pl-20">
-            {[
-              { val: '50+', label: t.stats.clubs },
-              { val: '1200+', label: t.stats.players },
-              { val: '12', label: t.stats.titles },
-              { val: '24/7', label: t.stats.support }
-            ].map((stat, i) => (
+          ) : null}
+          <div className={`flex-1 grid grid-cols-4 gap-16 text-white text-center ${heroShowLogos ? 'pl-20' : ''}`}>
+            {statItems.map((stat, i) => (
               <div key={i} className="group cursor-default">
                 <p className="text-6xl font-black tracking-tighter text-white group-hover:text-orange-500 transition-colors duration-300">{stat.val}</p>
                 <p className="text-[10px] uppercase tracking-[0.3em] text-slate-500 font-black mt-2">{stat.label}</p>
@@ -137,6 +233,7 @@ const Hero: React.FC<HeroProps> = ({ onRegisterClick, onScheduleClick, lang }) =
           </div>
         </div>
       </div>
+      )}
     </div>
   );
 };

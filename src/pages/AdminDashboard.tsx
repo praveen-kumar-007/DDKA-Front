@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+﻿import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
+import {
   CheckCircle, XCircle,
   Users, Building, Search,
   LogOut, Newspaper, Image as ImageIcon, Mail, UserCheck, Heart,
@@ -35,7 +35,7 @@ type LoginAlertSummary = {
   newLogins: number;
 };
 
-const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang, onLogout }) => { 
+const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang, onLogout }) => {
   const navigate = useNavigate();
   const [activeTab] = useState<'players' | 'institutions'>('players');
 
@@ -49,7 +49,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang, onLogout }
   // Selection & export state removed (moved to dedicated Registrations page)
 
   // Public/feature visibility settings (controlled by superadmin)
-  const [publicSettings, setPublicSettings] = useState<{ allowGallery?: boolean; allowNews?: boolean; allowContacts?: boolean; allowDonations?: boolean; allowImportantDocs?: boolean; allowUnifiedSearch?: boolean; allowExportAll?: boolean; allowExportPlayers?: boolean; allowExportTechnicalOfficials?: boolean; allowExportInstitutions?: boolean }>({});
+  const [publicSettings, setPublicSettings] = useState<{ allowGallery?: boolean; allowNews?: boolean; allowContacts?: boolean; allowDonations?: boolean; allowImportantDocs?: boolean; allowUnifiedSearch?: boolean; allowRefereeBoard?: boolean; allowExportAll?: boolean; allowExportPlayers?: boolean; allowExportTechnicalOfficials?: boolean; allowExportInstitutions?: boolean }>({});
 
 
 
@@ -113,21 +113,21 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang, onLogout }
         return;
       }
 
-        const readState = getLoginAlertReadState();
-        if (!Array.isArray(json.alerts)) return;
-        const alerts = json.alerts;
-        const totalLogins = alerts.length;
-        const viewedAt = localStorage.getItem('loginAlertsViewedAt');
-        const viewedTime = viewedAt ? new Date(viewedAt).getTime() : 0;
-        const newLogins = alerts.reduce((count: number, alert: any) => {
-          const alertTime = alert.latestLoginAt ? new Date(alert.latestLoginAt).getTime() : 0;
-          const readTimestamp = readState[alert.userKey];
-          const readTime = readTimestamp ? new Date(readTimestamp).getTime() : 0;
-          if (readTimestamp && alertTime <= readTime) return count;
-          if (alertTime <= viewedTime) return count;
-          return count + 1;
-        }, 0);
-        setLoginAlertSummary({ totalLogins, newLogins });
+      const readState = getLoginAlertReadState();
+      if (!Array.isArray(json.alerts)) return;
+      const alerts = json.alerts;
+      const totalLogins = alerts.length;
+      const viewedAt = localStorage.getItem('loginAlertsViewedAt');
+      const viewedTime = viewedAt ? new Date(viewedAt).getTime() : 0;
+      const newLogins = alerts.reduce((count: number, alert: any) => {
+        const alertTime = alert.latestLoginAt ? new Date(alert.latestLoginAt).getTime() : 0;
+        const readTimestamp = readState[alert.userKey];
+        const readTime = readTimestamp ? new Date(readTimestamp).getTime() : 0;
+        if (readTimestamp && alertTime <= readTime) return count;
+        if (alertTime <= viewedTime) return count;
+        return count + 1;
+      }, 0);
+      setLoginAlertSummary({ totalLogins, newLogins });
     } catch (error) {
       console.error('Failed to fetch login alert summary', error);
     }
@@ -192,6 +192,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang, onLogout }
             allowDonations: typeof json.data.allowDonations === 'boolean' ? json.data.allowDonations : true,
             allowImportantDocs: typeof json.data.allowImportantDocs === 'boolean' ? json.data.allowImportantDocs : true,
             allowUnifiedSearch: typeof json.data.allowUnifiedSearch === 'boolean' ? json.data.allowUnifiedSearch : true,
+            allowRefereeBoard: typeof json.data.allowRefereeBoard === 'boolean' ? json.data.allowRefereeBoard : true,
             allowExportAll: typeof json.data.allowExportAll === 'boolean' ? json.data.allowExportAll : true,
             allowExportPlayers: typeof json.data.allowExportPlayers === 'boolean' ? json.data.allowExportPlayers : true,
             allowExportTechnicalOfficials: typeof json.data.allowExportTechnicalOfficials === 'boolean' ? json.data.allowExportTechnicalOfficials : true,
@@ -211,6 +212,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang, onLogout }
       if (!e?.detail) return;
       if (typeof e.detail.allowUnifiedSearch === 'boolean') {
         setPublicSettings(prev => ({ ...prev, allowUnifiedSearch: e.detail.allowUnifiedSearch }));
+      }
+      if (typeof e.detail.allowRefereeBoard === 'boolean') {
+        setPublicSettings(prev => ({ ...prev, allowRefereeBoard: e.detail.allowRefereeBoard }));
       }
     };
     window.addEventListener('ddka-settings-updated', onSettingsUpdate as EventListener);
@@ -442,7 +446,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang, onLogout }
   };
 
   // Generic small toggle for export-related settings
-  const ToggleSetting: React.FC<{ label: string; settingKey: 'allowExportAll' | 'allowExportPlayers' | 'allowExportTechnicalOfficials' | 'allowExportInstitutions' }> = ({ label, settingKey }) => {
+  const ToggleSetting: React.FC<{ label: string; settingKey: 'allowExportAll' | 'allowExportPlayers' | 'allowExportTechnicalOfficials' | 'allowExportInstitutions' | 'allowRefereeBoard' }> = ({ label, settingKey }) => {
     const [loadingSetting, setLoadingSetting] = useState(false);
     const [value, setValue] = useState<boolean | null>(null);
 
@@ -516,6 +520,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang, onLogout }
   };
 
   const ToggleExportAll: React.FC = () => <ToggleSetting label="EXP" settingKey="allowExportAll" />;
+  const ToggleRefereeBoard: React.FC = () => <ToggleSetting label="REF" settingKey="allowRefereeBoard" />;
 
   // Toggle for allowing admins to manage Donations (superadmin only)
 
@@ -534,7 +539,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang, onLogout }
             <h1 className="text-3xl md:text-5xl font-oswald font-bold text-blue-900 uppercase tracking-tight">DDKA CONTROL CENTER</h1>
             <p className="text-slate-500 font-medium flex items-center gap-2">
               <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-              Admin Portal • Team DDKA (Build By Praveen Kumar❤️)
+              Admin Portal â€¢ Team DDKA (Build By Praveen Kumarâ¤ï¸)
             </p>
             <div className="flex items-center gap-4">
               {adminRole && (
@@ -594,14 +599,22 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang, onLogout }
                             <div className="scale-[0.9] origin-left sm:origin-right"><ToggleExportAll /></div>
                           </div>
                         </div>
+
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                          <div className="text-sm font-semibold text-slate-700">Referee board</div>
+                          <div className="flex sm:justify-end">
+                            <div className="scale-[0.9] origin-left sm:origin-right"><ToggleRefereeBoard /></div>
+                          </div>
+                        </div>
                       </div>
+
                     </div>
                   </div>
                 )}
               </div>
             )}
 
-            <button 
+            <button
               onClick={handleLogout}
               className="w-full sm:w-auto flex items-center justify-center gap-2 bg-white text-red-600 px-4 md:px-6 py-2 md:py-3 rounded-xl font-black shadow-sm border-2 border-red-50 hover:bg-red-600 hover:text-white transition-all active:scale-95"
               title="Logout"
@@ -625,19 +638,17 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang, onLogout }
                   alert('You do not have permission to manage gallery. Please contact the superadmin.');
                 }
               }}
-              className={`flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-[92px] ${
-                adminRole === 'superadmin' || adminPermissions?.canAccessGallery
+              className={`flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-23 ${adminRole === 'superadmin' || adminPermissions?.canAccessGallery
                   ? 'bg-white hover:bg-blue-50 cursor-pointer'
                   : 'bg-slate-100 text-slate-400 cursor-not-allowed'
-              }`}
+                }`}
             >
               <ImageIcon
                 size={32}
-                className={`${
-                  adminRole === 'superadmin' || adminPermissions?.canAccessGallery
+                className={`${adminRole === 'superadmin' || adminPermissions?.canAccessGallery
                     ? 'text-blue-700 mb-2'
                     : 'text-slate-400 mb-2'
-                }`}
+                  }`}
               />
               <span className="font-bold text-xs">Manage Gallery</span>
             </button>
@@ -654,19 +665,17 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang, onLogout }
                   alert('You do not have permission to manage news. Please contact the superadmin.');
                 }
               }}
-              className={`flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-[92px] ${
-                adminRole === 'superadmin' || adminPermissions?.canAccessNews
+              className={`flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-23 ${adminRole === 'superadmin' || adminPermissions?.canAccessNews
                   ? 'bg-white hover:bg-blue-50 cursor-pointer'
                   : 'bg-slate-100 text-slate-400 cursor-not-allowed'
-              }`}
+                }`}
             >
               <Newspaper
                 size={32}
-                className={`${
-                  adminRole === 'superadmin' || adminPermissions?.canAccessNews
+                className={`${adminRole === 'superadmin' || adminPermissions?.canAccessNews
                     ? 'text-blue-700 mb-2'
                     : 'text-slate-400 mb-2'
-                }`}
+                  }`}
               />
               <span className="font-bold text-xs">Manage News</span>
             </button>
@@ -683,19 +692,17 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang, onLogout }
                   alert('You do not have permission to manage contact forms. Please contact the superadmin.');
                 }
               }}
-              className={`flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-[92px] ${
-                adminRole === 'superadmin' || adminPermissions?.canAccessContacts
+              className={`flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-23 ${adminRole === 'superadmin' || adminPermissions?.canAccessContacts
                   ? 'bg-white hover:bg-blue-50 cursor-pointer'
                   : 'bg-slate-100 text-slate-400 cursor-not-allowed'
-              }`}
+                }`}
             >
               <Mail
                 size={28}
-                className={`${
-                  adminRole === 'superadmin' || adminPermissions?.canAccessContacts
+                className={`${adminRole === 'superadmin' || adminPermissions?.canAccessContacts
                     ? 'text-blue-700 mb-2'
                     : 'text-slate-400 mb-2'
-                }`}
+                  }`}
               />
               <span className="font-bold text-xs">Contact Forms</span>
             </button>
@@ -708,7 +715,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang, onLogout }
               onClick={() => {
                 navigate('/admin/bulk-email');
               }}
-              className="flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-[92px] bg-white hover:bg-slate-50 cursor-pointer"
+              className="flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-23 bg-white hover:bg-slate-50 cursor-pointer"
             >
               <Mail
                 size={28}
@@ -725,7 +732,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang, onLogout }
               onClick={() => {
                 navigate('/admin/unified-search');
               }}
-              className="flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-[92px] bg-white hover:bg-slate-50 cursor-pointer"
+              className="flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-23 bg-white hover:bg-slate-50 cursor-pointer"
             >
               <Search size={28} className="text-slate-700 mb-2" />
               <span className="font-bold text-xs">Unified Search</span>
@@ -743,19 +750,17 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang, onLogout }
                   alert('You do not have permission to manage champions. Please contact the superadmin.');
                 }
               }}
-              className={`flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-[92px] ${
-                adminRole === 'superadmin' || adminPermissions?.canAccessChampions
+              className={`flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-23 ${adminRole === 'superadmin' || adminPermissions?.canAccessChampions
                   ? 'bg-white hover:bg-orange-50 cursor-pointer'
                   : 'bg-slate-100 text-slate-400 cursor-not-allowed'
-              }`}
+                }`}
             >
               <Trophy
                 size={28}
-                className={`${
-                  adminRole === 'superadmin' || adminPermissions?.canAccessChampions
+                className={`${adminRole === 'superadmin' || adminPermissions?.canAccessChampions
                     ? 'text-orange-700 mb-2'
                     : 'text-slate-400 mb-2'
-                }`}
+                  }`}
               />
               <span className="font-bold text-xs">Our Champions</span>
             </button>
@@ -772,20 +777,18 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang, onLogout }
                   alert('You do not have permission to manage referees. Please contact the superadmin.');
                 }
               }}
-              className={`flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-[92px] ${
-                adminRole === 'superadmin' || adminPermissions?.canAccessReferees
+              className={`flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-23 ${adminRole === 'superadmin' || adminPermissions?.canAccessReferees
                   ? 'bg-white hover:bg-slate-50 cursor-pointer'
                   : 'bg-slate-100 text-slate-400 cursor-not-allowed'
-              }`}
+                }`}
             >
               <div className="relative w-full flex items-center justify-center">
                 <Gavel
                   size={28}
-                  className={`${
-                    adminRole === 'superadmin' || adminPermissions?.canAccessReferees
+                  className={`${adminRole === 'superadmin' || adminPermissions?.canAccessReferees
                       ? 'text-amber-700 mb-2'
                       : 'text-slate-400 mb-2'
-                  }`}
+                    }`}
                 />
                 {0 > 0 && (adminRole === 'superadmin' || adminPermissions?.canAccessReferees) && (
                   <div className="absolute -top-1 -right-1 inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-700 text-white text-xs font-bold">0</div>
@@ -806,18 +809,16 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang, onLogout }
                   alert('You do not have permission to manage donations. Please contact the superadmin.');
                 }
               }}
-              className={`flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-[92px] ${
-                adminRole === 'superadmin' || adminPermissions?.canAccessDonations ? 'bg-white hover:bg-slate-50 cursor-pointer' : 'bg-slate-100 text-slate-400 cursor-not-allowed'
-              }`}
+              className={`flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-23 ${adminRole === 'superadmin' || adminPermissions?.canAccessDonations ? 'bg-white hover:bg-slate-50 cursor-pointer' : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                }`}
             >
               <div className="relative w-full flex items-center justify-center">
                 <Heart
                   size={28}
-                  className={`${
-                    adminRole === 'superadmin' || adminPermissions?.canAccessDonations
+                  className={`${adminRole === 'superadmin' || adminPermissions?.canAccessDonations
                       ? 'text-rose-700 mb-2'
                       : 'text-slate-400 mb-2'
-                  }`}
+                    }`}
                 />
                 {pendingDonations > 0 && (adminRole === 'superadmin' || adminPermissions?.canAccessDonations) && (
                   <div className="absolute -top-1 -right-1 inline-flex items-center justify-center w-6 h-6 rounded-full bg-rose-700 text-white text-xs font-bold">{pendingDonations}</div>
@@ -838,20 +839,18 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang, onLogout }
                   alert('You do not have permission to manage technical officials. Please contact the superadmin.');
                 }
               }}
-              className={`flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-[92px] ${
-                adminRole === 'superadmin' || adminPermissions?.canAccessTechnicalOfficials
+              className={`flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-23 ${adminRole === 'superadmin' || adminPermissions?.canAccessTechnicalOfficials
                   ? 'bg-white hover:bg-slate-50 cursor-pointer'
                   : 'bg-slate-100 text-slate-400 cursor-not-allowed'
-              }`}
+                }`}
             >
               <div className="relative w-full flex items-center justify-center">
                 <UserCheck
                   size={28}
-                  className={`${
-                    adminRole === 'superadmin' || adminPermissions?.canAccessTechnicalOfficials
+                  className={`${adminRole === 'superadmin' || adminPermissions?.canAccessTechnicalOfficials
                       ? 'text-emerald-700 mb-2'
                       : 'text-slate-400 mb-2'
-                  }`}
+                    }`}
                 />
                 {pendingOfficials > 0 && (adminRole === 'superadmin' || adminPermissions?.canAccessTechnicalOfficials) && (
                   <div className="absolute -top-1 -right-1 inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-700 text-white text-xs font-bold">{pendingOfficials}</div>
@@ -863,19 +862,41 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang, onLogout }
           {adminRole === 'superadmin' && (
             <button
               type="button"
+              onClick={() => { navigate('/admin/hero'); }}
+              className="flex flex-col items-center justify-center p-4 bg-white rounded-xl shadow border hover:bg-indigo-50 transition-all w-full min-h-23"
+            >
+              <Award size={28} className="text-indigo-700 mb-2" />
+              <span className="font-bold text-xs text-indigo-900">Hero Studio</span>
+            </button>
+          )}
+
+          {adminRole === 'superadmin' && (
+            <button
+              type="button"
+              onClick={() => { navigate('/admin/home-mini-tournament'); }}
+              className="flex flex-col items-center justify-center p-4 bg-white rounded-xl shadow border hover:bg-orange-50 transition-all w-full min-h-23"
+            >
+              <Newspaper size={28} className="text-orange-700 mb-2" />
+              <span className="font-bold text-xs text-orange-900">Home Tournament Section</span>
+            </button>
+          )}
+
+          {adminRole === 'superadmin' && (
+            <button
+              type="button"
               onClick={() => { navigate('/admin/manage-admins'); }}
-              className="flex flex-col items-center justify-center p-4 bg-white rounded-xl shadow border hover:bg-red-50 transition-all w-full min-h-[92px]"
+              className="flex flex-col items-center justify-center p-4 bg-white rounded-xl shadow border hover:bg-red-50 transition-all w-full min-h-23"
             >
               <UserCog size={28} className="text-red-700 mb-2" />
               <span className="font-bold text-xs text-red-900">Manage Admins</span>
             </button>
-          )} 
+          )}
 
           {adminRole === 'superadmin' && (
             <button
               type="button"
               onClick={() => { navigate('/admin/login-alerts'); }}
-              className="flex flex-col items-center justify-center p-4 bg-white rounded-xl shadow border hover:bg-blue-50 transition-all w-full min-h-[92px]"
+              className="flex flex-col items-center justify-center p-4 bg-white rounded-xl shadow border hover:bg-blue-50 transition-all w-full min-h-23"
             >
               <div className="relative w-full flex items-center justify-center">
                 <LogIn size={28} className="text-blue-700 mb-2" />
@@ -891,7 +912,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang, onLogout }
 
           {(adminRole === 'superadmin' || (publicSettings.allowImportantDocs && adminPermissions?.canAccessImportantDocs)) && (
             <div className="relative" ref={docsRef}>
-              <button 
+              <button
                 type="button"
                 aria-expanded={showDocs}
                 aria-controls="important-docs-dropdown"
@@ -899,9 +920,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang, onLogout }
                   if (adminRole === 'superadmin' || adminPermissions?.canAccessImportantDocs) setShowDocs(s => !s);
                   else alert('You do not have permission to access Important Docs.');
                 }}
-                className={`flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all min-h-[92px] ${
-                  (adminRole === 'superadmin' || adminPermissions?.canAccessImportantDocs) ? 'bg-white hover:bg-emerald-50 cursor-pointer w-full' : 'bg-slate-100 text-slate-400 cursor-not-allowed w-full'
-                }`}
+                className={`flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all min-h-23 ${(adminRole === 'superadmin' || adminPermissions?.canAccessImportantDocs) ? 'bg-white hover:bg-emerald-50 cursor-pointer w-full' : 'bg-slate-100 text-slate-400 cursor-not-allowed w-full'
+                  }`}
               >
                 <FileText size={28} className={`${(adminRole === 'superadmin' || adminPermissions?.canAccessImportantDocs) ? 'text-emerald-700 mb-2' : 'text-slate-400 mb-2'}`} />
                 <span className="font-bold text-xs text-emerald-900">Important Docs</span>
@@ -915,32 +935,32 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang, onLogout }
                 <div id="important-docs-dropdown" role="menu" className="absolute z-50 mt-2 left-1/2 -translate-x-1/2 w-64 sm:w-72 bg-white shadow-lg rounded-lg p-3 border ring-1 ring-slate-100">
                   <div className="flex items-center justify-between mb-2">
                     <strong className="text-sm">Important Docs</strong>
-                    <button onClick={() => setShowDocs(false)} aria-label="Close" className="text-slate-400 hover:text-slate-600">✕</button>
+                    <button onClick={() => setShowDocs(false)} aria-label="Close" className="text-slate-400 hover:text-slate-600">âœ•</button>
                   </div>
 
                   <nav className="flex flex-col gap-1">
-                      <a href="/important-docs/entryform.pdf" download className="flex items-center gap-3 py-2 px-2 rounded hover:bg-slate-50">
+                    <a href="/important-docs/entryform.pdf" download className="flex items-center gap-3 py-2 px-2 rounded hover:bg-slate-50">
                       <FileText size={18} className="text-slate-600 w-6" />
                       <span className="text-sm">Entry Form</span>
-                      <span className="ml-auto text-slate-400">↗</span>
+                      <span className="ml-auto text-slate-400">â†—</span>
                     </a>
 
                     <a href="/important-docs/technical-id-card.html" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 py-2 px-2 rounded hover:bg-slate-50">
                       <UserCheck size={18} className="text-slate-600 w-6" />
                       <span className="text-sm">Technical ID Card</span>
-                      <span className="ml-auto text-slate-400">↗</span>
+                      <span className="ml-auto text-slate-400">â†—</span>
                     </a>
 
                     <a href="/important-docs/official-certificate.html" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 py-2 px-2 rounded hover:bg-slate-50">
                       <Award size={18} className="text-slate-600 w-6" />
                       <span className="text-sm">Official Certificate</span>
-                      <span className="ml-auto text-slate-400">↗</span>
+                      <span className="ml-auto text-slate-400">â†—</span>
                     </a>
 
                     <a href="/important-docs/certificate-2.html" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 py-2 px-2 rounded hover:bg-slate-50">
                       <Trophy size={18} className="text-slate-600 w-6" />
                       <span className="text-sm">Certificate 2</span>
-                      <span className="ml-auto text-slate-400">↗</span>
+                      <span className="ml-auto text-slate-400">â†—</span>
                     </a>
                   </nav>
                 </div>
@@ -958,13 +978,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang, onLogout }
                   alert('You do not have permission to view player details. Please contact the superadmin.');
                 }
               }}
-              className={`flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-[92px] ${
-                activeTab === 'players'
+              className={`flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-23 ${activeTab === 'players'
                   ? 'bg-blue-900 text-white'
                   : (adminRole === 'superadmin' || adminPermissions?.canAccessPlayerDetails)
-                      ? 'bg-white hover:bg-blue-50 text-blue-900'
-                      : 'bg-slate-100 text-slate-400 cursor-not-allowed'
-              }`}
+                    ? 'bg-white hover:bg-blue-50 text-blue-900'
+                    : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                }`}
             >
               <div className="relative w-full flex items-center justify-center">
                 <Users
@@ -973,8 +992,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang, onLogout }
                     activeTab === 'players'
                       ? 'text-orange-400'
                       : (adminRole === 'superadmin' || adminPermissions?.canAccessPlayerDetails)
-                          ? 'text-blue-900'
-                          : 'text-slate-400'
+                        ? 'text-blue-900'
+                        : 'text-slate-400'
                   }
                 />
                 {pendingPlayers > 0 && (adminRole === 'superadmin' || adminPermissions?.canAccessPlayerDetails) && (
@@ -995,13 +1014,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang, onLogout }
                 alert('You do not have permission to view institution details. Please contact the superadmin.');
               }
             }}
-            className={`flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-[92px] ${
-              activeTab === 'institutions'
+            className={`flex flex-col items-center justify-center p-4 rounded-xl shadow border transition-all w-full min-h-23 ${activeTab === 'institutions'
                 ? 'bg-blue-900 text-white'
                 : (adminRole === 'superadmin' || adminPermissions?.canAccessInstitutionDetails)
-                    ? 'bg-white hover:bg-blue-50 text-blue-900'
-                    : 'bg-slate-100 text-slate-400 cursor-not-allowed'
-            }`}
+                  ? 'bg-white hover:bg-blue-50 text-blue-900'
+                  : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+              }`}
           >
             <div className="relative w-full flex items-center justify-center">
               <Building
@@ -1010,8 +1028,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang: _lang, onLogout }
                   activeTab === 'institutions'
                     ? 'text-orange-400'
                     : (adminRole === 'superadmin' || adminPermissions?.canAccessInstitutionDetails)
-                        ? 'text-blue-900'
-                        : 'text-slate-400'
+                      ? 'text-blue-900'
+                      : 'text-slate-400'
                 }
               />
               {pendingInstitutions > 0 && (adminRole === 'superadmin' || adminPermissions?.canAccessInstitutionDetails) && (
