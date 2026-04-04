@@ -150,7 +150,7 @@ const Account: React.FC = () => {
 
   const downloadOfficialAsset = async (assetType: 'id-card' | 'certificate') => {
     if (!profile) return;
-    const token = localStorage.getItem('userToken') || '';
+    const token = localStorage.getItem('userToken') || localStorage.getItem('token') || '';
     const officialId = profile.id || profile._id || '';
     const name = (profile?.candidateName || profile?.fullName || 'official').replace(/\s+/g, '_');
     const fallbackFilename = assetType === 'id-card' ? `ID_${name}.pdf` : `${name}_Certificate.pdf`;
@@ -165,9 +165,9 @@ const Account: React.FC = () => {
       : '';
 
     const endpointCandidates = [
-      normalizedDbUrl,
       `${API_URL}/api/technical-officials/me/${assetType}/download`,
       `${API_URL}/api/technical-officials/me/download/${assetType}`,
+      normalizedDbUrl,
       officialId ? `${API_URL}/api/technical-officials/${officialId}/${assetType}/download` : '',
       officialId ? `${API_URL}/api/technical-officials/${officialId}/download/${assetType}` : ''
     ].filter(Boolean) as string[];
