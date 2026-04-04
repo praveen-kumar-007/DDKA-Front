@@ -30,6 +30,8 @@ interface TechnicalOfficial {
   remarks?: string;
   grade?: 'A' | 'B' | 'C' | '';
   examScore?: number | null;
+  idCardDownloadUrl?: string;
+  certificateDownloadUrl?: string;
   createdAt: string;
   loginActivities?: LoginActivityEntry[];
 }
@@ -56,6 +58,7 @@ const AdminTechnicalOfficialDetails: React.FC = () => {
    const [adminRole, setAdminRole] = useState<string | null>(null);
    const [adminPermissions, setAdminPermissions] = useState<AdminPermissions | null>(null);
    const [deleting, setDeleting] = useState<boolean>(false);
+  const [downloadingAsset, setDownloadingAsset] = useState<'id-card' | 'certificate' | null>(null);
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -110,6 +113,91 @@ const AdminTechnicalOfficialDetails: React.FC = () => {
   }, [API_URL, id, initialOfficial]);
 
   const canDelete = adminRole === 'superadmin' || !!adminPermissions?.canDelete;
+
+  const getFilenameFromDisposition = (contentDisposition: string | null): string | null => {
+    if (!contentDisposition) return null;
+    const utf8Name = contentDisposition.match(/filename\*=UTF-8''([^;]+)/i);
+    if (utf8Name && utf8Name[1]) return decodeURIComponent(utf8Name[1]);
+    const quoted = contentDisposition.match(/filename="([^"]+)"/i);
+    if (quoted && quoted[1]) return quoted[1];
+    const plain = contentDisposition.match(/filename=([^;]+)/i);
+    return plain && plain[1] ? plain[1].trim() : null;
+  };
+
+  const forceDownloadBlob = (blob: Blob, filename: string) => {
+    const objectUrl = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = objectUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(objectUrl);
+  };
+
+  const downloadOfficialAsset = async (assetType: 'id-card' | 'certificate') => {
+    if (!official?._id) return;
+
+    const token = localStorage.getItem('token') || '';
+    const safeName = (official.candidateName || 'technical_official').replace(/\s+/g, '_');
+    const fallbackFilename = assetType === 'id-card' ? `ID_${safeName}.pdf` : `${safeName}_Certificate.pdf`;
+
+    const dbProvidedUrl = assetType === 'id-card'
+      ? (official.idCardDownloadUrl || '')
+      : (official.certificateDownloadUrl || '');
+
+    const normalizedDbUrl = dbProvidedUrl
+      ? (dbProvidedUrl.startsWith('http') ? dbProvidedUrl : `${API_URL}${dbProvidedUrl}`)
+      : '';
+
+    const endpointCandidates = [
+      normalizedDbUrl,
+      `${API_URL}/api/technical-officials/${official._id}/${assetType}/download`,
+      `${API_URL}/api/technical-officials/${official._id}/download/${assetType}`,
+      `${API_URL}/api/admin/technical-officials/${official._id}/${assetType}/download`,
+      `${API_URL}/api/admin/technical-officials/${official._id}/download/${assetType}`
+    ].filter(Boolean);
+
+    const uniqueEndpoints = Array.from(new Set(endpointCandidates));
+
+    setDownloadingAsset(assetType);
+    try {
+      let lastMessage = 'Backend download endpoint not available.';
+
+      for (const endpoint of uniqueEndpoints) {
+        try {
+          const response = await fetch(endpoint, {
+            method: 'GET',
+            headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+            credentials: 'include'
+          });
+
+          if (!response.ok) {
+            let message = `${response.status} ${response.statusText}`;
+            try {
+              const json = await response.json();
+              if (json?.message) message = json.message;
+            } catch {
+              // Ignore non-JSON responses
+            }
+            lastMessage = message;
+            continue;
+          }
+
+          const blob = await response.blob();
+          const filename = getFilenameFromDisposition(response.headers.get('content-disposition')) || fallbackFilename;
+          forceDownloadBlob(blob, filename);
+          return;
+        } catch (downloadError) {
+          console.error(`Failed downloading from ${endpoint}`, downloadError);
+        }
+      }
+
+      alert(`Unable to download ${assetType.replace('-', ' ')}. ${lastMessage}`);
+    } finally {
+      setDownloadingAsset(null);
+    }
+  };
 
   const handleStatusChange = async (newStatus: 'Pending' | 'Approved' | 'Rejected') => {
     if (!official) return;
@@ -500,187 +588,32 @@ const AdminTechnicalOfficialDetails: React.FC = () => {
                 </button>
               )}
               <div className="flex flex-wrap items-center gap-3 md:justify-end">
-                {(() => {
-                  const buildCertificateUrl = (autoDownload?: boolean) => {
-                    if (!official) return '';
-                    const suffix = (official._id || '').slice(-4).toUpperCase();
-                    const params = new URLSearchParams();
-                    if (API_URL) params.set('api', API_URL);
-                    if (API_URL) params.set('api', API_URL);
-                    params.set('name', official.candidateName);
-                    params.set('father', official.parentName);
-                    if (suffix && official.grade) params.set('regSuffix', suffix);
-                    // Use event date (fixed) for certificate
-                    params.set('date', '2026-01-18');
-                    if (official.grade) params.set('grade', official.grade);
-                    if (official.photoUrl) params.set('photoUrl', official.photoUrl);
-                    // Auto-download PDF at a comfortable resolution (no 8K oversize)
-                    if (autoDownload) { params.set('download', 'pdf'); }
-                    return `/important-docs/official-certificate.html?${params.toString()}`;
-                  };
-
-                  const buildIdCardUrl = (autoDownload?: boolean) => {
-                    if (!official) return '';
-                    const suffix = (official._id || '').slice(-4).toUpperCase();
-                    const params = new URLSearchParams();
-                    if (API_URL) params.set('api', API_URL);
-                    params.set('name', official.candidateName);
-                    if (suffix) {
-                      params.set('sno', suffix);
-                    }
-                    if (official.aadharNumber) {
-                      params.set('uid', official.aadharNumber);
-                    }
-                    const dobDate = official.dob ? new Date(official.dob) : null;
-                    if (dobDate && !Number.isNaN(dobDate.getTime())) {
-                      params.set('dob', dobDate.toISOString().slice(0, 10));
-                    }
-                    if (official.grade) params.set('grade', official.grade);
-                    if (official.photoUrl) params.set('photoUrl', official.photoUrl);
-                    if (official.bloodGroup) params.set('bloodGroup', official.bloodGroup);
-                    if (autoDownload) { params.set('download', 'pdf'); }
-                    return `/important-docs/technical-id-card.html?${params.toString()}`;
-                  };
-
-                  const triggerDownload = (url: string, filenameBase?: string) => {
-                    if (!url) return;
-                    const win = window.open(url, '_blank');
-                    if (!win) {
-                      // fallback to navigation if popup blocked
-                      window.location.href = url;
-                      return;
-                    }
-
-                    const handler = (e: MessageEvent) => {
-                      if (e.origin !== window.location.origin) return;
-                      const data = e.data || {};
-                      if (data.type !== 'ddka:certificate') return;
-
-                      try {
-                        if (data.format === 'png') {
-                          if (data.blob) {
-                            const url = URL.createObjectURL(data.blob);
-                            const a = document.createElement('a');
-                            a.href = url;
-                            a.download = `${(filenameBase || 'DDKA-Certificate')}.png`;
-                            document.body.appendChild(a);
-                            a.click();
-                            a.remove();
-                            URL.revokeObjectURL(url);
-                          } else if (data.dataUrl) {
-                            const a = document.createElement('a');
-                            a.href = data.dataUrl;
-                            a.download = `${(filenameBase || 'DDKA-Certificate')}.png`;
-                            document.body.appendChild(a);
-                            a.click();
-                            a.remove();
-                          }
-                        } else if (data.format === 'pdf') {
-                          // Blob may be posted directly
-                          if (data.blob) {
-                            const url = URL.createObjectURL(data.blob);
-                            const a = document.createElement('a');
-                            a.href = url;
-                            a.download = `${(filenameBase || 'DDKA-Certificate')}.pdf`;
-                            document.body.appendChild(a);
-                            a.click();
-                            a.remove();
-                            URL.revokeObjectURL(url);
-                          } else if (data.dataUrl) {
-                            const a = document.createElement('a');
-                            a.href = data.dataUrl;
-                            a.download = `${(filenameBase || 'DDKA-Certificate')}.pdf`;
-                            document.body.appendChild(a);
-                            a.click();
-                            a.remove();
-                          }
-                        }
-                      } catch (err) {
-                        console.error('Download handler failed', err);
-                      } finally {
-                        window.removeEventListener('message', handler as any);
-                        try { win.close(); } catch (e) {}
-                      }
-                    };
-
-                    window.addEventListener('message', handler as any);
-                  };
-
-                  return (
-                    <>
                 <button
                   type="button"
-                  disabled={official.status !== 'Approved' || !official.grade}
-                  onClick={() => {
-                    const url = buildIdCardUrl(false);
-                    if (!url) return;
-                    window.open(url, '_blank', 'noopener,noreferrer');
-                  }}
+                  disabled={official.status !== 'Approved' || !official.grade || downloadingAsset === 'id-card'}
+                  onClick={() => { downloadOfficialAsset('id-card'); }}
                   className="w-full sm:w-auto px-4 py-2 rounded-full bg-indigo-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-indigo-700 disabled:bg-slate-300 disabled:text-slate-600"
                   title={official.status !== 'Approved'
                     ? 'ID card available only after approval'
                     : !official.grade
                       ? 'Set a grade to generate ID card'
-                      : 'Open Technical Official ID card'}
+                      : 'Download Technical Official ID card from backend'}
                 >
-                  View / Download ID Card
+                  {downloadingAsset === 'id-card' ? 'Downloading ID Card...' : 'Download ID Card'}
                 </button>
                 <button
                   type="button"
-                  disabled={official.status !== 'Approved' || !official.grade}
-                  onClick={() => {
-                    const url = buildIdCardUrl(true);
-                    if (!url) return;
-                    const filenameBase = official ? `ID_${official.candidateName?.replace(/\s+/g, '_') || 'technical_official'}` : 'technical_official';
-                    triggerDownload(url, filenameBase);
-                  }}
-                  className="w-full sm:w-auto px-4 py-2 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold uppercase tracking-widest hover:bg-indigo-100 disabled:bg-slate-300 disabled:text-slate-600 border border-indigo-200"
-                  title={official.status !== 'Approved'
-                    ? 'ID card download available only after approval'
-                    : !official.grade
-                      ? 'Set a grade to generate ID card'
-                      : 'Download Technical Official ID card'}
-                >
-                  Download ID Card
-                </button>
-                <button
-                  type="button"
-                  disabled={official.status !== 'Approved' || !official.grade}
-                  onClick={() => {
-                    const url = buildCertificateUrl(false);
-                    if (!url) return;
-                    window.open(url, '_blank', 'noopener,noreferrer');
-                  }}
+                  disabled={official.status !== 'Approved' || !official.grade || downloadingAsset === 'certificate'}
+                  onClick={() => { downloadOfficialAsset('certificate'); }}
                   className="w-full sm:w-auto px-4 py-2 rounded-full bg-emerald-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-emerald-700 disabled:bg-slate-300 disabled:text-slate-600"
                   title={official.status !== 'Approved'
                     ? 'Certificate available only after approval'
                     : !official.grade
                       ? 'Set a grade to generate certificate'
-                      : 'Open Technical Official certificate'}
+                      : 'Download Technical Official certificate from backend'}
                 >
-                  View Certificate
+                  {downloadingAsset === 'certificate' ? 'Downloading Certificate...' : 'Download Certificate'}
                 </button>
-                <button
-                  type="button"
-                  disabled={official.status !== 'Approved' || !official.grade}
-                  onClick={() => {
-                    const url = buildCertificateUrl(true);
-                    if (!url) return;
-                    const filenameBase = official ? (official.candidateName || 'certificate').replace(/\s+/g, '_') : 'certificate';
-                    triggerDownload(url, filenameBase);
-                  }}
-                  className="w-full sm:w-auto px-4 py-2 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold uppercase tracking-widest hover:bg-emerald-100 disabled:bg-slate-300 disabled:text-slate-600 border border-emerald-200"
-                  title={official.status !== 'Approved'
-                    ? 'Certificate available only after approval'
-                    : !official.grade
-                      ? 'Set a grade to generate certificate'
-                      : 'Download Technical Official certificate'}
-                >
-                  Download Certificate
-                </button>
-                    </>
-                  );
-                })()}
               </div>
             </div>
           </div>

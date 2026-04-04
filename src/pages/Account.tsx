@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { IDCardFront } from './Frontcard';
-import { IDCardBack } from './Backcard';
 import { useNavigate } from 'react-router-dom';
 import { formatDateMDY } from '../utils/date';
 
@@ -11,6 +9,7 @@ const Account: React.FC = () => {
   const [role, setRole] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [showIdsToUsers, setShowIdsToUsers] = useState<boolean>(true);
+  const [downloadingAsset, setDownloadingAsset] = useState<'id-card' | 'certificate' | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -83,114 +82,89 @@ const Account: React.FC = () => {
     return formatDateMDY(d);
   };
 
-  const getIdSuffix = (p: any) => {
-    const raw = (p && (p._id || p.id || p.applicationId || '')) as string;
-    return raw ? raw.slice(-4).toUpperCase() : '';
+  const getFilenameFromDisposition = (contentDisposition: string | null): string | null => {
+    if (!contentDisposition) return null;
+    const utf8Name = contentDisposition.match(/filename\*=UTF-8''([^;]+)/i);
+    if (utf8Name && utf8Name[1]) return decodeURIComponent(utf8Name[1]);
+    const quoted = contentDisposition.match(/filename="([^"]+)"/i);
+    if (quoted && quoted[1]) return quoted[1];
+    const plain = contentDisposition.match(/filename=([^;]+)/i);
+    return plain && plain[1] ? plain[1].trim() : null;
   };
 
-  const buildTechnicalIdCardUrl = (autoDownload?: boolean) => {
-    if (!profile) return '';
-    const suffix = getIdSuffix(profile);
-    const params = new URLSearchParams();
-    if (API_URL) params.set('api', API_URL);
-    const name = profile.candidateName || profile.fullName || profile.instName || '';
-    params.set('name', name);
-    if (suffix) params.set('sno', suffix);
-    if (profile.aadharNumber) {
-      // Show actual Aadhar on ID card
-      params.set('uid', profile.aadharNumber);
-    } else if (suffix) {
-      // Fallback: keep old behavior if no Aadhar stored
-      params.set('uid', `DDKA-2026-${suffix}`);
-    }
-    const dobDate = profile.dob ? new Date(profile.dob) : null;
-    if (dobDate && !Number.isNaN(dobDate.getTime())) {
-      params.set('dob', dobDate.toISOString().slice(0, 10));
-    }
-    if (profile.bloodGroup) params.set('bloodGroup', profile.bloodGroup);
-    if (profile.photoUrl) params.set('photoUrl', profile.photoUrl);
-    // Auto-download PDF at a comfortable resolution (no 8K oversize)
-    if (autoDownload) { params.set('download', 'pdf'); }
-    return `/important-docs/technical-id-card.html?${params.toString()}`;
+  const forceDownloadBlob = (blob: Blob, filename: string) => {
+    const objectUrl = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = objectUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(objectUrl);
   };
 
-  const buildOfficialCertificateUrl = (autoDownload?: boolean) => {
-    if (!profile) return '';
-    const suffix = getIdSuffix(profile);
-    const params = new URLSearchParams();
-    if (API_URL) params.set('api', API_URL);
-    const name = profile.candidateName || profile.fullName || profile.instName || '';
-    params.set('name', name);
-    if (profile.parentName) params.set('father', profile.parentName);
-    if (suffix && profile.grade) params.set('regSuffix', suffix);
-    // Use event date (fixed) for certificates
-    params.set('date', '2026-01-18');
-    if (profile.grade) params.set('grade', profile.grade);
-    if (profile.photoUrl) params.set('photoUrl', profile.photoUrl);
-    if (autoDownload) { params.set('download', 'pdf'); params.set('resolution', '8k'); }
-    return `/important-docs/official-certificate.html?${params.toString()}`;
-  };
+  const downloadOfficialAsset = async (assetType: 'id-card' | 'certificate') => {
+    if (!profile) return;
+    const token = localStorage.getItem('userToken') || '';
+    const officialId = profile.id || profile._id || '';
+    const name = (profile?.candidateName || profile?.fullName || 'official').replace(/\s+/g, '_');
+    const fallbackFilename = assetType === 'id-card' ? `ID_${name}.pdf` : `${name}_Certificate.pdf`;
 
-  const triggerDownload = (url: string, filenameBase?: string) => {
-    if (!url) return;
-    const win = window.open(url, '_blank');
-    if (!win) {
-      window.location.href = url;
-      return;
-    }
+    const dbProvidedUrl = assetType === 'id-card'
+      ? (profile.idCardDownloadUrl || profile.officialIdCardDownloadUrl || '')
+      : (profile.certificateDownloadUrl || profile.officialCertificateDownloadUrl || '');
 
-    const handler = (e: MessageEvent) => {
-      if (e.origin !== window.location.origin) return;
-      const data = e.data || {};
-      if (data.type !== 'ddka:certificate') return;
+    const normalizedDbUrl = dbProvidedUrl
+      ? (dbProvidedUrl.startsWith('http') ? dbProvidedUrl : `${API_URL}${dbProvidedUrl}`)
+      : '';
 
-      try {
-        if (data.format === 'png') {
-          if (data.blob) {
-            const url = URL.createObjectURL(data.blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${(filenameBase || 'DDKA-Certificate')}.png`;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-            URL.revokeObjectURL(url);
-          } else if (data.dataUrl) {
-            const a = document.createElement('a');
-            a.href = data.dataUrl;
-            a.download = `${(filenameBase || 'DDKA-Certificate')}.png`;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
+    const endpointCandidates = [
+      normalizedDbUrl,
+      `${API_URL}/api/technical-officials/me/${assetType}/download`,
+      `${API_URL}/api/technical-officials/me/download/${assetType}`,
+      officialId ? `${API_URL}/api/technical-officials/${officialId}/${assetType}/download` : '',
+      officialId ? `${API_URL}/api/technical-officials/${officialId}/download/${assetType}` : ''
+    ].filter(Boolean) as string[];
+
+    const uniqueEndpoints = Array.from(new Set(endpointCandidates));
+
+    setDownloadingAsset(assetType);
+    try {
+      let lastMessage = 'Backend download endpoint not available.';
+
+      for (const endpoint of uniqueEndpoints) {
+        try {
+          const response = await fetch(endpoint, {
+            method: 'GET',
+            headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+            credentials: 'include'
+          });
+
+          if (!response.ok) {
+            let message = `${response.status} ${response.statusText}`;
+            try {
+              const json = await response.json();
+              if (json?.message) message = json.message;
+            } catch {
+              // Ignore non-JSON responses
+            }
+            lastMessage = message;
+            continue;
           }
-        } else if (data.format === 'pdf') {
-          if (data.blob) {
-            const url = URL.createObjectURL(data.blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${(filenameBase || 'DDKA-Certificate')}.pdf`;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-            URL.revokeObjectURL(url);
-          } else if (data.dataUrl) {
-            const a = document.createElement('a');
-            a.href = data.dataUrl;
-            a.download = `${(filenameBase || 'DDKA-Certificate')}.pdf`;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-          }
+
+          const blob = await response.blob();
+          const filename = getFilenameFromDisposition(response.headers.get('content-disposition')) || fallbackFilename;
+          forceDownloadBlob(blob, filename);
+          return;
+        } catch (downloadError) {
+          console.error(`Failed downloading from ${endpoint}`, downloadError);
         }
-      } catch (err) {
-        console.error('Download handler failed', err);
-      } finally {
-        window.removeEventListener('message', handler as any);
-        try { win.close(); } catch (e) {}
       }
-    };
 
-    window.addEventListener('message', handler as any);
+      alert(`Unable to download ${assetType.replace('-', ' ')}. ${lastMessage}`);
+    } finally {
+      setDownloadingAsset(null);
+    }
   };
 
   const canViewOfficialAssets = role === 'official' && profile?.status === 'Approved' && !!profile?.grade;
@@ -479,7 +453,7 @@ const Account: React.FC = () => {
                           <tr>
                             <td className="py-3 px-3">
                               <div className="font-semibold text-slate-800">Technical Official ID Card</div>
-                              <div className="text-xs text-slate-500">Download JPG / PDF from the asset page.</div>
+                              <div className="text-xs text-slate-500">Download directly from backend records.</div>
                             </td>
                             <td className="py-3 px-3">
                               {canViewOfficialAssets ? (
@@ -491,15 +465,11 @@ const Account: React.FC = () => {
                             <td className="py-3 px-3 text-right">
                               <button
                                 type="button"
-                                disabled={!canViewOfficialAssets}
-                                onClick={() => {
-                                  const url = buildTechnicalIdCardUrl(true);
-                                  if (!url) return;
-                                  triggerDownload(url, `ID_${(profile && (profile.candidateName || profile.fullName) || 'id').replace(/\s+/g,'_')}`);
-                                }}
+                                disabled={!canViewOfficialAssets || downloadingAsset === 'id-card'}
+                                onClick={() => { downloadOfficialAsset('id-card'); }}
                                 className="px-3 py-2 rounded-md bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-700 disabled:bg-slate-300 disabled:text-slate-600"
                               >
-                                Download
+                                {downloadingAsset === 'id-card' ? 'Downloading...' : 'Download ID'}
                               </button>
                             </td>
                           </tr>
@@ -520,63 +490,16 @@ const Account: React.FC = () => {
                           <td className="py-3 px-3 text-right">
                             <button
                               type="button"
-                              disabled={!canViewOfficialAssets}
-                              onClick={() => {
-                                const url = buildOfficialCertificateUrl(true);
-                                if (!url) return;
-                                triggerDownload(url, (profile && (profile.candidateName || profile.fullName) || 'certificate').replace(/\s+/g,'_'));
-                              }}
+                              disabled={!canViewOfficialAssets || downloadingAsset === 'certificate'}
+                              onClick={() => { downloadOfficialAsset('certificate'); }}
                               className="px-3 py-2 rounded-md bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700 disabled:bg-slate-300 disabled:text-slate-600"
                             >
-                              Download
+                              {downloadingAsset === 'certificate' ? 'Downloading...' : 'Download Certificate'}
                             </button>
                           </td>
                         </tr>
                       </tbody>
                     </table>
-                  </div>
-                </div>
-              )}
-
-              {/* ID Card card (only for approved profiles with visible IDs) */}
-              {profile.idNo && showIdsToUsers && profile.status === 'Approved' && (
-                <div className="bg-white rounded-2xl shadow-md border border-slate-100 p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold">Your ID Card</h3>
-                    <div className="text-sm text-slate-500">Printable & Shareable</div>
-                  </div>
-                  <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-                    <div className="flex flex-col items-center">
-                      <div className="mb-2 text-sm font-semibold text-slate-700">Front</div>
-                      <IDCardFront data={{
-                        idNo: profile.idNo,
-                        name: profile.fullName || profile.candidateName || profile.instName,
-                        fathersName: profile.fathersName || profile.parentName || '',
-                        dob: profile.dob,
-                        bloodGroup: profile.bloodGroup,
-                        phone: profile.phone || profile.mobile || profile.officePhone || '',
-                        address: profile.address,
-                        photoUrl: profile.photoUrl,
-                        transactionId: profile.transactionId,
-                        memberRole: profile.memberRole || (role === 'official' ? 'Official' : 'Player'),
-                      }} />
-                    </div>
-
-                    <div className="flex flex-col items-center">
-                      <div className="mb-2 text-sm font-semibold text-slate-700">Back</div>
-                      <IDCardBack data={{
-                        idNo: profile.idNo,
-                        name: profile.fullName || profile.candidateName || profile.instName,
-                        fathersName: profile.fathersName || profile.parentName || '',
-                        dob: profile.dob,
-                        bloodGroup: profile.bloodGroup,
-                        phone: profile.phone || profile.mobile || profile.officePhone || '',
-                        address: profile.address,
-                        photoUrl: profile.photoUrl,
-                        transactionId: profile.transactionId,
-                        memberRole: profile.memberRole || (role === 'official' ? 'Official' : 'Player'),
-                      }} />
-                    </div>
                   </div>
                 </div>
               )}
