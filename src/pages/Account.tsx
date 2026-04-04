@@ -103,6 +103,20 @@ const Account: React.FC = () => {
     URL.revokeObjectURL(objectUrl);
   };
 
+  const triggerTemplateDownload = (url: string) => {
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = url;
+    document.body.appendChild(iframe);
+    setTimeout(() => {
+      try {
+        iframe.remove();
+      } catch {
+        // Ignore cleanup errors
+      }
+    }, 20000);
+  };
+
   const downloadOfficialAsset = async (assetType: 'id-card' | 'certificate') => {
     if (!profile) return;
     const token = localStorage.getItem('userToken') || '';
@@ -149,6 +163,17 @@ const Account: React.FC = () => {
               // Ignore non-JSON responses
             }
             lastMessage = message;
+            continue;
+          }
+
+          const contentType = response.headers.get('content-type') || '';
+          if (contentType.includes('application/json')) {
+            const data = await response.json();
+            if (data?.downloadUrl) {
+              triggerTemplateDownload(String(data.downloadUrl));
+              return;
+            }
+            lastMessage = data?.message || 'Download URL not provided by backend.';
             continue;
           }
 
