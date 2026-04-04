@@ -103,12 +103,58 @@ const Account: React.FC = () => {
     URL.revokeObjectURL(objectUrl);
   };
 
+  const triggerTemplateDownload = (url: string, filenameBase: string) => {
+    const downloadWindow = window.open(url, '_blank');
+    if (!downloadWindow) {
+      window.location.href = url;
+      return;
+    }
+
+    const closeTimer = window.setTimeout(() => {
+      try { downloadWindow.close(); } catch { /* ignore */ }
+    }, 12000);
+
+    const handler = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return;
+      const data = event.data || {};
+      if (data.type !== 'ddka:certificate') return;
+
+      try {
+        const format = String(data.format || 'pdf').toLowerCase();
+        const ext = format === 'jpg' || format === 'jpeg' ? 'jpg' : (format === 'png' ? 'png' : 'pdf');
+        if (data.blob) {
+          forceDownloadBlob(data.blob as Blob, `${filenameBase}.${ext}`);
+        } else if (data.dataUrl) {
+          const link = document.createElement('a');
+          link.href = String(data.dataUrl);
+          link.download = `${filenameBase}.${ext}`;
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+        }
+      } catch (error) {
+        console.error('Template postMessage download failed', error);
+      } finally {
+        window.removeEventListener('message', handler as any);
+        window.clearTimeout(closeTimer);
+        try { downloadWindow.close(); } catch { /* ignore */ }
+      }
+    };
+
+    window.addEventListener('message', handler as any);
+
+    setTimeout(() => {
+      window.removeEventListener('message', handler as any);
+    }, 45000);
+  };
+
   const downloadOfficialAsset = async (assetType: 'id-card' | 'certificate') => {
     if (!profile) return;
     const token = localStorage.getItem('userToken') || '';
     const officialId = profile.id || profile._id || '';
     const name = (profile?.candidateName || profile?.fullName || 'official').replace(/\s+/g, '_');
     const fallbackFilename = assetType === 'id-card' ? `ID_${name}.pdf` : `${name}_Certificate.pdf`;
+    const templateFilenameBase = assetType === 'id-card' ? `DDKA-ID-${name}` : `DDKA-Certificate-${name}`;
 
     const dbProvidedUrl = assetType === 'id-card'
       ? (profile.idCardDownloadUrl || profile.officialIdCardDownloadUrl || '')
@@ -155,6 +201,10 @@ const Account: React.FC = () => {
           const contentType = response.headers.get('content-type') || '';
           if (contentType.includes('application/json')) {
             const data = await response.json();
+            if (data?.downloadUrl) {
+              triggerTemplateDownload(String(data.downloadUrl), templateFilenameBase);
+              return;
+            }
             lastMessage = data?.message || 'Download URL not provided by backend.';
             continue;
           }
