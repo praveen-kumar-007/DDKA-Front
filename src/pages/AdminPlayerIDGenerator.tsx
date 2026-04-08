@@ -96,61 +96,64 @@ const AdminPlayerIDGenerator = () => {
 
   const downloadIDCardPDF = async (player: PlayerData) => {
     try {
-      // Capture the preview wrapper which contains both front & back
-      const wrapper = document.getElementById(`card-both-${player._id}`);
-      if (!wrapper) return alert('Could not find ID card elements to export.');
-
-      // Prefer capturing only the actual card elements (front & back) to avoid extra headings/spacing
       const frontEl = document.getElementById(`card-front-${player._id}`);
       const backEl = document.getElementById(`card-back-${player._id}`);
       if (!frontEl || !backEl) return alert('Could not find ID card elements to export.');
 
-      const container = document.createElement('div');
-      container.style.display = 'flex';
-      container.style.gap = '12px';
-      container.style.background = '#ffffff';
-      container.style.padding = '0';
-      container.style.margin = '0';
-      container.style.alignItems = 'center';
-      container.style.justifyContent = 'center';
-      // exact pixel sizing: two cards side-by-side
-      const cardW = 210;
-      const cardH = 330;
-      container.style.width = `${cardW * 2 + 12}px`;
-      container.style.height = `${cardH}px`;
+      const [frontCanvas, backCanvas] = await Promise.all([
+        html2canvas(frontEl, {
+          scale: 4,
+          useCORS: true,
+          allowTaint: false,
+          backgroundColor: '#ffffff',
+          onclone: (clonedDoc: Document) => {
+            clonedDoc.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
+              const href = link.getAttribute('href') || '';
+              if (href.includes('fonts.googleapis.com')) {
+                link.parentNode?.removeChild(link);
+              }
+            });
+          },
+        }),
+        html2canvas(backEl, {
+          scale: 4,
+          useCORS: true,
+          allowTaint: false,
+          backgroundColor: '#ffffff',
+          onclone: (clonedDoc: Document) => {
+            clonedDoc.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
+              const href = link.getAttribute('href') || '';
+              if (href.includes('fonts.googleapis.com')) {
+                link.parentNode?.removeChild(link);
+              }
+            });
+          },
+        })
+      ]);
 
-      const frontClone = frontEl.cloneNode(true) as HTMLElement;
-      const backClone = backEl.cloneNode(true) as HTMLElement;
-      frontClone.style.margin = '0';
-      backClone.style.margin = '0';
-      container.appendChild(frontClone);
-      container.appendChild(backClone);
+      const frontImage = frontCanvas.toDataURL('image/png');
+      const backImage = backCanvas.toDataURL('image/png');
+      const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
 
-      document.body.appendChild(container);
+      // Real printable ID card sizing on A4 (CR80-like proportions).
+      const cardWidthMm = 54;
+      const cardHeightMm = 85.6;
+      const gapMm = 8;
+      const totalWidthMm = cardWidthMm * 2 + gapMm;
+      const startX = (210 - totalWidthMm) / 2;
+      const startY = (297 - cardHeightMm) / 2;
 
-      const canvas = await html2canvas(container, {
-        scale: 3,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#ffffff',
-        onclone: (clonedDoc: Document) => {
-          clonedDoc.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
-            const href = link.getAttribute('href') || '';
-            if (href.includes('fonts.googleapis.com')) {
-              link.parentNode?.removeChild(link);
-            }
-          });
-        },
-      });
-      const imgData = canvas.toDataURL('image/png');
+      pdf.addImage(frontImage, 'PNG', startX, startY, cardWidthMm, cardHeightMm);
+      pdf.addImage(backImage, 'PNG', startX + cardWidthMm + gapMm, startY, cardWidthMm, cardHeightMm);
 
-      const pdf = new jsPDF({ unit: 'px', format: [canvas.width, canvas.height] });
-      pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+      // Light cut guides for print finishing.
+      pdf.setDrawColor(210, 210, 210);
+      pdf.setLineWidth(0.2);
+      pdf.rect(startX, startY, cardWidthMm, cardHeightMm);
+      pdf.rect(startX + cardWidthMm + gapMm, startY, cardWidthMm, cardHeightMm);
 
-      const filename = `${player.fullName.replace(/\s+/g, '_')}_ID_${(player.idNo || ('DDKA-' + player.transactionId.slice(-6).toUpperCase()))}.pdf`;
+      const filename = `${player.fullName.replace(/\s+/g, '_')}_ID_${(player.idNo || ('DDKA-' + player.transactionId.slice(-6).toUpperCase()))}_A4.pdf`;
       pdf.save(filename);
-
-      document.body.removeChild(container);
     } catch (err) {
       console.error(err);
       alert('Failed to generate PDF. Please try again.');
