@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Phone, MapPin, ShieldCheck, Mail, CirclePlay, Camera, AtSign, Users, Heart } from 'lucide-react';
+import { Phone, MapPin, ShieldCheck, Mail, Heart } from 'lucide-react';
+import { FaYoutube, FaInstagram, FaXTwitter, FaFacebookF } from 'react-icons/fa6';
 import { useNavigate } from 'react-router-dom';
 import { CONTACT_INFO, SOCIAL_LINKS } from '../../constants';
 import { translations } from '../../translations';
@@ -203,7 +204,7 @@ const Footer: React.FC<FooterProps> = ({ lang }) => {
                 >
                   <span className="absolute inset-0 bg-gradient-to-tr from-red-600/25 via-transparent to-orange-500/25 opacity-60 group-hover:opacity-100 blur-md transition-opacity" />
                   <span className="relative flex items-center justify-center w-7 h-7 rounded-full bg-slate-950/90 group-hover:bg-black/90 transition-colors">
-                    <CirclePlay className="w-3 h-3 text-red-400 group-hover:text-red-300 transition-colors" />
+                    <FaYoutube className="w-3 h-3 text-red-400 group-hover:text-red-300 transition-colors" />
                   </span>
                 </a>
                 <a
@@ -215,7 +216,7 @@ const Footer: React.FC<FooterProps> = ({ lang }) => {
                 >
                   <span className="absolute inset-0 bg-gradient-to-tr from-pink-500/35 via-fuchsia-500/25 to-yellow-400/25 opacity-60 group-hover:opacity-100 blur-md transition-opacity" />
                   <span className="relative flex items-center justify-center w-7 h-7 rounded-full bg-slate-950/90 group-hover:bg-black/90 transition-colors">
-                    <Camera className="w-3 h-3 text-pink-400 group-hover:text-pink-300 transition-colors" />
+                    <FaInstagram className="w-3 h-3 text-pink-400 group-hover:text-pink-300 transition-colors" />
                   </span>
                 </a>
                 <a
@@ -227,7 +228,7 @@ const Footer: React.FC<FooterProps> = ({ lang }) => {
                 >
                   <span className="absolute inset-0 bg-gradient-to-tr from-sky-500/30 via-slate-500/25 to-white/15 opacity-60 group-hover:opacity-100 blur-md transition-opacity" />
                   <span className="relative flex items-center justify-center w-7 h-7 rounded-full bg-slate-950/90 group-hover:bg-black/90 transition-colors">
-                    <AtSign className="w-3 h-3 text-sky-400 group-hover:text-sky-300 transition-colors" />
+                    <FaXTwitter className="w-3 h-3 text-sky-400 group-hover:text-sky-300 transition-colors" />
                   </span>
                 </a>
                 <a
@@ -239,7 +240,7 @@ const Footer: React.FC<FooterProps> = ({ lang }) => {
                 >
                   <span className="absolute inset-0 bg-gradient-to-tr from-blue-600/35 via-sky-500/30 to-white/15 opacity-60 group-hover:opacity-100 blur-md transition-opacity" />
                   <span className="relative flex items-center justify-center w-7 h-7 rounded-full bg-slate-950/90 group-hover:bg-black/90 transition-colors">
-                    <Users className="w-3 h-3 text-blue-400 group-hover:text-blue-300 transition-colors" />
+                    <FaFacebookF className="w-3 h-3 text-blue-400 group-hover:text-blue-300 transition-colors" />
                   </span>
                 </a>
               </div>
