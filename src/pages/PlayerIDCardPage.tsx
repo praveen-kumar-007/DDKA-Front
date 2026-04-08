@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { Helmet } from 'react-helmet-async';
 import { IDCardFront } from "./Frontcard";
 import { IDCardBack } from "./Backcard";
@@ -9,10 +9,12 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const PlayerIDCardPage = () => {
   const { idNo } = useParams<{ idNo: string }>();
+  const [searchParams] = useSearchParams();
   const [cardData, setCardData] = useState<IDCardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showIdsToUsers, setShowIdsToUsers] = useState<boolean | null>(null);
+  const [allowSelfAccess, setAllowSelfAccess] = useState(false);
 
   useEffect(() => {
     if (!idNo) return;
@@ -28,6 +30,28 @@ const PlayerIDCardPage = () => {
           const sjson = await s.json();
           if (sjson && sjson.success && typeof sjson.data?.showIdsToUsers === 'boolean') {
             setShowIdsToUsers(sjson.data.showIdsToUsers);
+
+            // Allow a logged-in player to view their own card even when public ID visibility is disabled.
+            if (sjson.data.showIdsToUsers === false && searchParams.get('self') === '1' && idNo) {
+              try {
+                const token = localStorage.getItem('userToken') || localStorage.getItem('token') || '';
+                if (token) {
+                  const meRes = await fetch(`${API_URL}/api/auth/me`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                  });
+                  const meJson = await meRes.json();
+                  if (meRes.ok && meJson?.success && meJson?.profile) {
+                    const myIdNo = String(meJson.profile.idNo || '').trim().toUpperCase();
+                    const requestedIdNo = String(idNo).trim().toUpperCase();
+                    if (myIdNo && requestedIdNo && myIdNo === requestedIdNo) {
+                      setAllowSelfAccess(true);
+                    }
+                  }
+                }
+              } catch (selfErr) {
+                console.error('Failed self-access check for ID card', selfErr);
+              }
+            }
           }
         } catch (se) {
           console.error('Failed to fetch public settings', se);
@@ -63,7 +87,18 @@ const PlayerIDCardPage = () => {
     };
 
     fetchPlayerByIdNo();
-  }, [idNo]);
+  }, [idNo, searchParams]);
+
+  useEffect(() => {
+    if (!cardData) return;
+    if (searchParams.get('download') !== '1') return;
+
+    const t = window.setTimeout(() => {
+      window.print();
+    }, 250);
+
+    return () => window.clearTimeout(t);
+  }, [cardData, searchParams]);
 
   if (loading) {
     return (
@@ -110,7 +145,7 @@ const PlayerIDCardPage = () => {
       <div className="min-h-screen bg-slate-100 flex flex-col items-center justify-center p-4">
         <h1 className="text-xl font-bold text-slate-800 mb-4">DDKA Player ID Card{showIdsToUsers ? ` - ${cardData.idNo}` : ''}</h1>
 
-      {showIdsToUsers === false ? (
+      {showIdsToUsers === false && !allowSelfAccess ? (
         <div className="bg-yellow-50 rounded-lg p-6 text-yellow-800">ID visibility is currently disabled by the association. You can view profile details but the ID number and ID card are hidden.</div>
       ) : (
         <>

@@ -225,6 +225,7 @@ const Account: React.FC = () => {
   };
 
   const canViewOfficialAssets = role === 'official' && profile?.status === 'Approved' && !!profile?.grade;
+  const canViewPlayerIdCard = role === 'player' && !!profile?.idNo && profile?.status === 'Approved';
 
   // Show institution logo in the profile slot when no photo is uploaded
   const displayProfileImage = profile ? (profile.photoUrl || (role === 'institution' ? profile.instLogoUrl : '')) : '';
@@ -373,13 +374,13 @@ const Account: React.FC = () => {
                       <div><strong>Name:</strong> {profile.fullName || profile.candidateName || profile.instName || '—'}</div>
                       <div><strong>Email:</strong> {profile.email || '—'}</div>
                       <div><strong>Status:</strong> {profile.status || '—'}</div>
-                      {profile.idNo && showIdsToUsers && (
+                      {profile.idNo && (showIdsToUsers || role === 'player') && (
                         <div className="flex items-center gap-3">
                           <div><strong>Player ID:</strong> <span className="text-slate-700">{profile.idNo}</span></div>
                         </div>
                       )}
 
-                      {!showIdsToUsers && profile.idNo && (
+                      {!showIdsToUsers && profile.idNo && role !== 'player' && (
                         <div className="flex items-center gap-3">
                           <div className="text-sm text-yellow-700">ID is currently hidden by the association.</div>
                         </div>
@@ -487,6 +488,64 @@ const Account: React.FC = () => {
               </div>
 
               {/* Assets table (User downloads) */}
+              {role === 'player' && (
+                <div className="bg-white rounded-2xl shadow-md border border-slate-100 p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h3 className="text-lg font-semibold">My ID Card</h3>
+                      <div className="text-sm text-slate-500">View and download your approved player ID card.</div>
+                    </div>
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full text-sm">
+                      <thead>
+                        <tr className="text-left text-slate-500">
+                          <th className="py-2 px-3">Asset</th>
+                          <th className="py-2 px-3">Status</th>
+                          <th className="py-2 px-3 text-right">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y">
+                        <tr>
+                          <td className="py-3 px-3">
+                            <div className="font-semibold text-slate-800">Player ID Card</div>
+                            <div className="text-xs text-slate-500">Available after profile approval and ID assignment.</div>
+                          </td>
+                          <td className="py-3 px-3">
+                            {canViewPlayerIdCard ? (
+                              <span className="inline-flex items-center px-2 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">Available</span>
+                            ) : (
+                              <span className="inline-flex items-center px-2 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-semibold">Not available</span>
+                            )}
+                          </td>
+                          <td className="py-3 px-3 text-right">
+                            <div className="flex items-center justify-end gap-2">
+                              <a
+                                href={canViewPlayerIdCard ? `/id-card/${encodeURIComponent(profile.idNo)}?self=1` : '#'}
+                                target="_blank"
+                                rel="noreferrer"
+                                className={`px-3 py-2 rounded-md text-xs font-semibold ${canViewPlayerIdCard ? 'bg-indigo-600 text-white hover:bg-indigo-700' : 'bg-slate-300 text-slate-600 pointer-events-none'}`}
+                              >
+                                View ID
+                              </a>
+                              <a
+                                href={canViewPlayerIdCard ? `/id-card/${encodeURIComponent(profile.idNo)}?self=1&download=1` : '#'}
+                                target="_blank"
+                                rel="noreferrer"
+                                className={`px-3 py-2 rounded-md text-xs font-semibold ${canViewPlayerIdCard ? 'bg-emerald-600 text-white hover:bg-emerald-700' : 'bg-slate-300 text-slate-600 pointer-events-none'}`}
+                              >
+                                Download ID
+                              </a>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
               {role === 'official' && canViewOfficialAssets && (
                 <div className="bg-white rounded-2xl shadow-md border border-slate-100 p-6">
                   <div className="flex items-center justify-between mb-4">
@@ -561,7 +620,7 @@ const Account: React.FC = () => {
                 </div>
               )}
 
-              {!showIdsToUsers && profile.idNo && (
+              {!showIdsToUsers && profile.idNo && role !== 'player' && (
                 <div className="bg-yellow-50 rounded-2xl border border-yellow-200 p-4 text-sm text-yellow-800">
                   ID visibility is currently disabled by the association. Your profile details are retained but the ID number and ID card are hidden from users.
                 </div>
