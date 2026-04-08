@@ -197,10 +197,10 @@ export const IDCardBack: React.FC<Props> = ({ data }) => {
             lineHeight: 1.05,
           }}
         >
-          <p title={'+91 9123163206'} style={{ margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>
+          <p title={'+91 9123163206'} style={{ margin: 0, whiteSpace: 'normal', overflow: 'visible', textOverflow: 'clip', wordBreak: 'break-word', display: 'block' }}>
             <strong style={{ color: '#003366' }}>Phone:</strong> +91 9123163206
           </p>
-          <p title={'dhanbaddistrictkabaddi@gmail.com'} style={{ margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>
+          <p title={'dhanbaddistrictkabaddi@gmail.com'} style={{ margin: 0, whiteSpace: 'normal', overflow: 'visible', textOverflow: 'clip', wordBreak: 'break-word', display: 'block' }}>
             <strong style={{ color: '#003366' }}>Email:</strong> dhanbaddistrictkabaddi@gmail.com
           </p>
         </div>
@@ -214,7 +214,7 @@ export const IDCardBack: React.FC<Props> = ({ data }) => {
             lineHeight: 1.05,
           }}
         >
-          <p title={'Retired Rly Colony, Gomoh, Dhanbad, Jharkhand 828401'} style={{ margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>
+          <p title={'Retired Rly Colony, Gomoh, Dhanbad, Jharkhand 828401'} style={{ margin: 0, whiteSpace: 'normal', overflow: 'visible', textOverflow: 'clip', wordBreak: 'break-word', display: 'block' }}>
               <strong style={{ color: '#003366' }}>Address:</strong> Retired Rly Colony, Gomoh, Dhanbad, Jharkhand 828401
             </p>
         </div>
@@ -257,13 +257,13 @@ export const IDCardBack: React.FC<Props> = ({ data }) => {
             lineHeight: 1.02,
           }}
         >
-          <p title={data.name} style={{ margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>
+          <p title={data.name} style={{ margin: 0, whiteSpace: 'normal', overflow: 'visible', textOverflow: 'clip', wordBreak: 'break-word', display: 'block' }}>
             <strong style={{ color: '#003366' }}>Member Name:</strong> {data.name}
           </p>
           <div style={{ display: 'flex', justifyContent: 'center', marginTop: 2 }}>
             <div style={{ color: '#003366', fontWeight: 700, fontSize: '8px', letterSpacing: '0.6px' }}>{data.idNo}</div>
           </div>
-          <p style={{ margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>If found, please return to DDKA office.</p>
+          <p style={{ margin: 0, whiteSpace: 'normal', overflow: 'visible', textOverflow: 'clip', wordBreak: 'break-word', display: 'block' }}>If found, please return to DDKA office.</p>
         </div>
       </div>
 

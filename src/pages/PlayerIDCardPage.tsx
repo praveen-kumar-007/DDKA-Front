@@ -8,6 +8,8 @@ import { IDCardBack } from "./Backcard";
 import type { IDCardData } from "../types";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const CARD_EXPORT_SCALE = 7;
+const CARD_EXPORT_JPEG_QUALITY = 0.9;
 
 const PlayerIDCardPage = () => {
     const { idNo } = useParams<{ idNo: string }>();
@@ -22,30 +24,52 @@ const PlayerIDCardPage = () => {
     const frontCardRef = useRef<HTMLDivElement | null>(null);
     const backCardRef = useRef<HTMLDivElement | null>(null);
 
+    const waitForImagesInElement = async (element: HTMLElement) => {
+        const images = Array.from(element.querySelectorAll('img'));
+        await Promise.all(
+            images.map((img) => {
+                if (img.complete && img.naturalWidth > 0) {
+                    return img.decode ? img.decode().catch(() => undefined) : Promise.resolve();
+                }
+                return new Promise<void>((resolve) => {
+                    img.addEventListener('load', () => resolve(), { once: true });
+                    img.addEventListener('error', () => resolve(), { once: true });
+                });
+            })
+        );
+    };
+
     const downloadCombinedIdPdf = async () => {
         if (!cardData || !frontCardRef.current || !backCardRef.current || downloading) return;
 
         setDownloading(true);
         try {
+            await Promise.all([
+                waitForImagesInElement(frontCardRef.current),
+                waitForImagesInElement(backCardRef.current)
+            ]);
+
             const [frontCanvas, backCanvas] = await Promise.all([
                 html2canvas(frontCardRef.current, {
-                    scale: 4,
+                    scale: CARD_EXPORT_SCALE,
                     useCORS: true,
                     allowTaint: false,
                     backgroundColor: '#ffffff',
+                    logging: false,
                 }),
                 html2canvas(backCardRef.current, {
-                    scale: 4,
+                    scale: CARD_EXPORT_SCALE,
                     useCORS: true,
                     allowTaint: false,
                     backgroundColor: '#ffffff',
+                    logging: false,
                 })
             ]);
 
-            const frontImage = frontCanvas.toDataURL('image/png');
-            const backImage = backCanvas.toDataURL('image/png');
+            const frontImage = frontCanvas.toDataURL('image/jpeg', CARD_EXPORT_JPEG_QUALITY);
+            const backImage = backCanvas.toDataURL('image/jpeg', CARD_EXPORT_JPEG_QUALITY);
 
-            const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'landscape' });
+            const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'landscape', compress: true });
 
             // Fill most of A4 while keeping both cards on one page.
             const pageWidthMm = 297;
@@ -63,8 +87,8 @@ const PlayerIDCardPage = () => {
             const startX = (pageWidthMm - totalWidthMm) / 2;
             const startY = (pageHeightMm - cardHeightMm) / 2;
 
-            pdf.addImage(frontImage, 'PNG', startX, startY, cardWidthMm, cardHeightMm);
-            pdf.addImage(backImage, 'PNG', startX + cardWidthMm + gapMm, startY, cardWidthMm, cardHeightMm);
+            pdf.addImage(frontImage, 'JPEG', startX, startY, cardWidthMm, cardHeightMm, undefined, 'MEDIUM');
+            pdf.addImage(backImage, 'JPEG', startX + cardWidthMm + gapMm, startY, cardWidthMm, cardHeightMm, undefined, 'MEDIUM');
 
             // Light cut guides for print finishing.
             pdf.setDrawColor(210, 210, 210);
