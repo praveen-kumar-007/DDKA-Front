@@ -133,15 +133,23 @@ const AdminPlayerIDGenerator = () => {
 
       const frontImage = frontCanvas.toDataURL('image/png');
       const backImage = backCanvas.toDataURL('image/png');
-      const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+      const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'landscape' });
 
-      // Real printable ID card sizing on A4 (CR80-like proportions).
-      const cardWidthMm = 54;
-      const cardHeightMm = 85.6;
+      // Fill most of A4 while keeping both cards on one page.
+      const pageWidthMm = 297;
+      const pageHeightMm = 210;
+      const marginMm = 10;
       const gapMm = 8;
+      const cardAspect = 330 / 210;
+
+      const maxCardWidthByPageWidth = (pageWidthMm - (marginMm * 2) - gapMm) / 2;
+      const maxCardWidthByPageHeight = (pageHeightMm - (marginMm * 2)) / cardAspect;
+      const cardWidthMm = Math.min(maxCardWidthByPageWidth, maxCardWidthByPageHeight);
+      const cardHeightMm = cardWidthMm * cardAspect;
+
       const totalWidthMm = cardWidthMm * 2 + gapMm;
-      const startX = (210 - totalWidthMm) / 2;
-      const startY = (297 - cardHeightMm) / 2;
+      const startX = (pageWidthMm - totalWidthMm) / 2;
+      const startY = (pageHeightMm - cardHeightMm) / 2;
 
       pdf.addImage(frontImage, 'PNG', startX, startY, cardWidthMm, cardHeightMm);
       pdf.addImage(backImage, 'PNG', startX + cardWidthMm + gapMm, startY, cardWidthMm, cardHeightMm);

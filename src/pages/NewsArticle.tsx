@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useParams, Link } from 'react-router-dom';
-import { Calendar, Tag, ArrowLeft, Share2, Copy, Facebook, Linkedin, Twitter } from 'lucide-react';
+import { Calendar, Tag, ArrowLeft, Share2, Copy, Users, LinkIcon, AtSign } from 'lucide-react';
 
 // News Article Detail Page
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -148,7 +148,7 @@ const NewsArticle = () => {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-blue-600/10 text-blue-700 hover:bg-blue-600/20 font-medium transition-colors"
               >
-                <Facebook size={14} />
+                <Users size={14} />
                 Facebook
               </a>
               <a
@@ -157,7 +157,7 @@ const NewsArticle = () => {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-sky-500/10 text-sky-600 hover:bg-sky-500/20 font-medium transition-colors"
               >
-                <Twitter size={14} />
+                <AtSign size={14} />
                 Twitter
               </a>
               <a
@@ -166,7 +166,7 @@ const NewsArticle = () => {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-slate-700/10 text-slate-700 hover:bg-slate-700/20 font-medium transition-colors"
               >
-                <Linkedin size={14} />
+                <LinkIcon size={14} />
                 LinkedIn
               </a>
               <button
