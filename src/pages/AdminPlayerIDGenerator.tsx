@@ -58,7 +58,7 @@ const AdminPlayerIDGenerator = () => {
       });
 
       if (!response.ok) throw new Error('Failed to fetch players');
-      
+
       const data = await response.json();
       const approvedPlayers = data.filter((p: PlayerData) => p.status === 'Approved');
       setPlayers(approvedPlayers);
@@ -242,7 +242,7 @@ const AdminPlayerIDGenerator = () => {
             className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-        
+
         {/* View Toggle */}
         <div className="flex gap-2 bg-white border border-slate-300 rounded-lg p-1">
           <button
