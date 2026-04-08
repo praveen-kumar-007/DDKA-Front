@@ -94,37 +94,6 @@ const AdminPlayerIDGenerator = () => {
     };
   };
 
-  const downloadIDCard = (player: PlayerData) => {
-    const element = document.getElementById(`card-${player._id}`);
-    if (!element) return;
-
-    // Current fallback: open print dialog for quick PDF
-    const printWindow = window.open('', '', 'height=600,width=800');
-    if (printWindow) {
-      const cardHTML = element.innerHTML;
-      printWindow.document.write(`
-        <html>
-          <head>
-            <title>ID Card - ${player.fullName}</title>
-            <style>
-              body { font-family: Poppins, sans-serif; margin: 20px; }
-              .card-container { display: flex; gap: 30px; justify-content: center; }
-              .card { width: 240px; }
-            </style>
-          </head>
-          <body>
-            <div class="card-container">${cardHTML}</div>
-            <script>
-              window.print();
-              window.onafterprint = () => window.close();
-            </script>
-          </body>
-        </html>
-      `);
-      printWindow.document.close();
-    }
-  };
-
   const downloadIDCardPDF = async (player: PlayerData) => {
     try {
       // Capture the preview wrapper which contains both front & back
@@ -411,12 +380,14 @@ const AdminPlayerIDGenerator = () => {
               </button>
               <button
                 onClick={() => {
-                  downloadIDCard(selectedPlayer);
-                  setShowPreview(false);
+                  void (async () => {
+                    await downloadIDCardPDF(selectedPlayer);
+                    setShowPreview(false);
+                  })();
                 }}
                 className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded transition flex items-center gap-2"
               >
-                <Download size={18} /> Download ID Card
+                <Download size={18} /> Download ID Card (Single Page PDF)
               </button>
 
               <button

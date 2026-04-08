@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { Helmet } from 'react-helmet-async';
 import { IDCardFront } from "./Frontcard";
 import { IDCardBack } from "./Backcard";
 import type { IDCardData } from "../types";
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
@@ -15,6 +17,56 @@ const PlayerIDCardPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [showIdsToUsers, setShowIdsToUsers] = useState<boolean | null>(null);
   const [allowSelfAccess, setAllowSelfAccess] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+  const frontCardRef = useRef<HTMLDivElement | null>(null);
+  const backCardRef = useRef<HTMLDivElement | null>(null);
+
+  const downloadCombinedIdPdf = async () => {
+    if (!cardData || !frontCardRef.current || !backCardRef.current || downloading) return;
+
+    setDownloading(true);
+    try {
+      const container = document.createElement('div');
+      container.style.display = 'flex';
+      container.style.gap = '12px';
+      container.style.background = '#ffffff';
+      container.style.padding = '0';
+      container.style.margin = '0';
+      container.style.alignItems = 'center';
+      container.style.justifyContent = 'center';
+      container.style.width = '432px';
+      container.style.height = '330px';
+
+      const frontClone = frontCardRef.current.cloneNode(true) as HTMLElement;
+      const backClone = backCardRef.current.cloneNode(true) as HTMLElement;
+      frontClone.style.margin = '0';
+      backClone.style.margin = '0';
+      container.appendChild(frontClone);
+      container.appendChild(backClone);
+      document.body.appendChild(container);
+
+      const canvas = await html2canvas(container, {
+        scale: 3,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+      });
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({ unit: 'px', format: [canvas.width, canvas.height] });
+      pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+
+      const safeName = (cardData.name || 'Player').replace(/\s+/g, '_');
+      const safeId = (cardData.idNo || 'DDKA-ID').replace(/\s+/g, '_');
+      pdf.save(`${safeName}_${safeId}_ID_Card.pdf`);
+
+      document.body.removeChild(container);
+    } catch (downloadErr) {
+      console.error('Failed to download combined ID card PDF', downloadErr);
+      alert('Unable to download ID card right now. Please try again.');
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   useEffect(() => {
     if (!idNo) return;
@@ -91,14 +143,15 @@ const PlayerIDCardPage = () => {
 
   useEffect(() => {
     if (!cardData) return;
+    if (showIdsToUsers === false && !allowSelfAccess) return;
     if (searchParams.get('download') !== '1') return;
 
     const t = window.setTimeout(() => {
-      window.print();
+      void downloadCombinedIdPdf();
     }, 250);
 
     return () => window.clearTimeout(t);
-  }, [cardData, searchParams]);
+  }, [cardData, searchParams, showIdsToUsers, allowSelfAccess]);
 
   if (loading) {
     return (
@@ -152,19 +205,24 @@ const PlayerIDCardPage = () => {
             <div className="flex flex-wrap gap-8 justify-center items-start bg-white p-6 rounded-xl shadow-lg">
               <div className="flex flex-col items-center">
                 <h2 className="text-sm font-semibold text-slate-700 mb-2">Front Side</h2>
-                <IDCardFront data={cardData} />
+                <div ref={frontCardRef} style={{ width: '210px', height: '330px' }}>
+                  <IDCardFront data={cardData} />
+                </div>
               </div>
               <div className="flex flex-col items-center">
                 <h2 className="text-sm font-semibold text-slate-700 mb-2">Back Side</h2>
-                <IDCardBack data={cardData} />
+                <div ref={backCardRef} style={{ width: '210px', height: '330px' }}>
+                  <IDCardBack data={cardData} />
+                </div>
               </div>
             </div>
 
             <button
-              onClick={() => window.print()}
-              className="mt-6 px-6 py-2 bg-blue-700 hover:bg-blue-800 text-white text-sm font-bold rounded-full"
+              onClick={() => { void downloadCombinedIdPdf(); }}
+              disabled={downloading}
+              className="mt-6 px-6 py-2 bg-blue-700 hover:bg-blue-800 text-white text-sm font-bold rounded-full disabled:bg-slate-400 disabled:cursor-not-allowed"
             >
-              Print / Download ID Card
+              {downloading ? 'Downloading...' : 'Download ID Card (Single Page)'}
             </button>
           </>
         )}
