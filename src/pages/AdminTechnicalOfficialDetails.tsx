@@ -458,7 +458,7 @@ const AdminTechnicalOfficialDetails: React.FC = () => {
               </div>
               <div>
                 <p className="text-xs font-semibold text-slate-500 uppercase">Transaction ID</p>
-                <p className="text-sm text-slate-900 break-words font-mono text-xs">{official.transactionId || '-'}</p>
+                <p className="text-xs text-slate-900 break-words font-mono">{official.transactionId || '-'}</p>
               </div>
               <div>
                 <p className="text-xs font-semibold text-slate-500 uppercase">Referee Exam Score</p>
