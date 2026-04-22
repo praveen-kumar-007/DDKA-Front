@@ -126,16 +126,13 @@ const News = () => {
                         </span>
                       </div>
                       <div className="flex flex-wrap gap-2 text-[11px]">
-                        {/**
-                         * Use backend share URL so WhatsApp/Facebook/Twitter
-                         * can read server-rendered OG tags with the news image.
-                         */}
                         {(() => {
-                          const sharePreviewUrl = `${API_URL}/api/news/share/${item._id}`;
+                          const frontendOrigin = typeof window !== 'undefined' ? window.location.origin : '';
+                          const shareUrl = item._id ? `${frontendOrigin}/news/${item._id}` : '';
                           return (
                             <>
                         <a
-                          href={`https://wa.me/?text=${encodeURIComponent(`${item.title} - ${sharePreviewUrl}`)}`}
+                          href={`https://wa.me/?text=${encodeURIComponent(`${item.title} - ${shareUrl}`)}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-green-500/10 text-green-700 hover:bg-green-500/20 font-medium transition-colors"
@@ -143,7 +140,7 @@ const News = () => {
                           WhatsApp
                         </a>
                         <a
-                          href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(sharePreviewUrl)}`}
+                          href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-blue-600/10 text-blue-700 hover:bg-blue-600/20 font-medium transition-colors"
@@ -151,7 +148,7 @@ const News = () => {
                           Facebook
                         </a>
                         <a
-                          href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(sharePreviewUrl)}&text=${encodeURIComponent(item.title)}`}
+                          href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(item.title)}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-sky-500/10 text-sky-600 hover:bg-sky-500/20 font-medium transition-colors"
@@ -159,7 +156,7 @@ const News = () => {
                           Twitter
                         </a>
                         <a
-                          href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(sharePreviewUrl)}&title=${encodeURIComponent(item.title)}`}
+                          href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(item.title)}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-slate-700/10 text-slate-700 hover:bg-slate-700/20 font-medium transition-colors"
@@ -168,7 +165,7 @@ const News = () => {
                         </a>
                         <button
                           type="button"
-                          onClick={() => navigator.clipboard.writeText(sharePreviewUrl)}
+                          onClick={() => navigator.clipboard.writeText(shareUrl)}
                           className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium transition-colors"
                         >
                           <Copy size={12} />

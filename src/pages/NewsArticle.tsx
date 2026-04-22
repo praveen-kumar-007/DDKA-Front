@@ -30,11 +30,11 @@ const NewsArticle = () => {
 
   const isBrowser = typeof window !== 'undefined';
   const articleUrl = isBrowser && id ? `${window.location.origin}/news/${id}` : '';
-  const sharePreviewUrl = id ? `${API_URL}/api/news/share/${id}` : '';
+  const shareUrl = articleUrl;
 
   const handleCopyLink = () => {
-    if (!sharePreviewUrl) return;
-    navigator.clipboard.writeText(sharePreviewUrl).then(() => {
+    if (!shareUrl) return;
+    navigator.clipboard.writeText(shareUrl).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }).catch(() => { });
@@ -134,7 +134,7 @@ const NewsArticle = () => {
               </div>
               <div className="flex flex-wrap gap-2 text-xs">
                 <a
-                  href={`https://wa.me/?text=${encodeURIComponent(`${news.title} - ${sharePreviewUrl}`)}`}
+                  href={`https://wa.me/?text=${encodeURIComponent(`${news.title} - ${shareUrl}`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-green-500/10 text-green-700 hover:bg-green-500/20 font-medium transition-colors"
@@ -143,7 +143,7 @@ const NewsArticle = () => {
                   WhatsApp
                 </a>
                 <a
-                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(sharePreviewUrl)}`}
+                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-blue-600/10 text-blue-700 hover:bg-blue-600/20 font-medium transition-colors"
@@ -152,7 +152,7 @@ const NewsArticle = () => {
                   Facebook
                 </a>
                 <a
-                  href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(sharePreviewUrl)}&text=${encodeURIComponent(news.title)}`}
+                  href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(news.title)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-sky-500/10 text-sky-600 hover:bg-sky-500/20 font-medium transition-colors"
@@ -161,7 +161,7 @@ const NewsArticle = () => {
                   Twitter
                 </a>
                 <a
-                  href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(sharePreviewUrl)}&title=${encodeURIComponent(news.title)}`}
+                  href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(news.title)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-slate-700/10 text-slate-700 hover:bg-slate-700/20 font-medium transition-colors"
